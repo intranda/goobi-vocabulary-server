@@ -5,14 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "VocabularyField")
-@Data
 @RequiredArgsConstructor
 @NoArgsConstructor
 public class Field {
@@ -20,8 +19,10 @@ public class Field {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Getter
     @NonNull
     private String name;
+    @Getter
     @NonNull
     private String value;
 }
