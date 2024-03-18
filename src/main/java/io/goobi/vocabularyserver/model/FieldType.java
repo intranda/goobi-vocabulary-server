@@ -15,15 +15,14 @@ import java.util.Set;
 
 @Entity
 @Getter
-public enum FieldType {
-    TEXT,
-    SELECT_ONE,
-    SELECT_MANY;
-
+public class FieldType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 
     @ManyToMany
     @JoinTable(name = "FieldType_selectableValues",

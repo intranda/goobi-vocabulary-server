@@ -25,6 +25,12 @@ public class Vocabulary {
     @JoinColumn(name = "schema_id", nullable = false)
     private Schema schema;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "description", length = 4096)
+    private String description;
+
     @OneToMany(mappedBy = "vocabulary", orphanRemoval = true)
     private Set<Record> records = new LinkedHashSet<>();
 }
