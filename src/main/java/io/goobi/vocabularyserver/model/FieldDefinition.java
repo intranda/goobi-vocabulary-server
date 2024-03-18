@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -45,18 +46,22 @@ public class FieldDefinition {
     private FieldValidation validation;
 
     @Column(name = "required", nullable = false)
+    @Setter
     @NonNull
     private Boolean required = false;
 
     @Column(name = "unique", nullable = false)
+    @Setter
     @NonNull
     private Boolean unique = false;
 
     @Column(name = "main_entry", nullable = false)
+    @Setter
     @NonNull
     private Boolean mainEntry = false;
 
     @Column(name = "title_field", nullable = false)
+    @Setter
     @NonNull
     private Boolean titleField = false;
 }
