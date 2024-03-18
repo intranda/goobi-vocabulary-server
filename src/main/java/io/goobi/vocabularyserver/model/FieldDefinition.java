@@ -30,7 +30,7 @@ public class FieldDefinition {
     @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
     @NonNull
-    private VocabularySchema vocabularySchema;
+    private VocabularySchema schema;
 
     @Column(name = "language", length = 3)
     private String language;
