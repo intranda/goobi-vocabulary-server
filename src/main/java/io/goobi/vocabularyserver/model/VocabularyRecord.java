@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +24,7 @@ import java.util.Set;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Record {
+public class VocabularyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -34,7 +35,7 @@ public class Record {
     @NonNull
     private Vocabulary vocabulary;
 
-    @OneToMany(mappedBy = "record", orphanRemoval = true)
+    @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldInstance> fields = new LinkedHashSet<>();
 
     @Override
@@ -50,8 +51,8 @@ public class Record {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        Record record = (Record) o;
-        return getId() != null && Objects.equals(getId(), record.getId());
+        VocabularyRecord vocabularyRecord = (VocabularyRecord) o;
+        return getId() != null && Objects.equals(getId(), vocabularyRecord.getId());
     }
 
     @Override

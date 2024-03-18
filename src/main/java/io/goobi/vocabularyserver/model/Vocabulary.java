@@ -1,13 +1,14 @@
 package io.goobi.vocabularyserver.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,10 +29,10 @@ public class Vocabulary {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
     @NonNull
-    private Schema schema;
+    private VocabularySchema schema;
 
     @Column(name = "name", nullable = false)
     @NonNull
@@ -41,6 +42,6 @@ public class Vocabulary {
     @Setter
     private String description;
 
-    @OneToMany(mappedBy = "vocabulary", orphanRemoval = true)
-    private Set<Record> records = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "vocabulary", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VocabularyRecord> records = new LinkedHashSet<>();
 }

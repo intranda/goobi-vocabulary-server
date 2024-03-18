@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ import lombok.Setter;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"schema_id", "name"})})
 public class FieldDefinition {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,12 +30,12 @@ public class FieldDefinition {
     @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
     @NonNull
-    private Schema schema;
+    private VocabularySchema vocabularySchema;
 
     @Column(name = "language", length = 3)
     private String language;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     @NonNull
     private String name;
 
@@ -50,7 +53,7 @@ public class FieldDefinition {
     @NonNull
     private Boolean required = false;
 
-    @Column(name = "unique", nullable = false)
+    @Column(name = "distinctive", nullable = false)
     @Setter
     @NonNull
     private Boolean unique = false;

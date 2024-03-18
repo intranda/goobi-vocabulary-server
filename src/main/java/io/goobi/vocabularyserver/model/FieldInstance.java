@@ -34,7 +34,8 @@ public class FieldInstance {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "record_id", nullable = false)
-    private Record record;
+    @NonNull
+    private VocabularyRecord vocabularyRecord;
 
     @Column(name = "language", length = 3)
     private String language;
