@@ -1,9 +1,0 @@
-CREATE SEQUENCE field_seq INCREMENT BY 50 START WITH 1;
-
-CREATE TABLE field
-(
-    id    INT NOT NULL,
-    name  VARCHAR(255) NULL,
-    value VARCHAR(255) NULL,
-    CONSTRAINT pk_field PRIMARY KEY (id)
-);

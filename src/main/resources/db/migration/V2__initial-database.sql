@@ -1,27 +1,11 @@
-CREATE SEQUENCE field_definition_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE field_instance_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE field_type_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE field_validation_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE record_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE schema_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE selectable_value_seq INCREMENT BY 50 START WITH 1;
-
-CREATE SEQUENCE vocabulary_seq INCREMENT BY 50 START WITH 1;
-
 CREATE TABLE field_definition
 (
     id            BIGINT       NOT NULL,
     schema_id     INT          NOT NULL,
-    language      VARCHAR(3) NULL,
+    language      VARCHAR(3)   NULL,
     name          VARCHAR(255) NOT NULL,
     type_id       BIGINT       NOT NULL,
-    validation_id INT NULL,
+    validation_id INT          NULL,
     required      BIT(1)       NOT NULL,
     `unique`      BIT(1)       NOT NULL,
     main_entry    BIT(1)       NOT NULL,
@@ -31,17 +15,18 @@ CREATE TABLE field_definition
 
 CREATE TABLE field_instance
 (
-    id                  BIGINT NOT NULL,
-    field_definition_id BIGINT NOT NULL,
-    record_id           BIGINT NOT NULL,
+    id                  BIGINT     NOT NULL,
+    field_definition_id BIGINT     NOT NULL,
+    record_id           BIGINT     NOT NULL,
     language            VARCHAR(3) NULL,
-    value               LONGTEXT NULL,
+    value               LONGTEXT   NULL,
     CONSTRAINT pk_fieldinstance PRIMARY KEY (id)
 );
 
 CREATE TABLE field_type
 (
-    id BIGINT NOT NULL,
+    id   BIGINT       NOT NULL,
+    name VARCHAR(255) NOT NULL,
     CONSTRAINT pk_fieldtype PRIMARY KEY (id)
 );
 
@@ -54,8 +39,8 @@ CREATE TABLE field_type_selectable_values
 
 CREATE TABLE field_validation
 (
-    id                 INT NOT NULL,
-    regular_expression VARCHAR(1024) NULL,
+    id                 INT           NOT NULL,
+    regular_expression VARCHAR(1024) NOT NULL,
     CONSTRAINT pk_fieldvalidation PRIMARY KEY (id)
 );
 
@@ -81,13 +66,18 @@ CREATE TABLE selectable_value
 
 CREATE TABLE vocabulary
 (
-    id        INT NOT NULL,
-    schema_id INT NOT NULL,
+    id            INT           NOT NULL,
+    schema_id     INT           NOT NULL,
+    name          VARCHAR(255)  NOT NULL,
+    `description` VARCHAR(4096) NULL,
     CONSTRAINT pk_vocabulary PRIMARY KEY (id)
 );
 
 ALTER TABLE field_definition
     ADD CONSTRAINT uc_fielddefinition_name UNIQUE (name);
+
+ALTER TABLE field_type
+    ADD CONSTRAINT uc_fieldtype_name UNIQUE (name);
 
 ALTER TABLE vocabulary
     ADD CONSTRAINT uc_vocabulary_schema UNIQUE (schema_id);
@@ -118,7 +108,3 @@ ALTER TABLE field_type_selectable_values
 
 ALTER TABLE field_type_selectable_values
     ADD CONSTRAINT fk_fietypselval_on_selectable_value FOREIGN KEY (selectable_values_id) REFERENCES selectable_value (id);
-
-DROP TABLE field;
-
-DROP SEQUENCE field_seq;
