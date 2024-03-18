@@ -8,13 +8,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FieldType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,6 +28,7 @@ public class FieldType {
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
+    @NonNull
     private String name;
 
     @ManyToMany

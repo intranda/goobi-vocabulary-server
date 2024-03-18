@@ -5,13 +5,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectableValue {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,6 +25,7 @@ public class SelectableValue {
     private Long id;
 
     @Column(name = "value", nullable = false)
+    @NonNull
     private String value;
 
     @Override

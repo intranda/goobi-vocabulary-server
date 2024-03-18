@@ -8,7 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.LinkedHashSet;
@@ -17,6 +21,8 @@ import java.util.Set;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,14 +31,11 @@ public class Record {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "vocabulary_id", nullable = false)
+    @NonNull
     private Vocabulary vocabulary;
 
     @OneToMany(mappedBy = "record", orphanRemoval = true)
     private Set<FieldInstance> fields = new LinkedHashSet<>();
-
-    public void setFields(Set<FieldInstance> fields) {
-        this.fields = fields;
-    }
 
     @Override
     public final boolean equals(Object o) {
