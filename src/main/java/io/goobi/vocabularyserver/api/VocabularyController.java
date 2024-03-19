@@ -2,29 +2,29 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.exchange.Vocabulary;
-import io.goobi.vocabularyserver.repositories.VocabularyRepository;
-import io.goobi.vocabularyserver.service.exchange.ExchangeTypeTransformer;
+import io.goobi.vocabularyserver.service.Manager;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class VocabularyController {
-    private final VocabularyRepository vocabularyRepository;
-    private final ExchangeTypeTransformer exchangeTypeTransformer;
+    private final Manager<Vocabulary> manager;
 
-    VocabularyController(VocabularyRepository vocabularyRepository, ExchangeTypeTransformer exchangeTypeTransformer) {
-        this.vocabularyRepository = vocabularyRepository;
-        this.exchangeTypeTransformer = exchangeTypeTransformer;
+    public VocabularyController(Manager<Vocabulary> manager) {
+        this.manager = manager;
     }
 
     @GetMapping("/vocabulary")
     List<Vocabulary> getAllVocabularies() {
-        return vocabularyRepository.findAll()
-                .stream()
-                .map(exchangeTypeTransformer::transform)
-                .collect(Collectors.toList());
+        return manager.listAll();
+    }
+
+    @PostMapping("/vocabulary")
+    Vocabulary newVocabulary(@RequestBody Vocabulary vocabulary) {
+        return manager.create(vocabulary);
     }
 }

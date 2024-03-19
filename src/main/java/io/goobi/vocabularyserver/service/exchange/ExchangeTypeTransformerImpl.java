@@ -4,12 +4,20 @@ import io.goobi.vocabularyserver.exchange.FieldDefinition;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
+import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
 @Service
 public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
+
+    private final VocabularySchemaRepository vocabularySchemaRepository;
+
+    public ExchangeTypeTransformerImpl(VocabularySchemaRepository vocabularySchemaRepository) {
+        this.vocabularySchemaRepository = vocabularySchemaRepository;
+    }
+
     @Override
     public FieldDefinition transform(io.goobi.vocabularyserver.model.FieldDefinition jpaFieldDefinition) {
         FieldDefinition exchangeFieldDefinition = new FieldDefinition();
@@ -40,6 +48,14 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
         exchangeVocabulary.setDescription(jpaVocabulary.getDescription());
         exchangeVocabulary.setSchemaId(jpaVocabulary.getSchema().getId());
         return exchangeVocabulary;
+    }
+
+    @Override
+    public io.goobi.vocabularyserver.model.Vocabulary transform(Vocabulary newVocabulary) {
+        io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema = vocabularySchemaRepository.findById(newVocabulary.getSchemaId()).orElseThrow();
+        io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = new io.goobi.vocabularyserver.model.Vocabulary(jpaVocabularySchema, newVocabulary.getName());
+        jpaVocabulary.setDescription(newVocabulary.getDescription());
+        return jpaVocabulary;
     }
 
     @Override

@@ -12,5 +12,7 @@ public interface ExchangeTypeTransformer {
 
     Vocabulary transform(io.goobi.vocabularyserver.model.Vocabulary vocabulary);
 
+    io.goobi.vocabularyserver.model.Vocabulary transform(Vocabulary newVocabulary);
+
     VocabularySchema transform(io.goobi.vocabularyserver.model.VocabularySchema vocabularySchema);
 }
