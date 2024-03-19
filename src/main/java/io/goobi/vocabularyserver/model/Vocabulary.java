@@ -21,6 +21,7 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Setter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Vocabulary {

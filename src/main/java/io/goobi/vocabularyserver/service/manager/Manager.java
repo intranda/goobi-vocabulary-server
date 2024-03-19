@@ -10,8 +10,12 @@ public interface Manager<T> {
     default T get(long id) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
-    
+
     default T create(T newT) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default T replace(T newT) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
