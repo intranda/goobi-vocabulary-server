@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"schema_id", "name"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"schema_id", "name"}), @UniqueConstraint(columnNames = {"schema_id", "main_entry"})})
 public class FieldDefinition {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,10 +54,16 @@ public class FieldDefinition {
     @NonNull
     private Boolean unique = false;
 
-    @Column(name = "main_entry", nullable = false)
-    @Setter
-    @NonNull
-    private Boolean mainEntry = false;
+    @Column(name = "main_entry")
+    private Boolean mainEntry;
+
+    public void setMainEntry(final Boolean newValue) {
+        if (Boolean.TRUE.equals(newValue)) {
+            this.mainEntry = true;
+        } else {
+            this.mainEntry = null;
+        }
+    }
 
     @Column(name = "title_field", nullable = false)
     @Setter
