@@ -2,6 +2,8 @@ package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -13,6 +15,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class ControllerErrorHandlers {
+    private Logger logger = LoggerFactory.getLogger(ControllerErrorHandlers.class);
+
     @ResponseBody
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -52,6 +56,7 @@ public class ControllerErrorHandlers {
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String nullPointerHandler(NullPointerException e) {
+        logger.error("NullPointerException", e);
         return e.getMessage();
     }
 
