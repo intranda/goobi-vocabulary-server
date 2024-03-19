@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.service.manager;
 
+import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
@@ -52,5 +53,13 @@ public class VocabularyManager implements Manager<Vocabulary> {
         }
         replacements.forEach(Runnable::run);
         return exchangeTypeTransformer.transform(vocabularyRepository.save(jpaVocabulary));
+    }
+
+    @Override
+    public void delete(long id) {
+        if (!vocabularyRepository.existsById(id)) {
+            throw new EntityNotFoundException("Vocabulary", id);
+        }
+        vocabularyRepository.deleteById(id);
     }
 }
