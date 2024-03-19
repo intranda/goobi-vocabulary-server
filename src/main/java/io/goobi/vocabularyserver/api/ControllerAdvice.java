@@ -2,6 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,5 +37,15 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     String missingValuesHandler(MissingValuesException e) {
         return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String missingValuesHandler(DataIntegrityViolationException e) {
+        // TODO: This is a bit too much magic
+        int startIndex = e.getMessage().indexOf('[') + 1;
+        int endIndex = e.getMessage().indexOf(']');
+        return e.getMessage().substring(startIndex, endIndex);
     }
 }
