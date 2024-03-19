@@ -1,6 +1,7 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.MissingValuesException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,13 @@ public class ControllerAdvice {
     @ExceptionHandler(UnsupportedOperationException.class)
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     String methodNotImplementedYetHandler(UnsupportedOperationException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MissingValuesException.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    String missingValuesHandler(MissingValuesException e) {
         return e.getMessage();
     }
 }
