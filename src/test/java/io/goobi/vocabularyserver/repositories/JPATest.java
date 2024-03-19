@@ -45,20 +45,19 @@ class JPATest {
 
     @BeforeEach
     public void setUp() {
-        FieldType text = fieldTypeRepository.findById(1L).get();
-//        VocabularyFieldType text = new VocabularyFieldType("text");
-//        fieldTypeRepository.save(text);
-        VocabularySchema vocabularySchema = new VocabularySchema();
-        vocabularySchemaRepository.save(vocabularySchema);
+        FieldType text = fieldTypeRepository.findById(1L).orElse(new FieldType("text"));
+        fieldTypeRepository.save(text);
+        VocabularySchema vocabularySchema = vocabularySchemaRepository.findById(1L).orElse(new VocabularySchema());
+//        vocabularySchemaRepository.save(vocabularySchema);
         FieldDefinition heroName = new FieldDefinition(vocabularySchema, "Name", text);
         heroName.setMainEntry(true);
-        fieldDefinitionRepository.save(heroName);
+//        fieldDefinitionRepository.save(heroName);
         FieldDefinition heroPower = new FieldDefinition(vocabularySchema, "Power", text);
-        fieldDefinitionRepository.save(heroPower);
+//        fieldDefinitionRepository.save(heroPower);
         vocabularySchema.getDefinitions().add(heroName);
         vocabularySchema.getDefinitions().add(heroPower);
-//        schemaRepository.save(vocabularySchema);
-        Vocabulary vocabulary = new Vocabulary(vocabularySchema, "MCU");
+        vocabularySchemaRepository.save(vocabularySchema);
+        Vocabulary vocabulary = vocabularyRepository.findByName("MCU").orElse(new Vocabulary(vocabularySchema, "MCU"));
         vocabularyId = vocabularyRepository.save(vocabulary).getId();
         VocabularyRecord thor = new VocabularyRecord(vocabulary);
         FieldInstance thorName = new FieldInstance(heroName, thor, "Thor");
