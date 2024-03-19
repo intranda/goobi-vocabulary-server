@@ -34,8 +34,15 @@ public class ControllerAdvice {
 
     @ResponseBody
     @ExceptionHandler(MissingValuesException.class)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String missingValuesHandler(MissingValuesException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String nullPointerHandler(NullPointerException e) {
         return e.getMessage();
     }
 
