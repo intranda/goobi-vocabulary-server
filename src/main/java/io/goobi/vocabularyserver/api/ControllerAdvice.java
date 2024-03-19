@@ -8,6 +8,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @org.springframework.web.bind.annotation.ControllerAdvice
 public class ControllerAdvice {
@@ -22,6 +23,13 @@ public class ControllerAdvice {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     String methodNotSupportedHandler(HttpRequestMethodNotSupportedException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    String noResourceFoundHandler(NoResourceFoundException e) {
         return e.getMessage();
     }
 
