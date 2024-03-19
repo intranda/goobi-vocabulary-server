@@ -22,4 +22,11 @@ public class ControllerAdvice {
     String methodNotSupportedHandler(HttpRequestMethodNotSupportedException e) {
         return e.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(UnsupportedOperationException.class)
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    String methodNotImplementedYetHandler(UnsupportedOperationException e) {
+        return e.getMessage();
+    }
 }
