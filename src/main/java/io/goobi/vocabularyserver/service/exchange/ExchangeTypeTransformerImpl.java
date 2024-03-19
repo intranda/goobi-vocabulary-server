@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.service.exchange;
 
+import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.FieldDefinition;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
@@ -52,7 +53,9 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
 
     @Override
     public io.goobi.vocabularyserver.model.Vocabulary transform(Vocabulary newVocabulary) {
-        io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema = vocabularySchemaRepository.findById(newVocabulary.getSchemaId()).orElseThrow();
+        io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema = vocabularySchemaRepository
+                .findById(newVocabulary.getSchemaId())
+                .orElseThrow(() -> new EntityNotFoundException("VocabularySchema", newVocabulary.getSchemaId()));
         io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = new io.goobi.vocabularyserver.model.Vocabulary(jpaVocabularySchema, newVocabulary.getName());
         jpaVocabulary.setDescription(newVocabulary.getDescription());
         return jpaVocabulary;

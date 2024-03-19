@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.service.manager;
 
+import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.ExchangeTypeTransformer;
@@ -20,7 +21,7 @@ public class VocabularySchemaManager implements Manager<VocabularySchema> {
     public VocabularySchema get(long id) {
         return exchangeTypeTransformer.transform(
                 vocabularySchemaRepository.findById(id)
-                        .orElseThrow()
+                        .orElseThrow(() -> new EntityNotFoundException("VocabularySchema", id))
         );
     }
 }
