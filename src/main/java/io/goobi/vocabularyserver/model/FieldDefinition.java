@@ -44,10 +44,6 @@ public class FieldDefinition {
     @NonNull
     private FieldType type;
 
-    @ManyToOne
-    @JoinColumn(name = "validation_id")
-    private FieldValidation validation;
-
     @Column(name = "required", nullable = false)
     @Setter
     @NonNull
