@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class Vocabulary {
-    private int id;
-    private int schemaId;
+    private long id;
+    private long schemaId;
     private String name;
     private String description;
 }
