@@ -6,6 +6,6 @@ import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
-public interface VocabularyRepository extends ListCrudRepository<Vocabulary, Integer> {
+public interface VocabularyRepository extends ListCrudRepository<Vocabulary, Long> {
     Optional<Vocabulary> findByName(@NonNull String name);
 }

@@ -16,16 +16,15 @@ CREATE SEQUENCE vocabulary_seq INCREMENT BY 50 START WITH 1;
 
 CREATE TABLE field_definition
 (
-    id            BIGINT       NOT NULL,
-    schema_id     INT          NOT NULL,
-    language      VARCHAR(3)   NULL,
-    name          VARCHAR(255) NOT NULL,
-    type_id       BIGINT       NOT NULL,
-    validation_id INT          NULL,
-    required      BIT(1)       NOT NULL,
-    distinctive   BIT(1)       NOT NULL,
-    main_entry    BIT(1)       NOT NULL,
-    title_field   BIT(1)       NOT NULL,
+    id          BIGINT       NOT NULL,
+    schema_id   BIGINT       NOT NULL,
+    language    VARCHAR(3)   NULL,
+    name        VARCHAR(255) NOT NULL,
+    type_id     BIGINT       NOT NULL,
+    required    BIT(1)       NOT NULL,
+    distinctive BIT(1)       NOT NULL,
+    main_entry  BIT(1)       NULL,
+    title_field BIT(1)       NOT NULL,
     CONSTRAINT pk_fielddefinition PRIMARY KEY (id)
 );
 
@@ -41,8 +40,9 @@ CREATE TABLE field_instance
 
 CREATE TABLE field_type
 (
-    id   BIGINT       NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    id            BIGINT       NOT NULL,
+    name          VARCHAR(255) NOT NULL,
+    validation_id BIGINT       NULL,
     CONSTRAINT pk_fieldtype PRIMARY KEY (id)
 );
 
@@ -55,7 +55,7 @@ CREATE TABLE field_type_selectable_values
 
 CREATE TABLE field_validation
 (
-    id                 INT           NOT NULL,
+    id                 BIGINT        NOT NULL,
     regular_expression VARCHAR(1024) NOT NULL,
     CONSTRAINT pk_fieldvalidation PRIMARY KEY (id)
 );
@@ -69,8 +69,8 @@ CREATE TABLE selectable_value
 
 CREATE TABLE vocabulary
 (
-    id            INT           NOT NULL,
-    schema_id     INT           NOT NULL,
+    id            BIGINT        NOT NULL,
+    schema_id     BIGINT        NOT NULL,
     name          VARCHAR(255)  NOT NULL,
     `description` VARCHAR(4096) NULL,
     CONSTRAINT pk_vocabulary PRIMARY KEY (id)
@@ -79,21 +79,27 @@ CREATE TABLE vocabulary
 CREATE TABLE vocabulary_record
 (
     id            BIGINT NOT NULL,
-    vocabulary_id INT    NOT NULL,
+    vocabulary_id BIGINT NOT NULL,
     CONSTRAINT pk_vocabularyrecord PRIMARY KEY (id)
 );
 
 CREATE TABLE vocabulary_schema
 (
-    id INT NOT NULL,
+    id BIGINT NOT NULL,
     CONSTRAINT pk_vocabularyschema PRIMARY KEY (id)
 );
 
 ALTER TABLE field_definition
     ADD CONSTRAINT uc_3bd032e31c48345ed43f82c4f UNIQUE (schema_id, name);
 
+ALTER TABLE field_definition
+    ADD CONSTRAINT uc_5da3ceb45920df55de6c71310 UNIQUE (schema_id, main_entry);
+
 ALTER TABLE field_type
     ADD CONSTRAINT uc_fieldtype_name UNIQUE (name);
+
+ALTER TABLE vocabulary
+    ADD CONSTRAINT uc_vocabulary_name UNIQUE (name);
 
 ALTER TABLE field_definition
     ADD CONSTRAINT FK_FIELDDEFINITION_ON_SCHEMA FOREIGN KEY (schema_id) REFERENCES vocabulary_schema (id);
@@ -101,14 +107,14 @@ ALTER TABLE field_definition
 ALTER TABLE field_definition
     ADD CONSTRAINT FK_FIELDDEFINITION_ON_TYPE FOREIGN KEY (type_id) REFERENCES field_type (id);
 
-ALTER TABLE field_definition
-    ADD CONSTRAINT FK_FIELDDEFINITION_ON_VALIDATION FOREIGN KEY (validation_id) REFERENCES field_validation (id);
-
 ALTER TABLE field_instance
     ADD CONSTRAINT FK_FIELDINSTANCE_ON_FIELD_DEFINITION FOREIGN KEY (field_definition_id) REFERENCES field_definition (id);
 
 ALTER TABLE field_instance
     ADD CONSTRAINT FK_FIELDINSTANCE_ON_RECORD FOREIGN KEY (record_id) REFERENCES vocabulary_record (id);
+
+ALTER TABLE field_type
+    ADD CONSTRAINT FK_FIELDTYPE_ON_VALIDATION FOREIGN KEY (validation_id) REFERENCES field_validation (id);
 
 ALTER TABLE vocabulary_record
     ADD CONSTRAINT FK_VOCABULARYRECORD_ON_VOCABULARY FOREIGN KEY (vocabulary_id) REFERENCES vocabulary (id);
