@@ -79,6 +79,7 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
     public FieldInstance transform(io.goobi.vocabularyserver.model.FieldInstance jpaFieldInstance) {
         FieldInstance exchangeFieldInstance = new FieldInstance();
         exchangeFieldInstance.setId(jpaFieldInstance.getId());
+        exchangeFieldInstance.setDefinitionId(jpaFieldInstance.getDefinition().getId());
         exchangeFieldInstance.setLanguage(jpaFieldInstance.getLanguage());
         exchangeFieldInstance.setValue(jpaFieldInstance.getValue());
         return exchangeFieldInstance;
