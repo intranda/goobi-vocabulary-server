@@ -24,7 +24,8 @@ public class SelectableValue {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "value", nullable = false)
+    // `value` is a reserved Mysql keyword
+    @Column(name = "selection_value", nullable = false)
     @NonNull
     private String value;
 

@@ -34,7 +34,8 @@ public class Vocabulary {
     @NonNull
     private VocabularySchema schema;
 
-    @Column(name = "name", nullable = false, unique = true)
+    // `name` is a reserved Mysql keyword
+    @Column(name = "title", nullable = false, unique = true)
     @NonNull
     private String name;
 

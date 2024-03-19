@@ -20,7 +20,10 @@ import lombok.Setter;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"schema_id", "name"}), @UniqueConstraint(columnNames = {"schema_id", "main_entry"})})
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"schema_id", "label"}),
+        @UniqueConstraint(columnNames = {"schema_id", "main_entry"})
+})
 public class FieldDefinition {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +38,8 @@ public class FieldDefinition {
     @Column(name = "language", length = 3)
     private String language;
 
-    @Column(name = "name", nullable = false)
+    // `name` is a reserved Mysql keyword
+    @Column(name = "label", nullable = false)
     @NonNull
     private String name;
 
@@ -49,7 +53,7 @@ public class FieldDefinition {
     @NonNull
     private Boolean required = false;
 
-    // Naming this column `unique` led to SQL errors 1064, because `unique` is a reserved keyword!
+    // `unique` is a reserved MariaDB keyword
     @Column(name = "distinctive", nullable = false)
     @Setter
     @NonNull

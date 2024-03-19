@@ -19,7 +19,7 @@ CREATE TABLE field_definition
     id          BIGINT       NOT NULL,
     schema_id   BIGINT       NOT NULL,
     language    VARCHAR(3)   NULL,
-    name        VARCHAR(255) NOT NULL,
+    label       VARCHAR(255) NOT NULL,
     type_id     BIGINT       NOT NULL,
     required    BIT(1)       NOT NULL,
     distinctive BIT(1)       NOT NULL,
@@ -30,18 +30,18 @@ CREATE TABLE field_definition
 
 CREATE TABLE field_instance
 (
-    id                  BIGINT     NOT NULL,
-    field_definition_id BIGINT     NOT NULL,
-    record_id           BIGINT     NOT NULL,
-    language            VARCHAR(3) NULL,
-    value               LONGTEXT   NULL,
+    id                  BIGINT       NOT NULL,
+    field_definition_id BIGINT       NOT NULL,
+    record_id           BIGINT       NOT NULL,
+    language            VARCHAR(3)   NULL,
+    content             VARCHAR(255) NULL,
     CONSTRAINT pk_fieldinstance PRIMARY KEY (id)
 );
 
 CREATE TABLE field_type
 (
     id            BIGINT       NOT NULL,
-    name          VARCHAR(255) NOT NULL,
+    type_name     VARCHAR(255) NOT NULL,
     validation_id BIGINT       NULL,
     CONSTRAINT pk_fieldtype PRIMARY KEY (id)
 );
@@ -62,8 +62,8 @@ CREATE TABLE field_validation
 
 CREATE TABLE selectable_value
 (
-    id    BIGINT       NOT NULL,
-    value VARCHAR(255) NOT NULL,
+    id              BIGINT       NOT NULL,
+    selection_value VARCHAR(255) NOT NULL,
     CONSTRAINT pk_selectablevalue PRIMARY KEY (id)
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE vocabulary
 (
     id            BIGINT        NOT NULL,
     schema_id     BIGINT        NOT NULL,
-    name          VARCHAR(255)  NOT NULL,
+    title         VARCHAR(255)  NOT NULL,
     `description` VARCHAR(4096) NULL,
     CONSTRAINT pk_vocabulary PRIMARY KEY (id)
 );
@@ -90,16 +90,16 @@ CREATE TABLE vocabulary_schema
 );
 
 ALTER TABLE field_definition
-    ADD CONSTRAINT uc_3bd032e31c48345ed43f82c4f UNIQUE (schema_id, name);
+    ADD CONSTRAINT uc_46e8e276223be04d41c2677f0 UNIQUE (schema_id, label);
 
 ALTER TABLE field_definition
     ADD CONSTRAINT uc_5da3ceb45920df55de6c71310 UNIQUE (schema_id, main_entry);
 
 ALTER TABLE field_type
-    ADD CONSTRAINT uc_fieldtype_name UNIQUE (name);
+    ADD CONSTRAINT uc_fieldtype_type_name UNIQUE (type_name);
 
 ALTER TABLE vocabulary
-    ADD CONSTRAINT uc_vocabulary_name UNIQUE (name);
+    ADD CONSTRAINT uc_vocabulary_title UNIQUE (title);
 
 ALTER TABLE field_definition
     ADD CONSTRAINT FK_FIELDDEFINITION_ON_SCHEMA FOREIGN KEY (schema_id) REFERENCES vocabulary_schema (id);

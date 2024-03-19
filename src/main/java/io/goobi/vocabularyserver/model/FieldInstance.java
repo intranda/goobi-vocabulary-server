@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,8 +41,8 @@ public class FieldInstance {
     @Column(name = "language", length = MAX_LANGUAGE_LENGTH)
     private String language;
 
-    @Lob
-    @Column(name = "value")
+    // `value` is a reserved Mysql keyword
+    @Column(name = "content")
     @NonNull
     private String value;
 
