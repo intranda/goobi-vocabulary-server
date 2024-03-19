@@ -2,8 +2,10 @@ package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.FieldDefinition;
+import io.goobi.vocabularyserver.exchange.FieldInstance;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
@@ -70,5 +72,25 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
                 .map(this::transform)
                 .collect(Collectors.toList()));
         return exchangeVocabularySchema;
+    }
+
+    @Override
+    public VocabularyRecord transform(io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord) {
+        VocabularyRecord exchangeVocabularyRecord = new VocabularyRecord();
+        exchangeVocabularyRecord.setId(jpaVocabularyRecord.getId());
+        exchangeVocabularyRecord.setFields(jpaVocabularyRecord.getFields()
+                .stream()
+                .map(this::transform)
+                .collect(Collectors.toSet()));
+        return exchangeVocabularyRecord;
+    }
+
+    @Override
+    public FieldInstance transform(io.goobi.vocabularyserver.model.FieldInstance jpaFieldInstance) {
+        FieldInstance exchangeFieldInstance = new FieldInstance();
+        exchangeFieldInstance.setId(jpaFieldInstance.getId());
+        exchangeFieldInstance.setLanguage(jpaFieldInstance.getLanguage());
+        exchangeFieldInstance.setValue(jpaFieldInstance.getValue());
+        return exchangeFieldInstance;
     }
 }

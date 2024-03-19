@@ -22,6 +22,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FieldInstance {
+    private static final int MAX_LANGUAGE_LENGTH = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -37,7 +39,7 @@ public class FieldInstance {
     @NonNull
     private VocabularyRecord vocabularyRecord;
 
-    @Column(name = "language", length = 3)
+    @Column(name = "language", length = MAX_LANGUAGE_LENGTH)
     private String language;
 
     @Lob
