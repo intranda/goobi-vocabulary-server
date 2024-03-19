@@ -24,6 +24,7 @@ import java.util.Set;
 @Getter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+// Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
 public class VocabularyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

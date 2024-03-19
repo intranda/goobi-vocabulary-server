@@ -49,6 +49,7 @@ public class FieldDefinition {
     @NonNull
     private Boolean required = false;
 
+    // Naming this column `unique` led to SQL errors 1064, because `unique` is a reserved keyword!
     @Column(name = "distinctive", nullable = false)
     @Setter
     @NonNull
