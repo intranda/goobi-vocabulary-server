@@ -54,16 +54,6 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
     }
 
     @Override
-    public io.goobi.vocabularyserver.model.Vocabulary transform(Vocabulary newVocabulary) {
-        io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema = vocabularySchemaRepository
-                .findById(newVocabulary.getSchemaId())
-                .orElseThrow(() -> new EntityNotFoundException("VocabularySchema", newVocabulary.getSchemaId()));
-        io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = new io.goobi.vocabularyserver.model.Vocabulary(jpaVocabularySchema, newVocabulary.getName());
-        jpaVocabulary.setDescription(newVocabulary.getDescription());
-        return jpaVocabulary;
-    }
-
-    @Override
     public VocabularySchema transform(io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema) {
         VocabularySchema exchangeVocabularySchema = new VocabularySchema();
         exchangeVocabularySchema.setId(jpaVocabularySchema.getId());
