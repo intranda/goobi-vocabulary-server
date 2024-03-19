@@ -22,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
+//This line makes changes to database persist after test
+//@Transactional(propagation = Propagation.NOT_SUPPORTED)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class JPATest {
@@ -39,7 +40,7 @@ class JPATest {
     @Autowired
     private VocabularyRecordRepository vocabularyRecordRepository;
 
-    private int vocabularyId;
+    private long vocabularyId;
     private long thorRecordId;
 
     @BeforeEach
