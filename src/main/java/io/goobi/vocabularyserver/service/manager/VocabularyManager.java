@@ -1,4 +1,4 @@
-package io.goobi.vocabularyserver.service;
+package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;

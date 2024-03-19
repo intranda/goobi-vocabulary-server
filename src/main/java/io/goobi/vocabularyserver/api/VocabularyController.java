@@ -2,7 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.exchange.Vocabulary;
-import io.goobi.vocabularyserver.service.Manager;
+import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
