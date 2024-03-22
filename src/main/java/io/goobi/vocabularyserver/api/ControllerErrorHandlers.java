@@ -75,6 +75,12 @@ public class ControllerErrorHandlers {
         // TODO: This is a bit too much magic
         int startIndex = e.getMessage().indexOf('[') + 1;
         int endIndex = e.getMessage().indexOf(']');
+        if (startIndex < 0) {
+            startIndex = 0;
+        }
+        if (endIndex <= 0) {
+            endIndex = e.getMessage().length();
+        }
         return e.getMessage().substring(startIndex, endIndex);
     }
 }
