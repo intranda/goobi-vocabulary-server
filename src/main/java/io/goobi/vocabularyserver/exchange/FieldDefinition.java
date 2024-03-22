@@ -7,7 +7,7 @@ public class FieldDefinition {
     private long id;
     private String language;
     private String name;
-    private FieldType type;
+    private long typeId;
     private boolean required;
     private boolean unique;
     private boolean mainEntry;

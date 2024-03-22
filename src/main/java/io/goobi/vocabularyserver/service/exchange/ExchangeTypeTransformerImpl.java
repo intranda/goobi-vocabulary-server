@@ -18,7 +18,7 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
         exchangeFieldDefinition.setId(jpaFieldDefinition.getId());
         exchangeFieldDefinition.setLanguage(jpaFieldDefinition.getLanguage());
         exchangeFieldDefinition.setName(jpaFieldDefinition.getName());
-        exchangeFieldDefinition.setType(transform(jpaFieldDefinition.getType()));
+        exchangeFieldDefinition.setTypeId(jpaFieldDefinition.getType().getId());
         exchangeFieldDefinition.setRequired(jpaFieldDefinition.getRequired());
         exchangeFieldDefinition.setUnique(jpaFieldDefinition.getUnique());
         exchangeFieldDefinition.setMainEntry(jpaFieldDefinition.getMainEntry() != null);

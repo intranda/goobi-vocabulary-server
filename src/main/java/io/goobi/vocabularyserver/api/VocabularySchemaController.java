@@ -5,9 +5,14 @@ import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.service.manager.VocabularySchemaManager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,5 +34,11 @@ public class VocabularySchemaController {
     @GetMapping("/schemas/{id}")
     public EntityModel<VocabularySchema> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
+    }
+
+    @PostMapping("/schemas")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EntityModel<VocabularySchema> create(@RequestBody VocabularySchema newSchema) {
+        return assembler.toModel(manager.create(newSchema));
     }
 }
