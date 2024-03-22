@@ -66,7 +66,12 @@ public class RecordManager {
                 .findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, vocabularyId));
         io.goobi.vocabularyserver.model.VocabularyRecord result = new io.goobi.vocabularyserver.model.VocabularyRecord(jpaVocabulary);
-        result.getFields().addAll(newVocabularyRecord.getFields().stream().map(f -> transformFieldInstance(result, findFieldDefinition(f.getDefinitionId()), f)).collect(Collectors.toSet()));
+        result.getFields()
+                .addAll(newVocabularyRecord.getFields()
+                        .stream()
+                        .map(f -> transformFieldInstance(result, findFieldDefinition(f.getDefinitionId()), f))
+                        .collect(Collectors.toSet())
+                );
         return result;
     }
 
