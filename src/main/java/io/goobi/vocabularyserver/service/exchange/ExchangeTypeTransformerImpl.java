@@ -1,11 +1,17 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldDefinition;
-import io.goobi.vocabularyserver.exchange.FieldInstance;
-import io.goobi.vocabularyserver.exchange.FieldType;
-import io.goobi.vocabularyserver.exchange.Vocabulary;
-import io.goobi.vocabularyserver.exchange.VocabularyRecord;
-import io.goobi.vocabularyserver.exchange.VocabularySchema;
+import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
+import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
+import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.model.FieldDefinition;
+import io.goobi.vocabularyserver.model.FieldInstance;
+import io.goobi.vocabularyserver.model.FieldType;
+import io.goobi.vocabularyserver.model.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularyRecord;
+import io.goobi.vocabularyserver.model.VocabularySchema;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -13,67 +19,67 @@ import java.util.stream.Collectors;
 @Service
 public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
     @Override
-    public FieldDefinition transform(io.goobi.vocabularyserver.model.FieldDefinition jpaFieldDefinition) {
-        FieldDefinition exchangeFieldDefinition = new FieldDefinition();
-        exchangeFieldDefinition.setId(jpaFieldDefinition.getId());
-        exchangeFieldDefinition.setLanguage(jpaFieldDefinition.getLanguage());
-        exchangeFieldDefinition.setName(jpaFieldDefinition.getName());
-        exchangeFieldDefinition.setTypeId(jpaFieldDefinition.getType().getId());
-        exchangeFieldDefinition.setRequired(jpaFieldDefinition.getRequired());
-        exchangeFieldDefinition.setUnique(jpaFieldDefinition.getUnique());
-        exchangeFieldDefinition.setMainEntry(jpaFieldDefinition.getMainEntry() != null);
-        exchangeFieldDefinition.setTitleField(jpaFieldDefinition.getTitleField());
-        return exchangeFieldDefinition;
+    public FieldDefinitionDTO transform(FieldDefinition jpaFieldDefinition) {
+        FieldDefinitionDTO exchangeFieldDefinitionDTO = new FieldDefinitionDTO();
+        exchangeFieldDefinitionDTO.setId(jpaFieldDefinition.getId());
+        exchangeFieldDefinitionDTO.setLanguage(jpaFieldDefinition.getLanguage());
+        exchangeFieldDefinitionDTO.setName(jpaFieldDefinition.getName());
+        exchangeFieldDefinitionDTO.setTypeId(jpaFieldDefinition.getType().getId());
+        exchangeFieldDefinitionDTO.setRequired(jpaFieldDefinition.getRequired());
+        exchangeFieldDefinitionDTO.setUnique(jpaFieldDefinition.getUnique());
+        exchangeFieldDefinitionDTO.setMainEntry(jpaFieldDefinition.getMainEntry() != null);
+        exchangeFieldDefinitionDTO.setTitleField(jpaFieldDefinition.getTitleField());
+        return exchangeFieldDefinitionDTO;
     }
 
     @Override
-    public FieldType transform(io.goobi.vocabularyserver.model.FieldType jpaFieldType) {
-        FieldType exchangeFieldType = new FieldType();
-        exchangeFieldType.setId(jpaFieldType.getId());
-        exchangeFieldType.setName(jpaFieldType.getName());
-        return exchangeFieldType;
+    public FieldTypeDTO transform(FieldType jpaFieldType) {
+        FieldTypeDTO exchangeFieldTypeDTO = new FieldTypeDTO();
+        exchangeFieldTypeDTO.setId(jpaFieldType.getId());
+        exchangeFieldTypeDTO.setName(jpaFieldType.getName());
+        return exchangeFieldTypeDTO;
     }
 
     @Override
-    public Vocabulary transform(io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary) {
-        Vocabulary exchangeVocabulary = new Vocabulary();
-        exchangeVocabulary.setId(jpaVocabulary.getId());
-        exchangeVocabulary.setName(jpaVocabulary.getName());
-        exchangeVocabulary.setDescription(jpaVocabulary.getDescription());
-        exchangeVocabulary.setSchemaId(jpaVocabulary.getSchema().getId());
-        return exchangeVocabulary;
+    public VocabularyDTO transform(Vocabulary jpaVocabulary) {
+        VocabularyDTO exchangeVocabularyDTO = new VocabularyDTO();
+        exchangeVocabularyDTO.setId(jpaVocabulary.getId());
+        exchangeVocabularyDTO.setName(jpaVocabulary.getName());
+        exchangeVocabularyDTO.setDescription(jpaVocabulary.getDescription());
+        exchangeVocabularyDTO.setSchemaId(jpaVocabulary.getSchema().getId());
+        return exchangeVocabularyDTO;
     }
 
     @Override
-    public VocabularySchema transform(io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema) {
-        VocabularySchema exchangeVocabularySchema = new VocabularySchema();
-        exchangeVocabularySchema.setId(jpaVocabularySchema.getId());
-        exchangeVocabularySchema.setDefinitions(jpaVocabularySchema.getDefinitions()
+    public VocabularySchemaDTO transform(VocabularySchema jpaVocabularySchema) {
+        VocabularySchemaDTO exchangeVocabularySchemaDTO = new VocabularySchemaDTO();
+        exchangeVocabularySchemaDTO.setId(jpaVocabularySchema.getId());
+        exchangeVocabularySchemaDTO.setDefinitions(jpaVocabularySchema.getDefinitions()
                 .stream()
                 .map(this::transform)
                 .collect(Collectors.toList()));
-        return exchangeVocabularySchema;
+        return exchangeVocabularySchemaDTO;
     }
 
     @Override
-    public VocabularyRecord transform(io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord) {
-        VocabularyRecord exchangeVocabularyRecord = new VocabularyRecord();
-        exchangeVocabularyRecord.setId(jpaVocabularyRecord.getId());
-        exchangeVocabularyRecord.setVocabularyId(jpaVocabularyRecord.getVocabulary().getId());
-        exchangeVocabularyRecord.setFields(jpaVocabularyRecord.getFields()
+    public VocabularyRecordDTO transform(VocabularyRecord jpaVocabularyRecord) {
+        VocabularyRecordDTO exchangeVocabularyRecordDTO = new VocabularyRecordDTO();
+        exchangeVocabularyRecordDTO.setId(jpaVocabularyRecord.getId());
+        exchangeVocabularyRecordDTO.setVocabularyId(jpaVocabularyRecord.getVocabulary().getId());
+        exchangeVocabularyRecordDTO.setFields(jpaVocabularyRecord.getFields()
                 .stream()
                 .map(this::transform)
                 .collect(Collectors.toSet()));
-        return exchangeVocabularyRecord;
+        return exchangeVocabularyRecordDTO;
     }
 
     @Override
-    public FieldInstance transform(io.goobi.vocabularyserver.model.FieldInstance jpaFieldInstance) {
-        FieldInstance exchangeFieldInstance = new FieldInstance();
-        exchangeFieldInstance.setId(jpaFieldInstance.getId());
-        exchangeFieldInstance.setDefinitionId(jpaFieldInstance.getDefinition().getId());
-        exchangeFieldInstance.setLanguage(jpaFieldInstance.getLanguage());
-        exchangeFieldInstance.setValue(jpaFieldInstance.getValue());
-        return exchangeFieldInstance;
+    public FieldInstanceDTO transform(FieldInstance jpaFieldInstance) {
+        FieldInstanceDTO exchangeFieldInstanceDTO = new FieldInstanceDTO();
+        exchangeFieldInstanceDTO.setId(jpaFieldInstance.getId());
+        exchangeFieldInstanceDTO.setDefinitionId(jpaFieldInstance.getDefinition().getId());
+        exchangeFieldInstanceDTO.setLanguage(jpaFieldInstance.getLanguage());
+        exchangeFieldInstanceDTO.setValue(jpaFieldInstance.getValue());
+        return exchangeFieldInstanceDTO;
     }
 }

@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
-import io.goobi.vocabularyserver.exchange.VocabularyRecord;
+import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -28,24 +28,24 @@ public class RecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public CollectionModel<EntityModel<VocabularyRecord>> allInVocabulary(@PathVariable long vocabularyId) {
+    public CollectionModel<EntityModel<VocabularyRecordDTO>> allInVocabulary(@PathVariable long vocabularyId) {
         return assembler.toCollectionModel(manager.listAll(vocabularyId));
     }
 
     @GetMapping("/records/{recordId}")
-    public EntityModel<VocabularyRecord> one(@PathVariable long recordId) {
+    public EntityModel<VocabularyRecordDTO> one(@PathVariable long recordId) {
         return assembler.toModel(manager.get(recordId));
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecord) {
-        return assembler.toModel(manager.create(vocabularyId, vocabularyRecord));
+    public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) {
+        return assembler.toModel(manager.create(vocabularyId, vocabularyRecordDTO));
     }
 
     @DeleteMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
+    public ResponseEntity<VocabularyRecordDTO> delete(@PathVariable long recordId) {
         return ResponseEntity.ok(manager.delete(recordId));
     }
 }

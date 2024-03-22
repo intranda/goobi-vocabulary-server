@@ -3,7 +3,7 @@ package io.goobi.vocabularyserver.exchange;
 import lombok.Data;
 
 @Data
-public class FieldInstance {
+public class FieldInstanceDTO {
     private long id;
     private long definitionId;
     private String language;

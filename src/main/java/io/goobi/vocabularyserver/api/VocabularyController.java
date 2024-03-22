@@ -2,7 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.api.assemblers.VocabularyAssembler;
-import io.goobi.vocabularyserver.exchange.Vocabulary;
+import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -24,22 +24,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyController {
-    private final Manager<Vocabulary> manager;
+    private final Manager<VocabularyDTO> manager;
     private final VocabularyAssembler assembler;
 
-    public VocabularyController(Manager<Vocabulary> manager, VocabularyAssembler assembler) {
+    public VocabularyController(Manager<VocabularyDTO> manager, VocabularyAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }
 
     @GetMapping("/vocabularies")
-    public CollectionModel<EntityModel<Vocabulary>> all() {
+    public CollectionModel<EntityModel<VocabularyDTO>> all() {
         return assembler.toCollectionModel(manager.listAll());
     }
 
     @GetMapping("/vocabularies/{id}")
-    public EntityModel<Vocabulary> one(@PathVariable long id) {
-        EntityModel<Vocabulary> model = assembler.toModel(manager.get(id));
+    public EntityModel<VocabularyDTO> one(@PathVariable long id) {
+        EntityModel<VocabularyDTO> model = assembler.toModel(manager.get(id));
         model.add(linkTo(methodOn(RecordController.class).allInVocabulary(id)).withRel("records"));
         model.add(linkTo(methodOn(VocabularyController.class).delete(id)).withRel("delete"));
         return model;
@@ -47,19 +47,19 @@ public class VocabularyController {
 
     @PostMapping("/vocabularies")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabulary) {
-        return assembler.toModel(manager.create(vocabulary));
+    public EntityModel<VocabularyDTO> create(@RequestBody VocabularyDTO vocabularyDTO) {
+        return assembler.toModel(manager.create(vocabularyDTO));
     }
 
     @PutMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabulary, @PathVariable long id) {
-        return assembler.toModel(manager.replace(vocabulary, id));
+    public EntityModel<VocabularyDTO> update(@RequestBody VocabularyDTO vocabularyDTO, @PathVariable long id) {
+        return assembler.toModel(manager.replace(vocabularyDTO, id));
     }
 
     @DeleteMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Vocabulary> delete(@PathVariable long id) {
+    public ResponseEntity<VocabularyDTO> delete(@PathVariable long id) {
         return ResponseEntity.ok(manager.delete(id));
     }
 }

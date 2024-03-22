@@ -5,8 +5,8 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-public class VocabularyRecord {
+public class VocabularyRecordDTO {
     private long id;
     private long vocabularyId;
-    private Set<FieldInstance> fields;
+    private Set<FieldInstanceDTO> fields;
 }

@@ -1,10 +1,12 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
-import io.goobi.vocabularyserver.exchange.FieldInstance;
-import io.goobi.vocabularyserver.exchange.VocabularyRecord;
+import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.FieldDefinition;
+import io.goobi.vocabularyserver.model.FieldInstance;
 import io.goobi.vocabularyserver.model.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
@@ -31,7 +33,7 @@ public class RecordManager {
         this.exchangeTypeTransformer = exchangeTypeTransformer;
     }
 
-    public List<VocabularyRecord> listAll(long id) {
+    public List<VocabularyRecordDTO> listAll(long id) {
         Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
@@ -41,33 +43,33 @@ public class RecordManager {
                 .collect(Collectors.toList());
     }
 
-    public VocabularyRecord get(long id) {
+    public VocabularyRecordDTO get(long id) {
         return exchangeTypeTransformer.transform(
                 vocabularyRecordRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(io.goobi.vocabularyserver.model.VocabularyRecord.class, id))
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, id))
         );
     }
 
-    public VocabularyRecord create(long vocabularyId, VocabularyRecord newRecord) {
-        io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord = transformVocabularyRecord(vocabularyId, newRecord);
+    public VocabularyRecordDTO create(long vocabularyId, VocabularyRecordDTO newRecord) {
+        VocabularyRecord jpaVocabularyRecord = transformVocabularyRecord(vocabularyId, newRecord);
         return exchangeTypeTransformer.transform(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
-    public VocabularyRecord delete(long id) {
+    public VocabularyRecordDTO delete(long id) {
         if (!vocabularyRecordRepository.existsById(id)) {
-            throw new EntityNotFoundException(io.goobi.vocabularyserver.model.VocabularyRecord.class, id);
+            throw new EntityNotFoundException(VocabularyRecord.class, id);
         }
         vocabularyRecordRepository.deleteById(id);
         return null;
     }
 
-    private io.goobi.vocabularyserver.model.VocabularyRecord transformVocabularyRecord(long vocabularyId, io.goobi.vocabularyserver.exchange.VocabularyRecord newVocabularyRecord) {
-        io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = vocabularyRepository
+    private io.goobi.vocabularyserver.model.VocabularyRecord transformVocabularyRecord(long vocabularyId, VocabularyRecordDTO newVocabularyRecordDTO) {
+        Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, vocabularyId));
-        io.goobi.vocabularyserver.model.VocabularyRecord result = new io.goobi.vocabularyserver.model.VocabularyRecord(jpaVocabulary);
+        VocabularyRecord result = new VocabularyRecord(jpaVocabulary);
         result.getFields()
-                .addAll(newVocabularyRecord.getFields()
+                .addAll(newVocabularyRecordDTO.getFields()
                         .stream()
                         .map(f -> transformFieldInstance(result, findFieldDefinition(f.getDefinitionId()), f))
                         .collect(Collectors.toSet())
@@ -80,8 +82,8 @@ public class RecordManager {
     }
 
     // TODO: Perform validation
-    private io.goobi.vocabularyserver.model.FieldInstance transformFieldInstance(io.goobi.vocabularyserver.model.VocabularyRecord vocabularyRecord, FieldDefinition fieldDefinition, FieldInstance fieldInstance) {
-        io.goobi.vocabularyserver.model.FieldInstance result = new io.goobi.vocabularyserver.model.FieldInstance(fieldDefinition, vocabularyRecord, fieldInstance.getValue());
+    private FieldInstance transformFieldInstance(VocabularyRecord vocabularyRecord, FieldDefinition fieldDefinition, FieldInstanceDTO fieldInstanceDTO) {
+        FieldInstance result = new FieldInstance(fieldDefinition, vocabularyRecord, fieldInstanceDTO.getValue());
         result.setLanguage(fieldDefinition.getLanguage());
         return result;
     }

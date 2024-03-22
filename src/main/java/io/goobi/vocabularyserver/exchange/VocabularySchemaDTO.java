@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VocabularySchema {
+public class VocabularySchemaDTO {
     private long id;
-    private List<FieldDefinition> definitions;
+    private List<FieldDefinitionDTO> definitions;
 }

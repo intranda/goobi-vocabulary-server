@@ -1,22 +1,28 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldDefinition;
-import io.goobi.vocabularyserver.exchange.FieldInstance;
-import io.goobi.vocabularyserver.exchange.FieldType;
-import io.goobi.vocabularyserver.exchange.Vocabulary;
-import io.goobi.vocabularyserver.exchange.VocabularyRecord;
-import io.goobi.vocabularyserver.exchange.VocabularySchema;
+import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
+import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
+import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.model.FieldDefinition;
+import io.goobi.vocabularyserver.model.FieldInstance;
+import io.goobi.vocabularyserver.model.FieldType;
+import io.goobi.vocabularyserver.model.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularyRecord;
+import io.goobi.vocabularyserver.model.VocabularySchema;
 
 public interface ExchangeTypeTransformer {
-    FieldDefinition transform(io.goobi.vocabularyserver.model.FieldDefinition fieldDefinition);
+    FieldDefinitionDTO transform(FieldDefinition fieldDefinition);
 
-    FieldType transform(io.goobi.vocabularyserver.model.FieldType fieldType);
+    FieldTypeDTO transform(FieldType fieldType);
 
-    Vocabulary transform(io.goobi.vocabularyserver.model.Vocabulary vocabulary);
+    VocabularyDTO transform(Vocabulary vocabulary);
 
-    VocabularySchema transform(io.goobi.vocabularyserver.model.VocabularySchema vocabularySchema);
+    VocabularySchemaDTO transform(VocabularySchema vocabularySchema);
 
-    VocabularyRecord transform(io.goobi.vocabularyserver.model.VocabularyRecord vocabularyRecord);
+    VocabularyRecordDTO transform(VocabularyRecord vocabularyRecord);
 
-    FieldInstance transform(io.goobi.vocabularyserver.model.FieldInstance fieldInstance);
+    FieldInstanceDTO transform(FieldInstance fieldInstance);
 }
