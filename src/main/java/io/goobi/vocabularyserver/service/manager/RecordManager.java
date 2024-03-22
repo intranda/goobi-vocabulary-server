@@ -48,9 +48,17 @@ public class RecordManager {
         );
     }
 
-    public VocabularyRecord createNewRecordForVocabulary(long id, VocabularyRecord vocabularyRecord) {
-        io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord = transformVocabularyRecord(id, vocabularyRecord);
+    public VocabularyRecord create(long vocabularyId, VocabularyRecord newRecord) {
+        io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord = transformVocabularyRecord(vocabularyId, newRecord);
         return exchangeTypeTransformer.transform(vocabularyRecordRepository.save(jpaVocabularyRecord));
+    }
+
+    public VocabularyRecord delete(long id) {
+        if (!vocabularyRecordRepository.existsById(id)) {
+            throw new EntityNotFoundException(io.goobi.vocabularyserver.model.VocabularyRecord.class, id);
+        }
+        vocabularyRecordRepository.deleteById(id);
+        return null;
     }
 
     private io.goobi.vocabularyserver.model.VocabularyRecord transformVocabularyRecord(long vocabularyId, io.goobi.vocabularyserver.exchange.VocabularyRecord newVocabularyRecord) {

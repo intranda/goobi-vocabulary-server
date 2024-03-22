@@ -5,6 +5,8 @@ import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,8 +35,13 @@ public class RecordController {
         return assembler.toModel(manager.get(recordId));
     }
 
+    @DeleteMapping("/records/{recordId}")
+    public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
+        return ResponseEntity.ok(manager.delete(recordId));
+    }
+
     @PostMapping("/vocabularies/{vocabularyId}/records")
     public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecord) {
-        return assembler.toModel(manager.createNewRecordForVocabulary(vocabularyId, vocabularyRecord));
+        return assembler.toModel(manager.create(vocabularyId, vocabularyRecord));
     }
 }
