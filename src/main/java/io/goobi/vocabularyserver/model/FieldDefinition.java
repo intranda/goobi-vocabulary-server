@@ -18,6 +18,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {

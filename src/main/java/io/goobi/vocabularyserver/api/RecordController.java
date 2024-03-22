@@ -40,7 +40,11 @@ public class RecordController {
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) {
-        return assembler.toModel(manager.create(vocabularyId, vocabularyRecordDTO));
+        if (vocabularyRecordDTO.getVocabularyId() != 0 && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
+            throw new IllegalArgumentException("Inconsistency in passed id's");
+        }
+        vocabularyRecordDTO.setVocabularyId(vocabularyId);
+        return assembler.toModel(manager.create(vocabularyRecordDTO));
     }
 
     @DeleteMapping("/records/{recordId}")

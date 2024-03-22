@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class FieldDefinitionDTO {
     private long id;
+    private long schemaId;
     private String language;
     private String name;
     private long typeId;

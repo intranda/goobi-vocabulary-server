@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.LinkedHashSet;
@@ -22,6 +23,7 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Setter
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
