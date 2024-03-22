@@ -1,26 +1,17 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.FieldDefinition;
 import io.goobi.vocabularyserver.exchange.FieldInstance;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
-import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
 @Service
 public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
-
-    private final VocabularySchemaRepository vocabularySchemaRepository;
-
-    public ExchangeTypeTransformerImpl(VocabularySchemaRepository vocabularySchemaRepository) {
-        this.vocabularySchemaRepository = vocabularySchemaRepository;
-    }
-
     @Override
     public FieldDefinition transform(io.goobi.vocabularyserver.model.FieldDefinition jpaFieldDefinition) {
         FieldDefinition exchangeFieldDefinition = new FieldDefinition();

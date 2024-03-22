@@ -2,7 +2,9 @@ package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
+import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.ExchangeTypeTransformer;
@@ -38,11 +40,13 @@ public class VocabularyManager implements Manager<Vocabulary> {
         return exchangeTypeTransformer.transform(vocabularyRepository.save(jpaVocabulary));
     }
 
+    // TODO: This is not working correctly: Impossible to pass id for replace insertion
     @Override
-    public Vocabulary replace(Vocabulary newVocabulary) {
+    public Vocabulary replace(Vocabulary newVocabulary, long id) {
         io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = vocabularyRepository
-                .findById(newVocabulary.getId())
-                .orElseGet(() -> transformVocabulary(newVocabulary));
+                .findById(id)
+                .orElseThrow(() ->  new UnsupportedEntityReplacementException(newVocabulary.getClass(), id));
+//                .orElseGet(() -> transformVocabulary(newVocabulary));
 
         List<Runnable> replacements = new LinkedList<>();
         if (newVocabulary.getName() != null) {
@@ -52,7 +56,7 @@ public class VocabularyManager implements Manager<Vocabulary> {
             replacements.add(() -> jpaVocabulary.setDescription(newVocabulary.getDescription()));
         }
         if (replacements.isEmpty()) {
-            throw new MissingValuesException("Vocabulary", List.of("name", "description"));
+            throw new MissingValuesException(newVocabulary.getClass(), List.of("name", "description"));
         }
         replacements.forEach(Runnable::run);
         return exchangeTypeTransformer.transform(vocabularyRepository.save(jpaVocabulary));
@@ -61,7 +65,7 @@ public class VocabularyManager implements Manager<Vocabulary> {
     private io.goobi.vocabularyserver.model.Vocabulary transformVocabulary(Vocabulary newVocabulary) {
         io.goobi.vocabularyserver.model.VocabularySchema jpaVocabularySchema = vocabularySchemaRepository
                 .findById(newVocabulary.getSchemaId())
-                .orElseThrow(() -> new EntityNotFoundException("VocabularySchema", newVocabulary.getSchemaId()));
+                .orElseThrow(() -> new EntityNotFoundException(VocabularySchema.class, newVocabulary.getSchemaId()));
         io.goobi.vocabularyserver.model.Vocabulary result = new io.goobi.vocabularyserver.model.Vocabulary(jpaVocabularySchema, newVocabulary.getName());
         result.setDescription(newVocabulary.getDescription());
         return result;
@@ -70,7 +74,7 @@ public class VocabularyManager implements Manager<Vocabulary> {
     @Override
     public void delete(long id) {
         if (!vocabularyRepository.existsById(id)) {
-            throw new EntityNotFoundException("Vocabulary", id);
+            throw new EntityNotFoundException(io.goobi.vocabularyserver.model.Vocabulary.class, id);
         }
         vocabularyRepository.deleteById(id);
     }

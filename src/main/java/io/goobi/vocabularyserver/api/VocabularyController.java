@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class VocabularyController {
     private final Manager<Vocabulary> manager;
 
@@ -21,23 +23,22 @@ public class VocabularyController {
         this.manager = manager;
     }
 
-    @GetMapping("/vocabulary")
+    @GetMapping("/vocabularies")
     List<Vocabulary> getAllVocabularies() {
         return manager.listAll();
     }
 
-    @PostMapping("/vocabulary")
+    @PostMapping("/vocabularies")
     Vocabulary newVocabulary(@RequestBody Vocabulary vocabulary) {
         return manager.create(vocabulary);
     }
 
-    // TODO: This is not working correctly: Impossible to pass id for replace insertion
-    @PutMapping("/vocabulary")
-    Vocabulary replaceVocabulary(@RequestBody Vocabulary vocabulary) {
-        return manager.replace(vocabulary);
+    @PutMapping("/vocabularies/{id}")
+    Vocabulary replaceVocabulary(@RequestBody Vocabulary vocabulary, @PathVariable long id) {
+        return manager.replace(vocabulary, id);
     }
 
-    @DeleteMapping("/vocabulary/{id}")
+    @DeleteMapping("/vocabularies/{id}")
     void deleteVocabulary(@PathVariable long id) {
         manager.delete(id);
     }

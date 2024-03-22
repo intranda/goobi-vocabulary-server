@@ -15,7 +15,7 @@ public interface Manager<T> {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default T replace(T newT) {
+    default T replace(T newT, long id) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

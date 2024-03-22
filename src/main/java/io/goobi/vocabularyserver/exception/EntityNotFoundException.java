@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.exception;
 
 public class EntityNotFoundException extends IllegalArgumentException {
-    public EntityNotFoundException(String type, long id) {
-        super(type + " with id \"" + id + "\" not found");
+    public EntityNotFoundException(Class<?> type, long id) {
+        super(type.getSimpleName() + " with id \"" + id + "\" not found");
     }
 }

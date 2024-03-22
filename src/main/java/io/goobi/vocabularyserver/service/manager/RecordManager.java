@@ -34,7 +34,7 @@ public class RecordManager {
     public List<VocabularyRecord> listAllRecordsOfVocabulary(long id) {
         Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vocabulary", id));
+                .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
         return jpaVocabulary.getRecords()
                 .stream()
                 .map(exchangeTypeTransformer::transform)
@@ -49,14 +49,14 @@ public class RecordManager {
     private io.goobi.vocabularyserver.model.VocabularyRecord transformVocabularyRecord(long vocabularyId, io.goobi.vocabularyserver.exchange.VocabularyRecord newVocabularyRecord) {
         io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(vocabularyId)
-                .orElseThrow(() -> new EntityNotFoundException("Vocabulary", vocabularyId));
+                .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, vocabularyId));
         io.goobi.vocabularyserver.model.VocabularyRecord result = new io.goobi.vocabularyserver.model.VocabularyRecord(jpaVocabulary);
         result.getFields().addAll(newVocabularyRecord.getFields().stream().map(f -> transformFieldInstance(result, findFieldDefinition(f.getDefinitionId()), f)).collect(Collectors.toSet()));
         return result;
     }
 
     private FieldDefinition findFieldDefinition(long definitionId) {
-        return fieldDefinitionRepository.findById(definitionId).orElseThrow(() -> new EntityNotFoundException("FieldDefinition", definitionId));
+        return fieldDefinitionRepository.findById(definitionId).orElseThrow(() -> new EntityNotFoundException(FieldDefinition.class, definitionId));
     }
 
     // TODO: Perform validation

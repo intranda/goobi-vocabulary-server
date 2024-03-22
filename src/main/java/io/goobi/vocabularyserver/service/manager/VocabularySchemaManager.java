@@ -21,7 +21,7 @@ public class VocabularySchemaManager implements Manager<VocabularySchema> {
     public VocabularySchema get(long id) {
         return exchangeTypeTransformer.transform(
                 vocabularySchemaRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("VocabularySchema", id))
+                        .orElseThrow(() -> new EntityNotFoundException(io.goobi.vocabularyserver.model.VocabularySchema.class, id))
         );
     }
 }
