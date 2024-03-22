@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.repositories;
 
 import io.goobi.vocabularyserver.model.VocabularySchema;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 
-public interface VocabularySchemaRepository extends CrudRepository<VocabularySchema, Long> {
+public interface VocabularySchemaRepository extends ListCrudRepository<VocabularySchema, Long> {
 }
