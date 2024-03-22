@@ -6,6 +6,7 @@ import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -44,16 +46,19 @@ public class VocabularyController {
     }
 
     @PostMapping("/vocabularies")
+    @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabulary) {
         return assembler.toModel(manager.create(vocabulary));
     }
 
     @PutMapping("/vocabularies/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabulary, @PathVariable long id) {
         return assembler.toModel(manager.replace(vocabulary, id));
     }
 
     @DeleteMapping("/vocabularies/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Vocabulary> delete(@PathVariable long id) {
         return ResponseEntity.ok(manager.delete(id));
     }

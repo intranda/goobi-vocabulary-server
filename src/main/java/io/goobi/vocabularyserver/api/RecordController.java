@@ -5,6 +5,7 @@ import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,13 +37,15 @@ public class RecordController {
         return assembler.toModel(manager.get(recordId));
     }
 
-    @DeleteMapping("/records/{recordId}")
-    public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
-        return ResponseEntity.ok(manager.delete(recordId));
-    }
-
     @PostMapping("/vocabularies/{vocabularyId}/records")
+    @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecord) {
         return assembler.toModel(manager.create(vocabularyId, vocabularyRecord));
+    }
+
+    @DeleteMapping("/records/{recordId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
+        return ResponseEntity.ok(manager.delete(recordId));
     }
 }
