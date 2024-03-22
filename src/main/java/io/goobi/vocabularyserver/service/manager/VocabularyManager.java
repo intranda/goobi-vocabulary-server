@@ -35,6 +35,14 @@ public class VocabularyManager implements Manager<Vocabulary> {
     }
 
     @Override
+    public Vocabulary get(long id) {
+        return exchangeTypeTransformer.transform(
+                vocabularyRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException(io.goobi.vocabularyserver.model.Vocabulary.class, id))
+        );
+    }
+
+    @Override
     public Vocabulary create(Vocabulary newVocabulary) {
         io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = transformVocabulary(newVocabulary);
         return exchangeTypeTransformer.transform(vocabularyRepository.save(jpaVocabulary));
@@ -45,12 +53,12 @@ public class VocabularyManager implements Manager<Vocabulary> {
     public Vocabulary replace(Vocabulary newVocabulary, long id) {
         io.goobi.vocabularyserver.model.Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(id)
-                .orElseThrow(() ->  new UnsupportedEntityReplacementException(newVocabulary.getClass(), id));
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newVocabulary.getClass(), id));
 //                .orElseGet(() -> transformVocabulary(newVocabulary));
 
         List<Runnable> replacements = new LinkedList<>();
         if (newVocabulary.getName() != null) {
-            replacements.add(() ->jpaVocabulary.setName(newVocabulary.getName()));
+            replacements.add(() -> jpaVocabulary.setName(newVocabulary.getName()));
         }
         if (newVocabulary.getDescription() != null) {
             replacements.add(() -> jpaVocabulary.setDescription(newVocabulary.getDescription()));
@@ -72,10 +80,11 @@ public class VocabularyManager implements Manager<Vocabulary> {
     }
 
     @Override
-    public void delete(long id) {
+    public Vocabulary delete(long id) {
         if (!vocabularyRepository.existsById(id)) {
             throw new EntityNotFoundException(io.goobi.vocabularyserver.model.Vocabulary.class, id);
         }
         vocabularyRepository.deleteById(id);
+        return null;
     }
 }

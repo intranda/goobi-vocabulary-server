@@ -59,6 +59,7 @@ public class ExchangeTypeTransformerImpl implements ExchangeTypeTransformer {
     public VocabularyRecord transform(io.goobi.vocabularyserver.model.VocabularyRecord jpaVocabularyRecord) {
         VocabularyRecord exchangeVocabularyRecord = new VocabularyRecord();
         exchangeVocabularyRecord.setId(jpaVocabularyRecord.getId());
+        exchangeVocabularyRecord.setVocabularyId(jpaVocabularyRecord.getVocabulary().getId());
         exchangeVocabularyRecord.setFields(jpaVocabularyRecord.getFields()
                 .stream()
                 .map(this::transform)

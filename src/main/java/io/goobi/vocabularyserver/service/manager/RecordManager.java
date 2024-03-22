@@ -31,7 +31,7 @@ public class RecordManager {
         this.exchangeTypeTransformer = exchangeTypeTransformer;
     }
 
-    public List<VocabularyRecord> listAllRecordsOfVocabulary(long id) {
+    public List<VocabularyRecord> listAll(long id) {
         Vocabulary jpaVocabulary = vocabularyRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
@@ -39,6 +39,13 @@ public class RecordManager {
                 .stream()
                 .map(exchangeTypeTransformer::transform)
                 .collect(Collectors.toList());
+    }
+
+    public VocabularyRecord get(long id) {
+        return exchangeTypeTransformer.transform(
+                vocabularyRecordRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException(io.goobi.vocabularyserver.model.VocabularyRecord.class, id))
+        );
     }
 
     public VocabularyRecord createNewRecordForVocabulary(long id, VocabularyRecord vocabularyRecord) {

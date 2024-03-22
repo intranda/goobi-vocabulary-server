@@ -19,7 +19,7 @@ public interface Manager<T> {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default void delete(long id) {
+    default T delete(long id) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

@@ -10,12 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularySchemaController {
@@ -29,11 +23,7 @@ public class VocabularySchemaController {
 
     @GetMapping("/schemas")
     public CollectionModel<EntityModel<VocabularySchema>> all() {
-        List<EntityModel<VocabularySchema>> schemas = manager.listAll().stream()
-                .map(assembler::toModel)
-                .collect(Collectors.toList());
-        return CollectionModel.of(schemas,
-                linkTo(methodOn(VocabularySchemaController.class).all()).withSelfRel());
+        return assembler.toCollectionModel(manager.listAll());
     }
 
     @GetMapping("/schemas/{id}")
