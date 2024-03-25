@@ -60,7 +60,7 @@ class FieldDefinitionMapperTest {
         fieldDefinitionDTO.setName(FIELD_DEFINITION_NAME);
         fieldDefinitionDTO.setTypeId(FIELD_TYPE_ID);
 
-        when(fieldTypeRepository.findById(anyLong())).thenReturn(Optional.of(fieldType));
+        when(fieldTypeRepository.findById(FIELD_TYPE_ID)).thenReturn(Optional.of(fieldType));
         when(vocabularySchemaRepository.findById(SCHEMA_ID)).thenReturn(Optional.of(schema));
     }
 
