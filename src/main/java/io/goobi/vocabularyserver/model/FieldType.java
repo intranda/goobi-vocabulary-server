@@ -35,9 +35,8 @@ public class FieldType {
     @NonNull
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "validation_id")
-    private FieldValidation validation;
+    @Column(name = "validation")
+    private String validation;
 
     @ManyToMany
     @JoinTable(name = "FieldType_selectableValues",
