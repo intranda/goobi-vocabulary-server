@@ -1,12 +1,14 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
+import io.goobi.vocabularyserver.validation.RecordValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +20,14 @@ public class RecordManager {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
 
+    private final RecordValidator validator;
+
     public RecordManager(VocabularyRepository vocabularyRepository,
-                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper) {
+                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, RecordValidator validator) {
         this.vocabularyRepository = vocabularyRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
+        this.validator = validator;
     }
 
     public List<VocabularyRecordDTO> listAll(long id) {
@@ -42,8 +47,9 @@ public class RecordManager {
         );
     }
 
-    public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) {
+    public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws RecordValidationException {
         VocabularyRecord jpaVocabularyRecord = modelMapper.toEntity(newRecord);
+        validator.validate(jpaVocabularyRecord);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
