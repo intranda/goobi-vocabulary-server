@@ -138,4 +138,18 @@ public class RecordValidationTests {
 
         assertThrows(ValidationException.class, () -> recordManager.create(dto));
     }
+
+    @Test
+    void emptyFieldValue_fails() {
+        VocabularyRecordDTO dto = new VocabularyRecordDTO();
+        VocabularyRecord record = new VocabularyRecord(vocabulary);
+        when(mapper.toEntity(dto)).thenReturn(record);
+
+        FieldInstance nameField = new FieldInstance(fdName, record, "Thomas");
+        FieldInstance ageField = new FieldInstance(fdAge, record, "32");
+        FieldInstance hobbyField = new FieldInstance(fdHobbies, record, "");
+        record.setFields(Set.of(nameField, ageField, hobbyField));
+
+        assertThrows(ValidationException.class, () -> recordManager.create(dto));
+    }
 }

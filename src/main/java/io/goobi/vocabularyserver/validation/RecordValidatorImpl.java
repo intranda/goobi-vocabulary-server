@@ -9,20 +9,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
-public class RecordValidatorImpl implements RecordValidator {
-    private final FieldValidator validator;
-    private final List<Consumer<VocabularyRecord>> recordValidationMethods;
+public class RecordValidatorImpl implements Validator<VocabularyRecord> {
+    private final Validator<FieldInstance> fieldValidator;
+    private final List<ValidationMethod<VocabularyRecord>> validations;
 
-    public RecordValidatorImpl(FieldValidator validator) {
-        this.validator = validator;
-        recordValidationMethods = List.of(this::checkRequiredFieldsExistence);
+    public RecordValidatorImpl(Validator<FieldInstance> fieldValidator) {
+        this.fieldValidator = fieldValidator;
+        validations = List.of(this::checkRequiredFieldsExistence);
     }
 
-    private void checkRequiredFieldsExistence(VocabularyRecord vocabularyRecord) {
+    private void checkRequiredFieldsExistence(VocabularyRecord vocabularyRecord) throws RecordValidationException {
         List<FieldDefinition> missingFields = vocabularyRecord.getVocabulary()
                 .getSchema()
                 .getDefinitions()
@@ -31,7 +30,7 @@ public class RecordValidatorImpl implements RecordValidator {
                 .collect(Collectors.toList());
         missingFields.removeAll(vocabularyRecord.getFields().stream().map(FieldInstance::getDefinition).collect(Collectors.toList()));
         if (!missingFields.isEmpty()) {
-            throw new RuntimeException("Missing required fields: "
+            throw new RecordValidationException("Missing required fields: "
                     + missingFields.stream()
                     .map(f -> "\"" + f.getName() + "\"")
                     .collect(Collectors.joining(", "))
@@ -49,10 +48,10 @@ public class RecordValidatorImpl implements RecordValidator {
                 errors.add(e);
             }
         }
-        for (Consumer<VocabularyRecord> v : recordValidationMethods) {
+        for (ValidationMethod<VocabularyRecord> v : validations) {
             try {
-                v.accept(vocabularyRecord);
-            } catch (RuntimeException e) {
+                v.validate(vocabularyRecord);
+            } catch (ValidationException e) {
                 errors.add(e);
             }
         }
