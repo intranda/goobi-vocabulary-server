@@ -9,7 +9,6 @@ import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
-import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

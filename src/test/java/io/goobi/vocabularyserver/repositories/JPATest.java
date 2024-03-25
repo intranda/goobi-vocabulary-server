@@ -3,17 +3,15 @@ package io.goobi.vocabularyserver.repositories;
 import io.goobi.vocabularyserver.model.FieldDefinition;
 import io.goobi.vocabularyserver.model.FieldInstance;
 import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
+import io.goobi.vocabularyserver.model.VocabularySchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
