@@ -151,12 +151,18 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public VocabularySchema toEntity(VocabularySchemaDTO dto) {
-        return null;
+        VocabularySchema result = new VocabularySchema();
+        result.setId(dto.getId());
+        result.setDefinitions(dto.getDefinitions().stream().map(this::toEntity).collect(Collectors.toList()));
+        return result;
     }
 
     @Override
     public VocabularySchemaDTO toDTO(VocabularySchema entity) {
-        return null;
+        VocabularySchemaDTO result = new VocabularySchemaDTO();
+        result.setId(entity.getId());
+        result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
+        return result;
     }
 
     @Override

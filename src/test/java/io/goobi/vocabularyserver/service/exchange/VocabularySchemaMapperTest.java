@@ -1,0 +1,131 @@
+package io.goobi.vocabularyserver.service.exchange;
+
+import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
+import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.model.FieldDefinition;
+import io.goobi.vocabularyserver.model.FieldType;
+import io.goobi.vocabularyserver.model.SelectableValue;
+import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
+import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
+import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+@SpringBootTest
+class VocabularySchemaMapperTest {
+    private static final Long SCHEMA_ID = 697230634L;
+    private static final Long FIELD_TYPE_ID = 2435L;
+    private static final Long FIELD_DEFINITION_1_ID = 45234L;
+    private static final String FIELD_DEFINITION_1_NAME = "First name";
+    private static final Long FIELD_DEFINITION_2_ID = 423455234L;
+    private static final String FIELD_DEFINITION_2_NAME = "Last name";
+
+    private VocabularySchema vocabularySchema;
+    private VocabularySchemaDTO vocabularySchemaDTO;
+
+    private FieldDefinition fieldDefinition1;
+    private FieldDefinitionDTO fieldDefinitionDTO1;
+
+    private FieldDefinition fieldDefinition2;
+    private FieldDefinitionDTO fieldDefinitionDTO2;
+
+
+    @Mock
+    private FieldTypeRepository fieldTypeRepository;
+    @Mock
+    private VocabularySchemaRepository vocabularySchemaRepository;
+    @InjectMocks
+    private DTOMapperImpl mapper;
+
+    @BeforeEach
+    void setUp() {
+        FieldType fieldType = new FieldType("Text");
+        fieldType.setId(FIELD_TYPE_ID);
+
+        vocabularySchema = new VocabularySchema();
+        vocabularySchema.setId(SCHEMA_ID);
+
+        fieldDefinition1 = new FieldDefinition(vocabularySchema, FIELD_DEFINITION_1_NAME, fieldType);
+        fieldDefinition1.setId(FIELD_DEFINITION_1_ID);
+
+        fieldDefinition2 = new FieldDefinition(vocabularySchema, FIELD_DEFINITION_2_NAME, fieldType);
+        fieldDefinition2.setId(FIELD_DEFINITION_2_ID);
+
+        vocabularySchema.setDefinitions(List.of(fieldDefinition1, fieldDefinition2));
+
+        vocabularySchemaDTO = new VocabularySchemaDTO();
+        vocabularySchemaDTO.setId(SCHEMA_ID);
+
+        fieldDefinitionDTO1 = new FieldDefinitionDTO();
+        fieldDefinitionDTO1.setId(FIELD_DEFINITION_1_ID);
+        fieldDefinitionDTO1.setSchemaId(SCHEMA_ID);
+        fieldDefinitionDTO1.setTypeId(FIELD_TYPE_ID);
+        fieldDefinitionDTO1.setName(FIELD_DEFINITION_1_NAME);
+
+        fieldDefinitionDTO2 = new FieldDefinitionDTO();
+        fieldDefinitionDTO2.setId(FIELD_DEFINITION_2_ID);
+        fieldDefinitionDTO2.setSchemaId(SCHEMA_ID);
+        fieldDefinitionDTO2.setTypeId(FIELD_TYPE_ID);
+        fieldDefinitionDTO2.setName(FIELD_DEFINITION_2_NAME);
+
+        vocabularySchemaDTO.setDefinitions(List.of(fieldDefinitionDTO1, fieldDefinitionDTO2));
+
+        when(vocabularySchemaRepository.findById(SCHEMA_ID)).thenReturn(Optional.of(vocabularySchema));
+        when(fieldTypeRepository.findById(FIELD_TYPE_ID)).thenReturn(Optional.of(fieldType));
+    }
+
+    @Test
+    void validId_toDTO() {
+        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+
+        assertEquals(SCHEMA_ID, result.getId());
+    }
+
+    @Test
+    void childDefinitions_toDTO() {
+        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+
+        assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchemaId());
+        assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId());
+        assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName());
+        assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchemaId());
+        assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId());
+        assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName());
+    }
+
+    @Test
+    void validId_fromDTO() {
+        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertEquals(SCHEMA_ID, result.getId());
+    }
+
+    @Test
+    void childDefinitions_fromDTO() {
+        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchema().getId());
+        assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId());
+        assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName());
+        assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchema().getId());
+        assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId());
+        assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName());
+    }
+}
