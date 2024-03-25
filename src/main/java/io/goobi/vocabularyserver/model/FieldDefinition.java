@@ -36,9 +36,6 @@ public class FieldDefinition {
     @NonNull
     private VocabularySchema schema;
 
-    @Column(name = "language", length = 3)
-    private String language;
-
     // `name` is a reserved Mysql keyword
     @Column(name = "label", nullable = false)
     @NonNull
