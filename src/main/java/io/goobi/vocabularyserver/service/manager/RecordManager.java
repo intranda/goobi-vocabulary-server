@@ -6,7 +6,7 @@ import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
-import org.modelmapper.ModelMapper;
+import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 public class RecordManager {
     private final VocabularyRepository vocabularyRepository;
     private final VocabularyRecordRepository vocabularyRecordRepository;
-    private final ModelMapper modelMapper;
+    private final DTOMapper modelMapper;
 
     public RecordManager(VocabularyRepository vocabularyRepository,
-                         VocabularyRecordRepository vocabularyRecordRepository, ModelMapper modelMapper) {
+                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper) {
         this.vocabularyRepository = vocabularyRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
@@ -31,21 +31,20 @@ public class RecordManager {
                 .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
         return jpaVocabulary.getRecords()
                 .stream()
-                .map(r -> modelMapper.map(r, VocabularyRecordDTO.class))
+                .map(modelMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public VocabularyRecordDTO get(long id) {
-        return modelMapper.map(
+        return modelMapper.toDTO(
                 vocabularyRecordRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, id)),
-                VocabularyRecordDTO.class
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, id))
         );
     }
 
     public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) {
-        VocabularyRecord jpaVocabularyRecord = modelMapper.map(newRecord, VocabularyRecord.class);
-        return modelMapper.map(vocabularyRecordRepository.save(jpaVocabularyRecord), VocabularyRecordDTO.class);
+        VocabularyRecord jpaVocabularyRecord = modelMapper.toEntity(newRecord);
+        return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
     public VocabularyRecordDTO delete(long id) {

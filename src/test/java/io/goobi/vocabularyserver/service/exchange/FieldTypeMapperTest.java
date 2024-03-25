@@ -5,17 +5,15 @@ import io.goobi.vocabularyserver.model.FieldType;
 import io.goobi.vocabularyserver.model.SelectableValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class FieldTypeMapperTest {
@@ -25,7 +23,7 @@ class FieldTypeMapperTest {
     private static final Set<String> FIELD_TYPE_SELECTABLE_VALUES = Set.of("Value1", "2ndValue", "value numero three");
 
     @Autowired
-    private ModelMapper mapper;
+    private DTOMapper mapper;
 
     private FieldType fieldType;
     private FieldTypeDTO fieldTypeDTO;
@@ -45,28 +43,28 @@ class FieldTypeMapperTest {
 
     @Test
     void validId_toDTO() {
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertEquals(FIELD_TYPE_ID, result.getId());
     }
 
     @Test
     void validName_toDTO() {
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertEquals(FIELD_TYPE_NAME, result.getName());
     }
 
     @Test
     void existingValidation_toDTO() {
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertEquals(FIELD_TYPE_VALIDATION, result.getValidation());
     }
 
     @Test
     void existingSelectableValues_toDTO() {
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertEquals(FIELD_TYPE_SELECTABLE_VALUES, result.getSelectableValues());
     }
@@ -75,7 +73,7 @@ class FieldTypeMapperTest {
     void emptyValidation_toDTO() {
         fieldType.setValidation(null);
 
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertNull(result.getValidation());
     }
@@ -84,35 +82,35 @@ class FieldTypeMapperTest {
     void emptySelectableValues_toDTO() {
         fieldType.setSelectableValues(null);
 
-        FieldTypeDTO result = mapper.map(fieldType, FieldTypeDTO.class);
+        FieldTypeDTO result = mapper.toDTO(fieldType);
 
         assertNull(result.getSelectableValues());
     }
 
     @Test
     void validId_fromDTO() {
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
         assertEquals(FIELD_TYPE_ID, result.getId());
     }
 
     @Test
     void validName_fromDTO() {
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
         assertEquals(FIELD_TYPE_NAME, result.getName());
     }
 
     @Test
     void existingValidation_fromDTO() {
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
         assertEquals(FIELD_TYPE_VALIDATION, result.getValidation());
     }
 
     @Test
     void existingSelectableValues_fromDTO() {
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
         assertEquals(FIELD_TYPE_SELECTABLE_VALUES, result.getSelectableValues().stream().map(SelectableValue::getValue).collect(Collectors.toSet()));
     }
@@ -121,7 +119,7 @@ class FieldTypeMapperTest {
     void emptyValidation_fromDTO() {
         fieldTypeDTO.setValidation(null);
 
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
         assertNull(result.getValidation());
     }
@@ -130,8 +128,8 @@ class FieldTypeMapperTest {
     void emptySelectableValues_fromDTO() {
         fieldTypeDTO.setSelectableValues(null);
 
-        FieldType result = mapper.map(fieldTypeDTO, FieldType.class);
+        FieldType result = mapper.toEntity(fieldTypeDTO);
 
-        assertNull(result.getSelectableValues());
+        assertTrue(result.getSelectableValues().isEmpty());
     }
 }
