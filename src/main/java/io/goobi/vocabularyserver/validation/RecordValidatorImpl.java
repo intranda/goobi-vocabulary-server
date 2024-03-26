@@ -20,6 +20,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         this.fieldValidator = fieldValidator;
         setValidations(List.of(
                 this::checkRequiredFieldsExistence,
+                this::checkOnlyAllowedFieldDefinitionsGiven,
                 this::perFieldInstanceChecks
         ));
     }
@@ -43,6 +44,22 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
                             .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
                             .collect(Collectors.joining(", ")) + " -- "
                             + "provided fields: " + providedFields.stream()
+                            .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
+                            .collect(Collectors.joining(", "))
+            );
+        }
+    }
+
+    private void checkOnlyAllowedFieldDefinitionsGiven(VocabularyRecord vocabularyRecord) throws RecordValidationException {
+        List<FieldDefinition> providedFields = vocabularyRecord.getFields()
+                .stream()
+                .map(FieldInstance::getDefinition)
+                .collect(Collectors.toList());
+        providedFields.removeAll(vocabularyRecord.getVocabulary().getSchema().getDefinitions());
+        if (!providedFields.isEmpty()) {
+            throw new RecordValidationException(
+                    "Non-defined fields given: "
+                            + providedFields.stream()
                             .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
                             .collect(Collectors.joining(", "))
             );
