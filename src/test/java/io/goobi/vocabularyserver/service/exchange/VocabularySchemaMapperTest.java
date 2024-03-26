@@ -47,17 +47,24 @@ class VocabularySchemaMapperTest {
 
     @BeforeEach
     void setUp() {
-        FieldType fieldType = new FieldType("Text");
+        FieldType fieldType = new FieldType();
         fieldType.setId(FIELD_TYPE_ID);
+        fieldType.setName("Text");
 
         vocabularySchema = new VocabularySchema();
         vocabularySchema.setId(SCHEMA_ID);
 
-        fieldDefinition1 = new FieldDefinition(vocabularySchema, FIELD_DEFINITION_1_NAME, fieldType);
+        fieldDefinition1 = new FieldDefinition();
         fieldDefinition1.setId(FIELD_DEFINITION_1_ID);
+        fieldDefinition1.setSchema(vocabularySchema);
+        fieldDefinition1.setName(FIELD_DEFINITION_1_NAME);
+        fieldDefinition1.setType(fieldType);
 
-        fieldDefinition2 = new FieldDefinition(vocabularySchema, FIELD_DEFINITION_2_NAME, fieldType);
+        fieldDefinition2 = new FieldDefinition();
         fieldDefinition2.setId(FIELD_DEFINITION_2_ID);
+        fieldDefinition2.setSchema(vocabularySchema);
+        fieldDefinition2.setName(FIELD_DEFINITION_2_NAME);
+        fieldDefinition2.setType(fieldType);
 
         vocabularySchema.setDefinitions(List.of(fieldDefinition1, fieldDefinition2));
 

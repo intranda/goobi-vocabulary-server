@@ -60,26 +60,42 @@ class VocabularyRecordMapperTest {
         VocabularySchema schema = new VocabularySchema();
         schema.setId(SCHEMA_ID);
 
-        FieldType type = new FieldType("Text");
+        FieldType type = new FieldType();
+        type.setName("Text");
 
-        FieldDefinition fieldDefinition1 = new FieldDefinition(schema, FIELD_DEFINITION_1_NAME, type);
+        FieldDefinition fieldDefinition1 = new FieldDefinition();
         fieldDefinition1.setId(FIELD_DEFINITION_1_ID);
+        fieldDefinition1.setSchema(schema);
+        fieldDefinition1.setName(FIELD_DEFINITION_1_NAME);
+        fieldDefinition1.setType(type);
 
-        FieldDefinition fieldDefinition2 = new FieldDefinition(schema, FIELD_DEFINITION_2_NAME, type);
+        FieldDefinition fieldDefinition2 = new FieldDefinition();
         fieldDefinition2.setId(FIELD_DEFINITION_2_ID);
+        fieldDefinition2.setSchema(schema);
+        fieldDefinition2.setName(FIELD_DEFINITION_2_NAME);
+        fieldDefinition2.setType(type);
 
         schema.setDefinitions(List.of(fieldDefinition1, fieldDefinition2));
 
-        Vocabulary vocabulary = new Vocabulary(schema, "Some Vocabulary name");
+        Vocabulary vocabulary = new Vocabulary();
         vocabulary.setId(VOCABULARY_ID);
+        vocabulary.setSchema(schema);
+        vocabulary.setName("Some Vocabulary name");
 
-        vocabularyRecord = new VocabularyRecord(vocabulary);
+        vocabularyRecord = new VocabularyRecord();
         vocabularyRecord.setId(RECORD_ID);
+        vocabularyRecord.setVocabulary(vocabulary);
 
-        fieldInstance1 = new FieldInstance(fieldDefinition1, vocabularyRecord, FIELD_INSTANCE_1_VALUE);
+        fieldInstance1 = new FieldInstance();
         fieldInstance1.setId(FIELD_INSTANCE_1_ID);
-        fieldInstance2 = new FieldInstance(fieldDefinition2, vocabularyRecord, FIELD_INSTANCE_2_VALUE);
+        fieldInstance1.setDefinition(fieldDefinition1);
+        fieldInstance1.setVocabularyRecord(vocabularyRecord);
+        fieldInstance1.setValue(FIELD_INSTANCE_1_VALUE);
+        fieldInstance2 = new FieldInstance();
         fieldInstance2.setId(FIELD_INSTANCE_2_ID);
+        fieldInstance2.setDefinition(fieldDefinition2);
+        fieldInstance2.setVocabularyRecord(vocabularyRecord);
+        fieldInstance2.setValue(FIELD_INSTANCE_2_VALUE);
 
         vocabularyRecord.setFields(Set.of(fieldInstance1, fieldInstance2));
 

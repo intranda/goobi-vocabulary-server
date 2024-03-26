@@ -7,11 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -20,8 +16,6 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FieldInstance {
     private static final int MAX_LANGUAGE_LENGTH = 3;
 
@@ -32,12 +26,10 @@ public class FieldInstance {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "field_definition_id", nullable = false)
-    @NonNull
     private FieldDefinition definition;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "record_id", nullable = false)
-    @NonNull
     private VocabularyRecord vocabularyRecord;
 
     @Column(name = "language", length = MAX_LANGUAGE_LENGTH)
@@ -45,7 +37,6 @@ public class FieldInstance {
 
     // `value` is a reserved Mysql keyword
     @Column(name = "content")
-    @NonNull
     private String value;
 
     @Override

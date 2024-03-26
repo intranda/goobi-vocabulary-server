@@ -42,18 +42,28 @@ public class FieldInstanceMapperTest {
 
     @BeforeEach
     void setUp() {
-        FieldType type = new FieldType("Text");
+        FieldType type = new FieldType();
+        type.setName("Text");
         VocabularySchema schema = new VocabularySchema();
-        Vocabulary vocabulary = new Vocabulary(schema, "Vocab1");
-        fieldDefinition = new FieldDefinition(schema, "some name", type);
+        Vocabulary vocabulary = new Vocabulary();
+        vocabulary.setSchema(schema);
+        vocabulary.setName("Vocab1");
+        fieldDefinition = new FieldDefinition();
         fieldDefinition.setId(FIELD_DEFINITION_ID);
+        fieldDefinition.setSchema(schema);
+        fieldDefinition.setName("some name");
+        fieldDefinition.setType(type);
 
-        record = new VocabularyRecord(vocabulary);
+        record = new VocabularyRecord();
+        record.setVocabulary(vocabulary);
         record.setId(RECORD_ID);
 
-        fieldInstance = new FieldInstance(fieldDefinition, record, FIELD_INSTANCE_VALUE);
+        fieldInstance = new FieldInstance();
         fieldInstance.setId(FIELD_INSTANCE_ID);
+        fieldInstance.setDefinition(fieldDefinition);
+        fieldInstance.setVocabularyRecord(record);
         fieldInstance.setLanguage(FIELD_INSTANCE_LANGUAGE);
+        fieldInstance.setValue(FIELD_INSTANCE_VALUE);
 
         fieldInstanceDTO = new FieldInstanceDTO();
         fieldInstanceDTO.setId(FIELD_INSTANCE_ID);

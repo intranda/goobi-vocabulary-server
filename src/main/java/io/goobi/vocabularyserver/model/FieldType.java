@@ -8,11 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedHashSet;
@@ -21,8 +17,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FieldType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,7 +25,6 @@ public class FieldType {
 
     // `name` is a reserved Mysql keyword
     @Column(name = "type_name", nullable = false, unique = true)
-    @NonNull
     private String name;
 
     @Column(name = "validation")

@@ -74,8 +74,11 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public FieldDefinition toEntity(FieldDefinitionDTO dto) {
-        FieldDefinition result = new FieldDefinition(lookUpSchema(dto.getSchemaId()), dto.getName(), lookUpFieldType(dto.getTypeId()));
+        FieldDefinition result = new FieldDefinition();
         result.setId(dto.getId());
+        result.setSchema(lookUpSchema(dto.getSchemaId()));
+        result.setType(lookUpFieldType(dto.getTypeId()));
+        result.setName(dto.getName());
         result.setRequired(dto.isRequired());
         result.setUnique(dto.isUnique());
         result.setMainEntry(dto.isMainEntry());
@@ -99,9 +102,12 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public FieldInstance toEntity(FieldInstanceDTO dto) {
-        FieldInstance result = new FieldInstance(lookUpFieldDefinition(dto.getDefinitionId()), lookUpRecord(dto.getRecordId()), dto.getValue());
+        FieldInstance result = new FieldInstance();
         result.setId(dto.getId());
+        result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
+        result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         result.setLanguage(dto.getLanguage());
+        result.setValue(dto.getValue());
         return result;
     }
 
@@ -118,11 +124,18 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public FieldType toEntity(FieldTypeDTO dto) {
-        FieldType result = new FieldType(dto.getName());
+        FieldType result = new FieldType();
         result.setId(dto.getId());
+        result.setName(dto.getName());
         result.setValidation(dto.getValidation());
         if (dto.getSelectableValues() != null) {
-            result.setSelectableValues(dto.getSelectableValues().stream().map(SelectableValue::new).collect(Collectors.toSet()));
+            result.setSelectableValues(dto.getSelectableValues().stream()
+                    .map(s -> {
+                                SelectableValue sv = new SelectableValue();
+                                sv.setValue(s);
+                                return sv;
+                            }
+                    ).collect(Collectors.toSet()));
         }
         return result;
     }
@@ -141,8 +154,10 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public Vocabulary toEntity(VocabularyDTO dto) {
-        Vocabulary result = new Vocabulary(lookUpSchema(dto.getSchemaId()), dto.getName());
+        Vocabulary result = new Vocabulary();
         result.setId(dto.getId());
+        result.setSchema(lookUpSchema(dto.getSchemaId()));
+        result.setName(dto.getName());
         result.setDescription(dto.getDescription());
         return result;
     }
@@ -175,8 +190,9 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     public VocabularyRecord toEntity(VocabularyRecordDTO dto) {
-        VocabularyRecord result = new VocabularyRecord(lookUpVocabulary(dto.getVocabularyId()));
+        VocabularyRecord result = new VocabularyRecord();
         result.setId(dto.getId());
+        result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
         result.setFields(dto.getFields().stream().map(this::toEntity).collect(Collectors.toSet()));
         return result;
     }

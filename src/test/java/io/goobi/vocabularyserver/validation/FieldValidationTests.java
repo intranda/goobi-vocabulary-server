@@ -38,17 +38,27 @@ class FieldValidationTests {
     @BeforeEach
     public void setUp() {
         schema = new VocabularySchema();
-        Vocabulary vocabulary = new Vocabulary(schema, "Test vocabulary");
-        record = new VocabularyRecord(vocabulary);
+        Vocabulary vocabulary = new Vocabulary();
+        vocabulary.setSchema(schema);
+        vocabulary.setName("Test vocabulary");
+        record = new VocabularyRecord();
+        record.setVocabulary(vocabulary);
     }
 
     private FieldDefinition setupFieldDefinition(String name, String validation, List<String> selectableValues, boolean mainEntry, boolean titleField, boolean unique, boolean required) {
-        FieldType type = new FieldType("test_type");
+        FieldType type = new FieldType();
         type.setValidation(validation);
         if (selectableValues != null) {
-            type.setSelectableValues(selectableValues.stream().map(SelectableValue::new).collect(Collectors.toSet()));
+            type.setSelectableValues(selectableValues.stream().map(s -> {
+                SelectableValue sv = new SelectableValue();
+                sv.setValue(s);
+                return sv;
+            }).collect(Collectors.toSet()));
         }
-        FieldDefinition definition = new FieldDefinition(schema, name, type);
+        FieldDefinition definition = new FieldDefinition();
+        definition.setSchema(schema);
+        definition.setName(name);
+        definition.setType(type);
         definition.setMainEntry(mainEntry);
         definition.setTitleField(titleField);
         definition.setUnique(unique);
@@ -58,10 +68,10 @@ class FieldValidationTests {
     }
 
     private FieldInstance setupFieldInstance(FieldDefinition definition, String value) {
-        FieldInstance field = new FieldInstance(
-                definition,
-                record,
-                value);
+        FieldInstance field = new FieldInstance();
+        field.setDefinition(definition);
+        field.setVocabularyRecord(record);
+        field.setValue(value);
         record.setFields(Set.of(field));
         return field;
     }
@@ -69,7 +79,7 @@ class FieldValidationTests {
     @Test
     void textFieldValueNotMatchingValidation_fails() {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("name", "\\w+", null,true, true, true, true),
+                setupFieldDefinition("name", "\\w+", null, true, true, true, true),
                 "Thomas Lastname");
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
@@ -78,7 +88,7 @@ class FieldValidationTests {
     @Test
     void textFieldValueMatchingValidation_success() throws ValidationException {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("name", "\\w+", null,true, true, true, true),
+                setupFieldDefinition("name", "\\w+", null, true, true, true, true),
                 "Thomas");
 
         validator.validate(field);
@@ -87,7 +97,7 @@ class FieldValidationTests {
     @Test
     void numberFieldValueNotMatchingValidation_fails() {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("age", "\\d+", null,true, true, true, true),
+                setupFieldDefinition("age", "\\d+", null, true, true, true, true),
                 "Thomas");
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
@@ -96,7 +106,7 @@ class FieldValidationTests {
     @Test
     void numberFieldValueMatchingValidation_fails() throws ValidationException {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("age", "\\d+", null,true, true, true, true),
+                setupFieldDefinition("age", "\\d+", null, true, true, true, true),
                 "32");
 
         validator.validate(field);
@@ -105,7 +115,7 @@ class FieldValidationTests {
     @Test
     void valueIsOneOfTheSelectableValues_success() throws ValidationException {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("OS", null, List.of("Linux", "Windows"),false, false, false, false),
+                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false),
                 "Linux");
 
         validator.validate(field);
@@ -114,7 +124,7 @@ class FieldValidationTests {
     @Test
     void valueIsNotOneOfTheSelectableValues_success() {
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("OS", null, List.of("Linux", "Windows"),false, false, false, false),
+                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false),
                 "MacOS");
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
@@ -123,8 +133,8 @@ class FieldValidationTests {
     @Test
     void emptyFieldValue_fails() {
         FieldInstance field = setupFieldInstance(
-            setupFieldDefinition("hobbies", null, null,true, true, true, true),
-            "");
+                setupFieldDefinition("hobbies", null, null, true, true, true, true),
+                "");
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -134,7 +144,7 @@ class FieldValidationTests {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndValue(record.getVocabulary().getId(), "Bob")).thenReturn(true);
 
         FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("name", null, null,true, true, true, true),
+                setupFieldDefinition("name", null, null, true, true, true, true),
                 "Bob");
 
         assertThrows(ValidationException.class, () -> validator.validate(field));

@@ -45,14 +45,20 @@ class FieldDefinitionMapperTest {
         schema = new VocabularySchema();
         schema.setId(SCHEMA_ID);
 
-        fieldType = new FieldType("Anything_not_tested");
+        fieldType = new FieldType();
         fieldType.setId(FIELD_TYPE_ID);
 
-        FieldDefinition child = new FieldDefinition(schema, "Child", fieldType);
+        FieldDefinition child = new FieldDefinition();
+        child.setSchema(schema);
+        child.setName("Child");
+        child.setType(fieldType);
         schema.getDefinitions().add(child);
 
-        fieldDefinition = new FieldDefinition(schema, FIELD_DEFINITION_NAME, fieldType);
+        fieldDefinition = new FieldDefinition();
         fieldDefinition.setId(FIELD_DEFINITION_ID);
+        fieldDefinition.setSchema(schema);
+        fieldDefinition.setName(FIELD_DEFINITION_NAME);
+        fieldDefinition.setType(fieldType);
         fieldDefinitionDTO = new FieldDefinitionDTO();
         fieldDefinitionDTO.setId(FIELD_DEFINITION_ID);
         fieldDefinitionDTO.setSchemaId(SCHEMA_ID);

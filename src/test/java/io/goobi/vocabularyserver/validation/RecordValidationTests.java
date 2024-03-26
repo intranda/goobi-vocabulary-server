@@ -27,14 +27,20 @@ class RecordValidationTests {
 
     @BeforeEach
     public void setUp() {
-        FieldType ftText = new FieldType(FIELD_TYPE_TEXT_NAME);
+        FieldType ftText = new FieldType();
+        ftText.setName(FIELD_TYPE_TEXT_NAME);
         ftText.setId(FIELD_TYPE_TEXT_ID);
         ftText.setValidation("\\w+");
 
         VocabularySchema schema = new VocabularySchema();
-        vocabulary = new Vocabulary(schema, "Test vocabulary");
+        vocabulary = new Vocabulary();
+        vocabulary.setSchema(schema);
+        vocabulary.setName("Test vocabulary");
 
-        FieldDefinition fdName = new FieldDefinition(schema, "Name", ftText);
+        FieldDefinition fdName = new FieldDefinition();
+        fdName.setSchema(schema);
+        fdName.setName("Name");
+        fdName.setType(ftText);
         fdName.setMainEntry(true);
         fdName.setTitleField(true);
         fdName.setUnique(true);
@@ -45,7 +51,8 @@ class RecordValidationTests {
 
     @Test
     void missingRequiredField_fails() {
-        VocabularyRecord record = new VocabularyRecord(vocabulary);
+        VocabularyRecord record = new VocabularyRecord();
+        record.setVocabulary(vocabulary);
 
         assertThrows(ValidationException.class, () -> validator.validate(record));
     }

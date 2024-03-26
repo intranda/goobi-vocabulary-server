@@ -34,24 +34,24 @@ class VocabularyMapperTest {
 
     private Vocabulary vocabulary;
     private VocabularyDTO vocabularyDTO;
-    private VocabularyRecord vocabularyRecord1;
-    private VocabularyRecord vocabularyRecord2;
-    private VocabularyRecordDTO vocabularyRecordDTO1;
-    private VocabularyRecordDTO vocabularyRecordDTO2;
 
     @BeforeEach
     void setUp() {
         VocabularySchema schema = new VocabularySchema();
         schema.setId(SCHEMA_ID);
 
-        vocabulary = new Vocabulary(schema, VOCABULARY_NAME);
+        vocabulary = new Vocabulary();
         vocabulary.setId(VOCABULARY_ID);
+        vocabulary.setSchema(schema);
+        vocabulary.setName(VOCABULARY_NAME);
         vocabulary.setDescription(VOCABULARY_DESCRIPTION);
 
-        vocabularyRecord1 = new VocabularyRecord(vocabulary);
+        VocabularyRecord vocabularyRecord1 = new VocabularyRecord();
         vocabularyRecord1.setId(RECORD_1_ID);
-        vocabularyRecord2 = new VocabularyRecord(vocabulary);
+        vocabularyRecord1.setVocabulary(vocabulary);
+        VocabularyRecord vocabularyRecord2 = new VocabularyRecord();
         vocabularyRecord2.setId(RECORD_2_ID);
+        vocabularyRecord2.setVocabulary(vocabulary);
 
         vocabulary.setRecords(Set.of(vocabularyRecord1, vocabularyRecord2));
 

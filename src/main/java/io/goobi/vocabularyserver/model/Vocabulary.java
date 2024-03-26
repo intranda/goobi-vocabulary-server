@@ -9,11 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedHashSet;
@@ -22,8 +18,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Vocabulary {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,16 +26,13 @@ public class Vocabulary {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
-    @NonNull
     private VocabularySchema schema;
 
     // `name` is a reserved Mysql keyword
     @Column(name = "title", nullable = false, unique = true)
-    @NonNull
     private String name;
 
     @Column(name = "description", length = 4096)
-    @Setter
     private String description;
 
     @OneToMany(mappedBy = "vocabulary", cascade = CascadeType.ALL, orphanRemoval = true)

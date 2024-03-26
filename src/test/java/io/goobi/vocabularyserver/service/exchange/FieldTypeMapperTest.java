@@ -30,10 +30,15 @@ class FieldTypeMapperTest {
 
     @BeforeEach
     void setUp() {
-        fieldType = new FieldType(FIELD_TYPE_NAME);
+        fieldType = new FieldType();
         fieldType.setId(FIELD_TYPE_ID);
+        fieldType.setName(FIELD_TYPE_NAME);
         fieldType.setValidation(FIELD_TYPE_VALIDATION);
-        fieldType.setSelectableValues(FIELD_TYPE_SELECTABLE_VALUES.stream().map(SelectableValue::new).collect(Collectors.toSet()));
+        fieldType.setSelectableValues(FIELD_TYPE_SELECTABLE_VALUES.stream().map(s -> {
+            SelectableValue sv = new SelectableValue();
+            sv.setValue(s);
+            return sv;
+        }).collect(Collectors.toSet()));
         fieldTypeDTO = new FieldTypeDTO();
         fieldTypeDTO.setId(FIELD_TYPE_ID);
         fieldTypeDTO.setName(FIELD_TYPE_NAME);
