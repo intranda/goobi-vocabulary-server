@@ -12,13 +12,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RecordValidatorImpl implements Validator<VocabularyRecord> {
+public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
     private final Validator<FieldInstance> fieldValidator;
-    private final List<ValidationMethod<VocabularyRecord>> validations;
 
     public RecordValidatorImpl(Validator<FieldInstance> fieldValidator) {
+        super("Field validator");
         this.fieldValidator = fieldValidator;
-        validations = List.of(this::checkRequiredFieldsExistence);
+        setValidations(List.of(
+                this::checkRequiredFieldsExistence,
+                this::perFieldInstanceChecks
+        ));
     }
 
     private void checkRequiredFieldsExistence(VocabularyRecord vocabularyRecord) throws RecordValidationException {
@@ -38,19 +41,11 @@ public class RecordValidatorImpl implements Validator<VocabularyRecord> {
         }
     }
 
-    @Override
-    public void validate(VocabularyRecord vocabularyRecord) throws RecordValidationException {
+    private void perFieldInstanceChecks(VocabularyRecord vocabularyRecord) throws RecordValidationException {
         List<Throwable> errors = new LinkedList<>();
         for (FieldInstance f : vocabularyRecord.getFields()) {
             try {
-                validator.validate(f);
-            } catch (ValidationException e) {
-                errors.add(e);
-            }
-        }
-        for (ValidationMethod<VocabularyRecord> v : validations) {
-            try {
-                v.validate(vocabularyRecord);
+                fieldValidator.validate(f);
             } catch (ValidationException e) {
                 errors.add(e);
             }

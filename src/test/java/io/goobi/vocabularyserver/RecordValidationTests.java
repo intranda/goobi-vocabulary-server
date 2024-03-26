@@ -1,6 +1,5 @@
 package io.goobi.vocabularyserver;
 
-import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.FieldDefinition;
@@ -13,8 +12,8 @@ import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import io.goobi.vocabularyserver.validation.FieldValidatorImpl;
-import io.goobi.vocabularyserver.validation.RecordValidator;
 import io.goobi.vocabularyserver.validation.RecordValidatorImpl;
+import io.goobi.vocabularyserver.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +40,7 @@ public class RecordValidationTests {
     @Mock
     private VocabularyRecordRepository repository;
     @Spy
-    private RecordValidator validator = new RecordValidatorImpl(new FieldValidatorImpl());
+    private Validator<VocabularyRecord> validator = new RecordValidatorImpl(new FieldValidatorImpl());
     @InjectMocks
     private RecordManager recordManager;
 
@@ -91,7 +90,7 @@ public class RecordValidationTests {
     }
 
     @Test
-    void validRecord_success() throws RecordValidationException {
+    void validRecord_success() throws ValidationException {
         VocabularyRecordDTO dto = new VocabularyRecordDTO();
         VocabularyRecord record = new VocabularyRecord(vocabulary);
         when(mapper.toEntity(dto)).thenReturn(record);

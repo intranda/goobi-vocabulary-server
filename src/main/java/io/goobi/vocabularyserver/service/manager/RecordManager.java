@@ -1,14 +1,14 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
-import io.goobi.vocabularyserver.exception.RecordValidationException;
+import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
-import io.goobi.vocabularyserver.validation.RecordValidator;
+import io.goobi.vocabularyserver.validation.Validator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +20,10 @@ public class RecordManager {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
 
-    private final RecordValidator validator;
+    private final Validator<VocabularyRecord> validator;
 
     public RecordManager(VocabularyRepository vocabularyRepository,
-                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, RecordValidator validator) {
+                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecord> validator) {
         this.vocabularyRepository = vocabularyRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
@@ -47,7 +47,7 @@ public class RecordManager {
         );
     }
 
-    public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws RecordValidationException {
+    public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws ValidationException {
         VocabularyRecord jpaVocabularyRecord = modelMapper.toEntity(newRecord);
         validator.validate(jpaVocabularyRecord);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));

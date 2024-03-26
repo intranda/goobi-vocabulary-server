@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
-import io.goobi.vocabularyserver.exception.RecordValidationException;
+import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.hateoas.CollectionModel;
@@ -40,7 +40,7 @@ public class RecordController {
 
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws RecordValidationException {
+    public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
         if (vocabularyRecordDTO.getVocabularyId() != 0 && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
             throw new IllegalArgumentException("Inconsistency in passed id's");
         }
