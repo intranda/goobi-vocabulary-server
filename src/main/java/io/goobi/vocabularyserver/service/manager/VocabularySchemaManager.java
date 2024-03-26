@@ -3,6 +3,7 @@ package io.goobi.vocabularyserver.service.manager;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
@@ -46,5 +47,14 @@ public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
         VocabularySchema jpaSchema = modelMapper.toEntity(newSchema);
         validator.validate(jpaSchema);
         return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));
+    }
+
+    @Override
+    public VocabularySchemaDTO delete(long id) {
+        if (!vocabularySchemaRepository.existsById(id)) {
+            throw new EntityNotFoundException(VocabularySchema.class, id);
+        }
+        vocabularySchemaRepository.deleteById(id);
+        return null;
     }
 }
