@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1")
-public class RecordController {
+public class VocabularyRecordController {
     private final RecordManager manager;
     private final RecordAssembler assembler;
 
-    public RecordController(RecordManager manager, RecordAssembler assembler) {
+    public VocabularyRecordController(RecordManager manager, RecordAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }

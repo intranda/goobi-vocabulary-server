@@ -40,7 +40,7 @@ public class VocabularyController {
     @GetMapping("/vocabularies/{id}")
     public EntityModel<VocabularyDTO> one(@PathVariable long id) {
         EntityModel<VocabularyDTO> model = assembler.toModel(manager.get(id));
-        model.add(linkTo(methodOn(RecordController.class).allInVocabulary(id)).withRel("records"));
+        model.add(linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(id)).withRel("records"));
         model.add(linkTo(methodOn(VocabularyController.class).delete(id)).withRel("delete"));
         return model;
     }

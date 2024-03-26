@@ -1,6 +1,6 @@
 package io.goobi.vocabularyserver.api.assemblers;
 
-import io.goobi.vocabularyserver.api.RecordController;
+import io.goobi.vocabularyserver.api.VocabularyRecordController;
 import io.goobi.vocabularyserver.api.VocabularyController;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import org.springframework.hateoas.EntityModel;
@@ -15,10 +15,10 @@ public class RecordAssembler implements RepresentationModelAssembler<VocabularyR
     @Override
     public EntityModel<VocabularyRecordDTO> toModel(VocabularyRecordDTO entity) {
         return EntityModel.of(entity,
-                linkTo(methodOn(RecordController.class).one(entity.getId())).withSelfRel(),
+                linkTo(methodOn(VocabularyRecordController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(VocabularyController.class).one(entity.getVocabularyId())).withRel("vocabulary"),
-                linkTo(methodOn(RecordController.class).allInVocabulary(entity.getVocabularyId())).withRel("vocabulary_records"),
-                linkTo(methodOn(RecordController.class).delete(entity.getId())).withRel("delete")
+                linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getVocabularyId())).withRel("vocabulary_records"),
+                linkTo(methodOn(VocabularyRecordController.class).delete(entity.getId())).withRel("delete")
         );
     }
 }
