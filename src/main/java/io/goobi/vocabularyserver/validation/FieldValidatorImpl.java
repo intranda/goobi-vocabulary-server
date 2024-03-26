@@ -31,30 +31,34 @@ public class FieldValidatorImpl extends BaseValidator<FieldInstance> {
         String value = field.getValue();
         String regex = field.getDefinition().getType().getValidation();
         if (regex != null && !Pattern.matches(regex, value)) {
-            throw new FieldValidationException("Field value \"" + value + "\" doesn't satisfy validation regular expression \"" + regex + "\"");
+            throw new FieldValidationException("Field value \"" + value + "\" doesn't satisfy validation regular expression \"" + regex + "\" for field \""
+                    + field.getDefinition().getName() + "\" [" + field.getDefinition().getId() + "]");
         }
     }
 
-    private void checkValueIsOneOfSelectableValues(FieldInstance fieldInstance) throws FieldValidationException {
-        Set<SelectableValue> selectableValues = fieldInstance.getDefinition().getType().getSelectableValues();
+    private void checkValueIsOneOfSelectableValues(FieldInstance field) throws FieldValidationException {
+        Set<SelectableValue> selectableValues = field.getDefinition().getType().getSelectableValues();
         if (selectableValues != null && !selectableValues.isEmpty()) {
-            String value = fieldInstance.getValue();
+            String value = field.getValue();
             Set<String> selectableStringValues = selectableValues.stream().map(SelectableValue::getValue).collect(Collectors.toSet());
             if (!selectableStringValues.contains(value)) {
-                throw new FieldValidationException("Field value \"" + value + "\" is not one of the allowed selectable values: " + String.join(", ", selectableStringValues));
+                throw new FieldValidationException("Field value \"" + value + "\" is not one of the allowed selectable values for field \""
+                        + field.getDefinition().getName() + "\" [" + field.getDefinition().getId() + "]: "
+                        + String.join(", ", selectableStringValues));
             }
         }
     }
 
     private void checkForbiddenBlankValue(FieldInstance field) throws FieldValidationException {
         if (field.getValue().isBlank()) {
-            throw new FieldValidationException("Field value is not allowed to be blank");
+            throw new FieldValidationException("Field \"" + field.getDefinition().getName() + "\" [" + field.getDefinition().getId() + "] value is not allowed to be blank");
         }
     }
 
     private void checkValueUniqueness(FieldInstance field) throws FieldValidationException {
-        if (field.getDefinition().getUnique() && fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndValue(field.getVocabularyRecord().getVocabulary().getId(), field.getValue())) {
-            throw new FieldValidationException("Unique field value \"" + field.getValue() + "\" is already present in vocabulary");
+        if (Boolean.TRUE.equals(field.getDefinition().getUnique()) && fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndValue(field.getVocabularyRecord().getVocabulary().getId(), field.getValue())) {
+            throw new FieldValidationException("Unique field value \"" + field.getValue() + "\" for field \"" +
+                    field.getDefinition().getName() + "\" [" + field.getDefinition().getId() + "] is already present in vocabulary");
         }
     }
 }
