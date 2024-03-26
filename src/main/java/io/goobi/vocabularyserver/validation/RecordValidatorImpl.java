@@ -16,7 +16,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
     private final Validator<FieldInstance> fieldValidator;
 
     public RecordValidatorImpl(Validator<FieldInstance> fieldValidator) {
-        super("Field validator");
+        super("Record");
         this.fieldValidator = fieldValidator;
         setValidations(List.of(
                 this::checkRequiredFieldsExistence,
@@ -31,12 +31,20 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
                 .stream()
                 .filter(FieldDefinition::getRequired)
                 .collect(Collectors.toList());
-        missingFields.removeAll(vocabularyRecord.getFields().stream().map(FieldInstance::getDefinition).collect(Collectors.toList()));
+        List<FieldDefinition> providedFields = vocabularyRecord.getFields()
+                .stream()
+                .map(FieldInstance::getDefinition)
+                .collect(Collectors.toList());
+        missingFields.removeAll(providedFields);
         if (!missingFields.isEmpty()) {
-            throw new RecordValidationException("Missing required fields: "
-                    + missingFields.stream()
-                    .map(f -> "\"" + f.getName() + "\"")
-                    .collect(Collectors.joining(", "))
+            throw new RecordValidationException(
+                    "Missing required fields: "
+                            + missingFields.stream()
+                            .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
+                            .collect(Collectors.joining(", ")) + " -- "
+                            + "provided fields: " + providedFields.stream()
+                            .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
+                            .collect(Collectors.joining(", "))
             );
         }
     }

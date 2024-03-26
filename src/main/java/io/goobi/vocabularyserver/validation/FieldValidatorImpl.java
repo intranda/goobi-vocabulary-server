@@ -17,7 +17,7 @@ public class FieldValidatorImpl extends BaseValidator<FieldInstance> {
     private final FieldInstanceRepository fieldInstanceRepository;
 
     public FieldValidatorImpl(FieldInstanceRepository fieldInstanceRepository) {
-        super("Field Instance");
+        super("Field");
         setValidations(List.of(
                 this::checkRegularExpressionMatchesValue,
                 this::checkValueIsOneOfSelectableValues,
