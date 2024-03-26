@@ -14,7 +14,10 @@ import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.model.VocabularySchema;
 
 public interface DTOMapper {
-    FieldDefinition toEntity(FieldDefinitionDTO dto);
+    default FieldDefinition toEntity(FieldDefinitionDTO dto) {
+        return toEntity(dto, true);
+    }
+    FieldDefinition toEntity(FieldDefinitionDTO dto, boolean fullInitialization);
 
     FieldDefinitionDTO toDTO(FieldDefinition entity);
 

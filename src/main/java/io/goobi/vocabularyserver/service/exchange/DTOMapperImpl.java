@@ -73,10 +73,12 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldDefinition toEntity(FieldDefinitionDTO dto) {
+    public FieldDefinition toEntity(FieldDefinitionDTO dto, boolean fullInitialization) {
         FieldDefinition result = new FieldDefinition();
         result.setId(dto.getId());
-        result.setSchema(lookUpSchema(dto.getSchemaId()));
+        if (fullInitialization) {
+            result.setSchema(lookUpSchema(dto.getSchemaId()));
+        }
         result.setType(lookUpFieldType(dto.getTypeId()));
         result.setName(dto.getName());
         result.setRequired(dto.isRequired());
@@ -176,7 +178,10 @@ public class DTOMapperImpl implements DTOMapper {
     public VocabularySchema toEntity(VocabularySchemaDTO dto) {
         VocabularySchema result = new VocabularySchema();
         result.setId(dto.getId());
-        result.setDefinitions(dto.getDefinitions().stream().map(this::toEntity).collect(Collectors.toList()));
+        result.setDefinitions(dto.getDefinitions().stream()
+                .map(d -> this.toEntity(d, false)
+                ).collect(Collectors.toList()));
+        result.getDefinitions().forEach(d -> d.setSchema(result));
         return result;
     }
 
