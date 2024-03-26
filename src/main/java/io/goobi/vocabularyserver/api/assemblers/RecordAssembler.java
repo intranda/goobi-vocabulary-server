@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.api.assemblers;
 
-import io.goobi.vocabularyserver.api.VocabularyRecordController;
 import io.goobi.vocabularyserver.api.VocabularyController;
+import io.goobi.vocabularyserver.api.VocabularyRecordController;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
