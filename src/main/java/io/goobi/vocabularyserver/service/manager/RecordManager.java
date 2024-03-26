@@ -60,4 +60,11 @@ public class RecordManager {
         vocabularyRecordRepository.deleteById(id);
         return null;
     }
+
+    public List<VocabularyRecordDTO> search(long id, String searchTerm) {
+        return vocabularyRecordRepository.findByVocabulary_IdAndFields_ValueLikeIgnoreCase(id, searchTerm)
+                .stream()
+                .map(modelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

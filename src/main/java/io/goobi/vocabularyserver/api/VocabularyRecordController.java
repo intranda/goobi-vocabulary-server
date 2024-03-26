@@ -38,6 +38,11 @@ public class VocabularyRecordController {
         return assembler.toModel(manager.get(recordId));
     }
 
+    @GetMapping("/vocabularies/{vocabularyId}/records/search")
+    public CollectionModel<EntityModel<VocabularyRecordDTO>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm) {
+        return assembler.toCollectionModel(manager.search(vocabularyId, searchTerm));
+    }
+
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
