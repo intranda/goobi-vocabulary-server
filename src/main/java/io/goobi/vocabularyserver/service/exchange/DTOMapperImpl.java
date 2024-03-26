@@ -21,6 +21,7 @@ import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,10 +104,12 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldInstance toEntity(FieldInstanceDTO dto) {
+    public FieldInstance toEntity(FieldInstanceDTO dto, boolean fullInitialization) {
         FieldInstance result = new FieldInstance();
         result.setId(dto.getId());
-        result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
+        if (fullInitialization) {
+            result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
+        }
         result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         result.setLanguage(dto.getLanguage());
         result.setValue(dto.getValue());
@@ -198,7 +201,17 @@ public class DTOMapperImpl implements DTOMapper {
         VocabularyRecord result = new VocabularyRecord();
         result.setId(dto.getId());
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
-        result.setFields(dto.getFields().stream().map(this::toEntity).collect(Collectors.toSet()));
+        // Field instance equality is based on IDs, therefore we need to provide distince IDs for all field instances.
+        // Otherwise, after collecting them in sets will result in only one field.
+        // The IDs are ignored by JPA anyway.
+        Iterator<FieldInstanceDTO> fieldIterator = dto.getFields().iterator();
+        for (int i = 1; i <= dto.getFields().size(); i++) {
+            fieldIterator.next().setId(i);
+        }
+        result.setFields(dto.getFields().stream()
+                .map(f -> this.toEntity(f, false))
+                .collect(Collectors.toSet()));
+        result.getFields().forEach(f -> f.setVocabularyRecord(result));
         return result;
     }
 

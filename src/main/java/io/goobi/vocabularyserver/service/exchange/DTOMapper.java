@@ -21,7 +21,10 @@ public interface DTOMapper {
 
     FieldDefinitionDTO toDTO(FieldDefinition entity);
 
-    FieldInstance toEntity(FieldInstanceDTO dto);
+    default FieldInstance toEntity(FieldInstanceDTO dto) {
+        return toEntity(dto, true);
+    }
+    FieldInstance toEntity(FieldInstanceDTO dto, boolean fullInitialization);
 
     FieldInstanceDTO toDTO(FieldInstance entity);
 
