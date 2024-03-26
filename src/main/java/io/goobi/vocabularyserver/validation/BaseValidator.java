@@ -27,10 +27,12 @@ public class BaseValidator<T> implements Validator<T> {
             }
         }
         if (!errors.isEmpty()) {
-            throw new ValidationException("Error validating " + name + ":\n\t"
-                    + errors.stream()
-                    .map(Throwable::getMessage)
-                    .collect(Collectors.joining("\n\t")));
+            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
+            List<String> errorLines = List.of(errorMessages.split("\n"));
+            throw new ValidationException("Error validating " + name + ":\n"
+                    + errorLines.stream()
+                    .map(l -> "\t" + l)
+                    .collect(Collectors.joining("\n")));
         }
     }
 }

@@ -59,10 +59,11 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
             }
         }
         if (!errors.isEmpty()) {
-            throw new RecordValidationException("Error validating Vocabulary record:\n\t"
-                    + errors.stream()
-                    .map(Throwable::getMessage)
-                    .collect(Collectors.joining("\n\t")));
+            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
+            List<String> errorLines = List.of(errorMessages.split("\n"));
+            throw new RecordValidationException(errorLines.stream()
+                    .map(l -> "\t" + l)
+                    .collect(Collectors.joining("\n")));
         }
     }
 }
