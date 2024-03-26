@@ -2,6 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.api.assemblers.VocabularyAssembler;
+import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.hateoas.CollectionModel;
@@ -47,7 +48,7 @@ public class VocabularyController {
 
     @PostMapping("/vocabularies")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyDTO> create(@RequestBody VocabularyDTO vocabularyDTO) {
+    public EntityModel<VocabularyDTO> create(@RequestBody VocabularyDTO vocabularyDTO) throws ValidationException {
         return assembler.toModel(manager.create(vocabularyDTO));
     }
 

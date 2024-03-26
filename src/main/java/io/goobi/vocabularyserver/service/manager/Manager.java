@@ -1,5 +1,7 @@
 package io.goobi.vocabularyserver.service.manager;
 
+import io.goobi.vocabularyserver.exception.ValidationException;
+
 import java.util.List;
 
 public interface Manager<T> {
@@ -11,7 +13,7 @@ public interface Manager<T> {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default T create(T newT) {
+    default T create(T newT) throws ValidationException {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

@@ -1,6 +1,7 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.api.assemblers.VocabularySchemaAssembler;
+import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
 import io.goobi.vocabularyserver.service.manager.VocabularySchemaManager;
 import org.springframework.hateoas.CollectionModel;
@@ -37,7 +38,7 @@ public class VocabularySchemaController {
 
     @PostMapping("/schemas")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularySchemaDTO> create(@RequestBody VocabularySchemaDTO newSchema) {
+    public EntityModel<VocabularySchemaDTO> create(@RequestBody VocabularySchemaDTO newSchema) throws ValidationException {
         return assembler.toModel(manager.create(newSchema));
     }
 }
