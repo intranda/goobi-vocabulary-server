@@ -60,10 +60,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         }
         if (!errors.isEmpty()) {
             String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
-            List<String> errorLines = List.of(errorMessages.split("\n"));
-            throw new RecordValidationException(errorLines.stream()
-                    .map(l -> "\t" + l)
-                    .collect(Collectors.joining("\n")));
+            throw new RecordValidationException(errorMessages);
         }
     }
 }
