@@ -56,7 +56,11 @@ public class FieldValidatorImpl extends BaseValidator<FieldInstance> {
     }
 
     private void checkValueUniqueness(FieldInstance field) throws FieldValidationException {
-        if (Boolean.TRUE.equals(field.getDefinition().getUnique()) && fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndValue(field.getVocabularyRecord().getVocabulary().getId(), field.getValue())) {
+        if (Boolean.TRUE.equals(field.getDefinition().getUnique())
+                && fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndValue(
+                        field.getVocabularyRecord().getVocabulary().getId(),
+                        field.getDefinition().getId(),
+                        field.getValue())) {
             throw new FieldValidationException("Unique field value \"" + field.getValue() + "\" for field \"" +
                     field.getDefinition().getName() + "\" [" + field.getDefinition().getId() + "] is already present in vocabulary");
         }

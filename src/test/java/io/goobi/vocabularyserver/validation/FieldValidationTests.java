@@ -140,13 +140,37 @@ class FieldValidationTests {
     }
 
     @Test
-    void duplicateUniqueFieldRecord_fails() {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndValue(record.getVocabulary().getId(), "Bob")).thenReturn(true);
+    void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws ValidationException {
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndValue(record.getVocabulary().getId(), 1L, "Bob")).thenReturn(true);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndValue(record.getVocabulary().getId(), 2L, "Bob")).thenReturn(false);
 
-        FieldInstance field = setupFieldInstance(
-                setupFieldDefinition("name", null, null, true, true, true, true),
+        FieldInstance fieldFriend = setupFieldInstance(
+                setupFieldDefinition("Best Friend", null, null, false, true, false, true),
+                "Thomas");
+        fieldFriend.getDefinition().setId(1L);
+        FieldInstance fieldName = setupFieldInstance(
+                setupFieldDefinition("Name", null, null, true, true, true, true),
                 "Bob");
+        fieldName.getDefinition().setId(2L);
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        validator.validate(fieldFriend);
+        validator.validate(fieldName);
+    }
+
+    @Test
+    void duplicateUniqueFieldValueForTheSameFieldDefinition_fails() {
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndValue(record.getVocabulary().getId(), 1L, "Bob")).thenReturn(false);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndValue(record.getVocabulary().getId(), 2L, "Bob")).thenReturn(true);
+
+        FieldInstance fieldFriend = setupFieldInstance(
+                setupFieldDefinition("Best Friend", null, null, false, true, false, true),
+                "Thomas");
+        fieldFriend.getDefinition().setId(1L);
+        FieldInstance fieldName = setupFieldInstance(
+                setupFieldDefinition("Name", null, null, true, true, true, true),
+                "Bob");
+        fieldName.getDefinition().setId(2L);
+
+        assertThrows(ValidationException.class, () -> validator.validate(fieldName));
     }
 }
