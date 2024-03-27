@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyController {
@@ -40,10 +37,7 @@ public class VocabularyController {
 
     @GetMapping("/vocabularies/{id}")
     public EntityModel<VocabularyDTO> one(@PathVariable long id) {
-        EntityModel<VocabularyDTO> model = assembler.toModel(manager.get(id));
-        model.add(linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(id)).withRel("records"));
-        model.add(linkTo(methodOn(VocabularyController.class).delete(id)).withRel("delete"));
-        return model;
+        return assembler.toModel(manager.get(id));
     }
 
     @PostMapping("/vocabularies")
