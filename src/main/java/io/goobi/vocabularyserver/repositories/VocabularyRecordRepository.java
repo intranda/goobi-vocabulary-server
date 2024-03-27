@@ -1,6 +1,8 @@
 package io.goobi.vocabularyserver.repositories;
 
 import io.goobi.vocabularyserver.model.VocabularyRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
@@ -12,4 +14,6 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
     Optional<VocabularyRecord> findById(Long aLong);
 
     List<VocabularyRecord> findByVocabulary_IdAndFields_ValueLikeIgnoreCase(@NonNull Long id, @NonNull String value);
+
+    Page<VocabularyRecord> findByVocabulary_Id(@NonNull Long id, Pageable pageable);
 }

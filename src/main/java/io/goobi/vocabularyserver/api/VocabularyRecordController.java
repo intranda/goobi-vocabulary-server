@@ -4,6 +4,8 @@ import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -29,8 +31,8 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public CollectionModel<EntityModel<VocabularyRecordDTO>> allInVocabulary(@PathVariable long vocabularyId) {
-        return assembler.toCollectionModel(manager.listAll(vocabularyId));
+    public Page<VocabularyRecordDTO> allInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest) {
+        return manager.listAll(vocabularyId, pageRequest);
     }
 
     @GetMapping("/records/{recordId}")

@@ -3,12 +3,12 @@ package io.goobi.vocabularyserver.service.manager;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
-import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.validation.Validator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,28 +16,20 @@ import java.util.stream.Collectors;
 
 @Service
 public class RecordManager {
-    private final VocabularyRepository vocabularyRepository;
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
 
     private final Validator<VocabularyRecord> validator;
 
-    public RecordManager(VocabularyRepository vocabularyRepository,
-                         VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecord> validator) {
-        this.vocabularyRepository = vocabularyRepository;
+    public RecordManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecord> validator) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
     }
 
-    public List<VocabularyRecordDTO> listAll(long id) {
-        Vocabulary jpaVocabulary = vocabularyRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
-        return jpaVocabulary.getRecords()
-                .stream()
-                .map(modelMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<VocabularyRecordDTO> listAll(long id, Pageable pageRequest) {
+        return vocabularyRecordRepository.findByVocabulary_Id(id, pageRequest)
+                .map(modelMapper::toDTO);
     }
 
     public VocabularyRecordDTO get(long id) {
