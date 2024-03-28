@@ -73,7 +73,6 @@ class RecordValidationTests {
         FieldInstance name = new FieldInstance();
         name.setVocabularyRecord(record);
         name.setDefinition(fdName);
-        name.setValue("Tom");
 
         FieldDefinition os = new FieldDefinition();
         os.setSchema(new VocabularySchema());
@@ -87,7 +86,6 @@ class RecordValidationTests {
         FieldInstance unknown = new FieldInstance();
         unknown.setVocabularyRecord(record);
         unknown.setDefinition(os);
-        unknown.setValue("Linux");
 
         record.setFields(Set.of(name, unknown));
 
