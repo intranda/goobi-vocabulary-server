@@ -44,7 +44,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
             }
         }
         if (wrongValues != null) {
-            throw new FieldValueValidationException("The following field values do not satisfy the validation \""
+            throw new FieldValueValidationException("The following field value(s) do not satisfy the validation \""
                     + regex + "\" for field \"" + fieldValue.getFieldInstance().getDefinition().getName() + "\" ["
                     + fieldValue.getFieldInstance().getDefinition().getId() + "]:\n\t- "
                     + String.join("\n\t- ", wrongValues));
@@ -62,7 +62,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
                     .filter(v -> !selectableStringValues.contains(v))
                     .collect(Collectors.toSet());
             if (!wrongValues.isEmpty()) {
-                throw new FieldValueValidationException("Field values \"" + String.join("\", \"", wrongValues) + "\" is not one of the allowed selectable values for field \""
+                throw new FieldValueValidationException("Field value(s) \"" + String.join("\", \"", wrongValues) + "\" is not one of the allowed selectable values for field \""
                         + fieldValue.getFieldInstance().getDefinition().getName() + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "]: "
                         + String.join(", ", selectableStringValues));
             }
@@ -87,7 +87,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
                             ))
                     .collect(Collectors.toSet());
             if (!duplicateUniqueValues.isEmpty()) {
-                throw new FieldValueValidationException("Unique field values \"" + String.join("\", \"", duplicateUniqueValues)
+                throw new FieldValueValidationException("Unique field value(s) \"" + String.join("\", \"", duplicateUniqueValues)
                         + "\" for field \"" + fieldValue.getFieldInstance().getDefinition().getName() + "\" ["
                         + fieldValue.getFieldInstance().getDefinition().getId() + "] is already present in vocabulary");
             }
