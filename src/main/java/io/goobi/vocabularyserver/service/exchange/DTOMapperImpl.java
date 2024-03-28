@@ -4,24 +4,31 @@ import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
 import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
 import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
+import io.goobi.vocabularyserver.exchange.FieldValueDTO;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
 import io.goobi.vocabularyserver.model.FieldDefinition;
 import io.goobi.vocabularyserver.model.FieldInstance;
+import io.goobi.vocabularyserver.model.FieldTranslation;
 import io.goobi.vocabularyserver.model.FieldType;
+import io.goobi.vocabularyserver.model.FieldValue;
+import io.goobi.vocabularyserver.model.Language;
 import io.goobi.vocabularyserver.model.SelectableValue;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
+import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
+import io.goobi.vocabularyserver.repositories.LanguageRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,16 +38,22 @@ public class DTOMapperImpl implements DTOMapper {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final VocabularyRepository vocabularyRepository;
     private final FieldDefinitionRepository fieldDefinitionRepository;
+    private final FieldInstanceRepository fieldInstanceRepository;
+    private final LanguageRepository languageRepository;
 
     public DTOMapperImpl(FieldTypeRepository fieldTypeRepository, VocabularySchemaRepository vocabularySchemaRepository,
                          VocabularyRecordRepository vocabularyRecordRepository,
                          VocabularyRepository vocabularyRepository,
-                         FieldDefinitionRepository fieldDefinitionRepository) {
+                         FieldDefinitionRepository fieldDefinitionRepository,
+                         FieldInstanceRepository fieldInstanceRepository,
+                         LanguageRepository languageRepository) {
         this.fieldTypeRepository = fieldTypeRepository;
         this.vocabularySchemaRepository = vocabularySchemaRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.vocabularyRepository = vocabularyRepository;
         this.fieldDefinitionRepository = fieldDefinitionRepository;
+        this.fieldInstanceRepository = fieldInstanceRepository;
+        this.languageRepository = languageRepository;
     }
 
     private Vocabulary lookUpVocabulary(Long id) {
@@ -67,10 +80,21 @@ public class DTOMapperImpl implements DTOMapper {
                 .orElseThrow(() -> new EntityNotFoundException(FieldDefinition.class, id));
     }
 
+    private FieldInstance lookupFieldInstance(Long id) {
+        return fieldInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(FieldInstance.class, id));
+    }
+
     private FieldType lookUpFieldType(Long id) {
         return fieldTypeRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(FieldType.class, id));
+    }
+
+    private Language lookUpLanguage(String abbreviation) {
+        return languageRepository.findByAbbreviation(abbreviation)
+                .orElseThrow(() -> new EntityNotFoundException(Language.class, abbreviation));
     }
 
     @Override
@@ -111,8 +135,11 @@ public class DTOMapperImpl implements DTOMapper {
             result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
         }
         result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
-        result.setLanguage(dto.getLanguage());
-        result.setValue(dto.getValue());
+        result.setFieldValues(dto.getValues().stream()
+                .map(fv -> toEntity(fv, false))
+                .collect(Collectors.toSet())
+        );
+        result.getFieldValues().forEach(fv -> fv.setFieldInstance(result));
         return result;
     }
 
@@ -122,8 +149,47 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setRecordId(entity.getVocabularyRecord().getId());
         result.setDefinitionId(entity.getDefinition().getId());
-        result.setLanguage(entity.getLanguage());
-        result.setValue(entity.getValue());
+        result.setValues(entity.getFieldValues().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toSet())
+        );
+        return result;
+    }
+
+    @Override
+    // TODO: Test this
+    public FieldValue toEntity(FieldValueDTO dto, boolean fullInitialization) {
+        FieldValue result = new FieldValue();
+        result.setId(dto.getId());
+        // TODO: Maybe manual initialization
+        if (fullInitialization) {
+            result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
+        }
+        result.setTranslations(dto.getTranslations().entrySet().stream()
+                .map(e -> toEntity(e, result))
+                .collect(Collectors.toSet())
+        );
+        return result;
+    }
+
+    private FieldTranslation toEntity(Map.Entry<String, String> entry, FieldValue fieldValue) {
+        FieldTranslation result = new FieldTranslation();
+        // ID is not present but will be auto-generated anyway
+        result.setLanguage(lookUpLanguage(entry.getKey()));
+        result.setFieldValue(fieldValue);
+        result.setValue(entry.getValue());
+        return result;
+    }
+
+    @Override
+    // TODO: Test this
+    public FieldValueDTO toDTO(FieldValue entity) {
+        FieldValueDTO result = new FieldValueDTO();
+        result.setId(entity.getId());
+        result.setFieldId(entity.getFieldInstance().getId());
+        result.setTranslations(entity.getTranslations().stream()
+                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), FieldTranslation::getValue))
+        );
         return result;
     }
 

@@ -1,18 +1,21 @@
 package io.goobi.vocabularyserver.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,7 +25,7 @@ public class FieldInstance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -33,12 +36,8 @@ public class FieldInstance {
     @JoinColumn(name = "record_id", nullable = false)
     private VocabularyRecord vocabularyRecord;
 
-    @Column(name = "language", length = MAX_LANGUAGE_LENGTH)
-    private String language;
-
-    // `value` is a reserved Mysql keyword
-    @Column(name = "content", columnDefinition = "TEXT")
-    private String value;
+    @OneToMany(mappedBy = "fieldInstance", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<FieldValue> fieldValues = new LinkedHashSet<>();
 
     @Override
     public final boolean equals(Object o) {

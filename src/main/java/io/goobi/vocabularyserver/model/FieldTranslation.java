@@ -6,9 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -18,48 +17,23 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"schema_id", "label"}),
-        @UniqueConstraint(columnNames = {"schema_id", "main_entry"})
-})
-public class FieldDefinition {
+public class FieldTranslation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "schema_id", nullable = false)
-    private VocabularySchema schema;
-
-    // `name` is a reserved Mysql keyword
-    @Column(name = "label", nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "field_value_id", nullable = false)
+    private FieldValue fieldValue;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "type_id", nullable = false)
-    private FieldType type;
+    @JoinColumn(name = "language_id", nullable = false)
+    private Language language;
 
-    @Column(name = "required", nullable = false)
-    private Boolean required = false;
-
-    // `unique` is a reserved MariaDB keyword
-    @Column(name = "distinctive", nullable = false)
-    private Boolean unique = false;
-
-    @Column(name = "main_entry")
-    private Boolean mainEntry;
-
-    public void setMainEntry(final Boolean newValue) {
-        if (Boolean.TRUE.equals(newValue)) {
-            this.mainEntry = true;
-        } else {
-            this.mainEntry = null;
-        }
-    }
-
-    @Column(name = "title_field", nullable = false)
-    private Boolean titleField = false;
+    @Lob
+    @Column(name = "content")
+    private String value;
 
     @Override
     public final boolean equals(Object o) {
@@ -74,7 +48,7 @@ public class FieldDefinition {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        FieldDefinition that = (FieldDefinition) o;
+        FieldTranslation that = (FieldTranslation) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
