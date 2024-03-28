@@ -3,6 +3,7 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,8 +44,8 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
-    public CollectionModel<EntityModel<VocabularyRecordDTO>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm) {
-        return assembler.toCollectionModel(manager.search(vocabularyId, searchTerm));
+    public PagedModel<EntityModel<VocabularyRecordDTO>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecordDTO> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.search(vocabularyId, searchTerm, pageRequest), assembler);
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")

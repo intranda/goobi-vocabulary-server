@@ -11,9 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class RecordManager {
     private final VocabularyRecordRepository vocabularyRecordRepository;
@@ -53,10 +50,8 @@ public class RecordManager {
         return null;
     }
 
-    public List<VocabularyRecordDTO> search(long id, String searchTerm) {
-        return vocabularyRecordRepository.findByVocabulary_IdAndFields_ValueLikeIgnoreCase(id, searchTerm)
-                .stream()
-                .map(modelMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<VocabularyRecordDTO> search(long id, String searchTerm, Pageable pageRequest) {
+        return vocabularyRecordRepository.findByVocabulary_IdAndFields_ValueLikeIgnoreCase(id, searchTerm, pageRequest)
+                .map(modelMapper::toDTO);
     }
 }
