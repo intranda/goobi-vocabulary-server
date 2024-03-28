@@ -4,7 +4,6 @@ import io.goobi.vocabularyserver.api.VocabularyController;
 import io.goobi.vocabularyserver.api.VocabularyRecordController;
 import io.goobi.vocabularyserver.api.VocabularySchemaController;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,7 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
                 linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(VocabularyController.class).all()).withRel("vocabularies"),
                 linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
-                linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getId(), null)).withRel("records"),
+                linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getId(), null, null)).withRel("records"),
                 linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete")
         );
     }

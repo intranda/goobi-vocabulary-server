@@ -6,8 +6,10 @@ import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +33,8 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public Page<VocabularyRecordDTO> allInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest) {
-        return manager.listAll(vocabularyId, pageRequest);
+    public PagedModel<EntityModel<VocabularyRecordDTO>> allInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecordDTO> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.listAll(vocabularyId, pageRequest), assembler);
     }
 
     @GetMapping("/records/{recordId}")
