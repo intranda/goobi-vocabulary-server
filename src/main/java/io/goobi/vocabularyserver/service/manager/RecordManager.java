@@ -51,10 +51,7 @@ public class RecordManager {
     }
 
     public Page<VocabularyRecordDTO> search(long id, String searchTerm, Pageable pageRequest) {
-//        return vocabularyRecordRepository.findByVocabulary_IdAndFields_ValueLikeIgnoreCase(id, searchTerm, pageRequest)
-//                .map(modelMapper::toDTO);
-        // TODO: Fix this
-        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLikeIgnoreCase(id, searchTerm, pageRequest)
+        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, searchTerm, pageRequest)
                 .map(modelMapper::toDTO);
     }
 }
