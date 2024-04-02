@@ -24,4 +24,7 @@ public class VocabularySchema {
 
     @OneToMany(mappedBy = "schema", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FieldDefinition> definitions = new ArrayList<>();
+
+    @Column(name = "hierarchical_records")
+    private Boolean hierarchicalRecords;
 }

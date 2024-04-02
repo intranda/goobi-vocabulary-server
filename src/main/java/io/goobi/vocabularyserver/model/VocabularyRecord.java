@@ -34,6 +34,13 @@ public class VocabularyRecord {
     @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldInstance> fields = new LinkedHashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "parent_record_id")
+    private VocabularyRecord parentRecord;
+
+    @OneToMany(mappedBy = "parentRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VocabularyRecord> children = new LinkedHashSet<>();
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) {
