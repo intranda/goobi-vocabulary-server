@@ -7,7 +7,6 @@ import io.goobi.vocabularyserver.model.SelectableValue;
 import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +43,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
             }
         }
         if (wrongValues != null) {
-            throw new FieldValueValidationException("The following field value(s) do not satisfy the validation \""
+            throw new FieldValueValidationException("The following field translation(s) do not satisfy the validation \""
                     + regex + "\" for field \"" + fieldValue.getFieldInstance().getDefinition().getName() + "\" ["
                     + fieldValue.getFieldInstance().getDefinition().getId() + "]:\n\t- "
                     + String.join("\n\t- ", wrongValues));
@@ -62,7 +61,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
                     .filter(v -> !selectableStringValues.contains(v))
                     .collect(Collectors.toSet());
             if (!wrongValues.isEmpty()) {
-                throw new FieldValueValidationException("Field value(s) \"" + String.join("\", \"", wrongValues) + "\" is not one of the allowed selectable values for field \""
+                throw new FieldValueValidationException("Field translation(s) \"" + String.join("\", \"", wrongValues) + "\" is not one of the allowed selectable values for field \""
                         + fieldValue.getFieldInstance().getDefinition().getName() + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "]: "
                         + String.join(", ", selectableStringValues));
             }
