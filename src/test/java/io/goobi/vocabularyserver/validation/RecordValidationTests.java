@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -28,6 +29,7 @@ class RecordValidationTests {
     @InjectMocks
     private RecordValidatorImpl validator;
 
+    private VocabularySchema schema;
     private Vocabulary vocabulary;
     private FieldType ftText;
     private FieldDefinition fdName;
@@ -40,7 +42,7 @@ class RecordValidationTests {
         ftText.setId(FIELD_TYPE_TEXT_ID);
         ftText.setValidation("\\w+");
 
-        VocabularySchema schema = new VocabularySchema();
+        schema = new VocabularySchema();
         vocabulary = new Vocabulary();
         vocabulary.setSchema(schema);
         vocabulary.setName("Test vocabulary");
@@ -75,7 +77,7 @@ class RecordValidationTests {
         name.setDefinition(fdName);
 
         FieldDefinition os = new FieldDefinition();
-        os.setSchema(new VocabularySchema());
+        os.setSchema(schema);
         os.setName("Name");
         os.setType(ftText);
         os.setMainEntry(true);
@@ -90,5 +92,61 @@ class RecordValidationTests {
         record.setFields(Set.of(name, unknown));
 
         assertThrows(ValidationException.class, () -> validator.validate(record));
+    }
+
+    @Test
+    void hierarchicalRecordsIfNotEnabled_fails() {
+        schema.setHierarchicalRecords(false);
+
+        VocabularyRecord parent = new VocabularyRecord();
+        parent.setVocabulary(vocabulary);
+        FieldInstance parentNameField = new FieldInstance();
+        parentNameField.setId(1L);
+        parentNameField.setDefinition(fdName);
+        parentNameField.setVocabularyRecord(parent);
+        parent.setFields(Set.of(parentNameField));
+
+        VocabularyRecord child = new VocabularyRecord();
+        child.setVocabulary(vocabulary);
+        FieldInstance childNameField = new FieldInstance();
+        childNameField.setId(2L);
+        childNameField.setDefinition(fdName);
+        childNameField.setVocabularyRecord(child);
+        child.setFields(Set.of(childNameField));
+        child.setParentRecord(parent);
+        parent.setChildren(Set.of(child));
+
+        assertAll("Parent and child validations",
+                () -> assertThrows(ValidationException.class, () -> validator.validate(parent)),
+                () -> assertThrows(ValidationException.class, () -> validator.validate(child))
+        );
+    }
+
+    @Test
+    void hierarchicalRecordsIfEnabled_success() {
+        schema.setHierarchicalRecords(true);
+
+        VocabularyRecord parent = new VocabularyRecord();
+        parent.setVocabulary(vocabulary);
+        FieldInstance parentNameField = new FieldInstance();
+        parentNameField.setId(1L);
+        parentNameField.setDefinition(fdName);
+        parentNameField.setVocabularyRecord(parent);
+        parent.setFields(Set.of(parentNameField));
+
+        VocabularyRecord child = new VocabularyRecord();
+        child.setVocabulary(vocabulary);
+        FieldInstance childNameField = new FieldInstance();
+        childNameField.setId(2L);
+        childNameField.setDefinition(fdName);
+        childNameField.setVocabularyRecord(child);
+        child.setFields(Set.of(childNameField));
+        child.setParentRecord(parent);
+        parent.setChildren(Set.of(child));
+
+        assertAll("Parent and child validations",
+                () -> validator.validate(parent),
+                () -> validator.validate(child)
+        );
     }
 }

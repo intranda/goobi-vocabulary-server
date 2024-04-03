@@ -7,8 +7,10 @@ import io.goobi.vocabularyserver.model.FieldInstance;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +23,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         setValidations(List.of(
                 this::checkRequiredFieldsExistence,
                 this::checkOnlyAllowedFieldDefinitionsGiven,
+                this::checkHierarchy,
                 this::perFieldInstanceChecks
         ));
     }
@@ -63,6 +66,21 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
                             .map(f -> "\"" + f.getName() + "\" [" + f.getId() + "]")
                             .collect(Collectors.joining(", "))
             );
+        }
+    }
+
+    private void checkHierarchy(VocabularyRecord vocabularyRecord) throws RecordValidationException {
+        if (Boolean.FALSE.equals(vocabularyRecord.getVocabulary().getSchema().getHierarchicalRecords())) {
+            Set<String> errors = new HashSet<>();
+            if (vocabularyRecord.getParentRecord() != null) {
+                errors.add("can't define parent record if hierarchical records are deactivated in vocabulary schema");
+            }
+            if (!vocabularyRecord.getChildren().isEmpty()) {
+                errors.add("can't define children records if hierarchical records are deactivated in vocabulary schema");
+            }
+            if (!errors.isEmpty()) {
+                throw new RecordValidationException("Record violates hierarchy validation:\n\t- " + String.join("\n\t- ", errors));
+            }
         }
     }
 
