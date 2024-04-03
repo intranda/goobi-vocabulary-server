@@ -42,6 +42,16 @@ public class RecordManager {
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
+    public VocabularyRecordDTO createSubRecord(VocabularyRecordDTO newRecord) throws ValidationException {
+        VocabularyRecord jpaParent = vocabularyRecordRepository.findById(newRecord.getParentId())
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, newRecord.getParentId()));
+        newRecord.setVocabularyId(jpaParent.getVocabulary().getId());
+        VocabularyRecord jpaNewChildRecord = modelMapper.toEntity(newRecord);
+        jpaParent.getChildren().add(jpaNewChildRecord);
+        validator.validate(jpaParent);
+        return modelMapper.toDTO(vocabularyRecordRepository.save(jpaParent));
+    }
+
     public VocabularyRecordDTO delete(long id) {
         if (!vocabularyRecordRepository.existsById(id)) {
             throw new EntityNotFoundException(VocabularyRecord.class, id);

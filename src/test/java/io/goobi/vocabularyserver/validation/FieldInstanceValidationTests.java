@@ -186,17 +186,19 @@ class FieldInstanceValidationTests {
 
     @Test
     void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws ValidationException {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, "Bob")).thenReturn(true);
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, "Bob")).thenReturn(false);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, 11L, "Bob")).thenReturn(true);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 12L, "Bob")).thenReturn(false);
 
         FieldInstance fieldFriend = setupFieldInstance(
                 setupFieldDefinition("Best Friend", null, null, false, true, false, true, false),
                 Pair.of("none", "Thomas"));
         fieldFriend.getDefinition().setId(1L);
+        fieldFriend.setId(11L);
         FieldInstance fieldName = setupFieldInstance(
                 setupFieldDefinition("Name", null, null, true, true, true, true, false),
                 Pair.of("none", "Bob"));
         fieldName.getDefinition().setId(2L);
+        fieldName.setId(12L);
 
         validator.validate(fieldFriend);
         validator.validate(fieldName);
@@ -204,17 +206,13 @@ class FieldInstanceValidationTests {
 
     @Test
     void duplicateUniqueFieldValueForTheSameFieldDefinition_fails() {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, "Bob")).thenReturn(false);
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, "Bob")).thenReturn(true);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 10L, "Bob")).thenReturn(true);
 
-        FieldInstance fieldFriend = setupFieldInstance(
-                setupFieldDefinition("Best Friend", null, null, false, true, false, true, false),
-                Pair.of("none", "Thomas"));
-        fieldFriend.getDefinition().setId(1L);
         FieldInstance fieldName = setupFieldInstance(
                 setupFieldDefinition("Name", null, null, true, true, true, true, false),
                 Pair.of("none", "Bob"));
         fieldName.getDefinition().setId(2L);
+        fieldName.setId(10L);
 
         assertThrows(ValidationException.class, () -> validator.validate(fieldName));
     }

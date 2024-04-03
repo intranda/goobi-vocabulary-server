@@ -3,12 +3,9 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -54,8 +51,21 @@ public class VocabularyRecordController {
         if (vocabularyRecordDTO.getVocabularyId() != 0 && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
             throw new IllegalArgumentException("Inconsistency in passed id's");
         }
+        if (vocabularyRecordDTO.getParentId() != null) {
+            throw new IllegalArgumentException("You cannot provide parentId explicitly, please use the correct endpoint to add hierarchical records");
+        }
         vocabularyRecordDTO.setVocabularyId(vocabularyId);
         return assembler.toModel(manager.create(vocabularyRecordDTO));
+    }
+
+    @PostMapping("/records/{recordId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EntityModel<VocabularyRecordDTO> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
+        if (vocabularyRecordDTO.getParentId() != null) {
+            throw new IllegalArgumentException("You cannot provide parentId explicitly, it is set implicitly");
+        }
+        vocabularyRecordDTO.setParentId(recordId);
+        return assembler.toModel(manager.createSubRecord(vocabularyRecordDTO));
     }
 
     @DeleteMapping("/records/{recordId}")
