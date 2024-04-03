@@ -1,15 +1,17 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.MissingValuesException;
+import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
-import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.validation.Validator;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,24 @@ public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
     public VocabularySchemaDTO create(VocabularySchemaDTO newSchema) throws ValidationException {
         VocabularySchema jpaSchema = modelMapper.toEntity(newSchema);
         validator.validate(jpaSchema);
+        return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));
+    }
+
+    // TODO: This is not working correctly: Impossible to pass id for replace insertion
+    @Override
+    public VocabularySchemaDTO replace(VocabularySchemaDTO newSchema, long id) {
+        VocabularySchema jpaSchema = vocabularySchemaRepository
+                .findById(id)
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newSchema.getClass(), id));
+
+        List<Runnable> replacements = new LinkedList<>();
+        if (newSchema.getHierarchicalRecords() != null) {
+            replacements.add(() -> jpaSchema.setHierarchicalRecords(newSchema.getHierarchicalRecords()));
+        }
+        if (replacements.isEmpty()) {
+            throw new MissingValuesException(newSchema.getClass(), List.of("hierarchicalRecords"));
+        }
+        replacements.forEach(Runnable::run);
         return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));
     }
 
