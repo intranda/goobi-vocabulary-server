@@ -1,13 +1,12 @@
 package io.goobi.vocabularyserver.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,9 +29,6 @@ public class FieldType {
     @Column(name = "validation")
     private String validation;
 
-    @ManyToMany
-    @JoinTable(name = "FieldType_selectableValues",
-            joinColumns = @JoinColumn(name = "fieldType_id"),
-            inverseJoinColumns = @JoinColumn(name = "selectableValues_id"))
+    @OneToMany(mappedBy = "fieldType", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SelectableValue> selectableValues = new LinkedHashSet<>();
 }

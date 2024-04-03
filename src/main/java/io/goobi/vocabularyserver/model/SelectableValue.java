@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -19,6 +21,10 @@ public class SelectableValue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "field_type_id", nullable = false)
+    private FieldType fieldType;
 
     // `value` is a reserved Mysql keyword
     @Column(name = "selection_value", nullable = false)
