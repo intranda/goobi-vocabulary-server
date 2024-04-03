@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -100,12 +101,14 @@ class VocabularySchemaMapperTest {
     void childDefinitions_toDTO() {
         VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
 
-        assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchemaId());
-        assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId());
-        assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName());
-        assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchemaId());
-        assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId());
-        assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName());
+        assertAll("Verify child definitions",
+                () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchemaId()),
+                () -> assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId()),
+                () -> assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName()),
+                () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchemaId()),
+                () -> assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId()),
+                () -> assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName())
+        );
     }
 
     @Test
@@ -119,11 +122,13 @@ class VocabularySchemaMapperTest {
     void childDefinitions_fromDTO() {
         VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
 
-        assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchema().getId());
-        assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId());
-        assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName());
-        assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchema().getId());
-        assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId());
-        assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName());
+        assertAll("Verify child definitions",
+                () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchema().getId()),
+                () -> assertEquals(FIELD_DEFINITION_1_ID, result.getDefinitions().get(0).getId()),
+                () -> assertEquals(FIELD_DEFINITION_1_NAME, result.getDefinitions().get(0).getName()),
+                () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(1).getSchema().getId()),
+                () -> assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId()),
+                () -> assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName())
+        );
     }
 }
