@@ -19,6 +19,7 @@ public class RecordAssembler implements RepresentationModelAssembler<VocabularyR
                 linkTo(methodOn(VocabularyController.class).one(entity.getVocabularyId())).withRel("vocabulary"),
                 linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getVocabularyId(), null, null)).withRel("vocabulary_records"),
                 linkTo(methodOn(VocabularyRecordController.class).delete(entity.getId())).withRel("delete")
-        );
+        )
+                .addIf(entity.getParentId() != null, () -> linkTo(methodOn(VocabularyRecordController.class).one(entity.getParentId())).withRel("parent_record"));
     }
 }
