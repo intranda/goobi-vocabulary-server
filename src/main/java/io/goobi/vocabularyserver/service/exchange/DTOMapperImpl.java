@@ -172,6 +172,7 @@ public class DTOMapperImpl implements DTOMapper {
         if (fullInitialization) {
             result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
         }
+        // TODO: Maybe issue with same IDs
         result.setTranslations(dto.getTranslations().entrySet().stream()
                 .map(e -> toEntity(e, result))
                 .collect(Collectors.toSet())
@@ -206,6 +207,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(dto.getId());
         result.setName(dto.getName());
         result.setValidation(dto.getValidation());
+        // TODO: Check this, might be broken due to same ID issue with Set
         if (dto.getSelectableValues() != null) {
             result.setSelectableValues(dto.getSelectableValues().stream()
                     .map(s -> {
