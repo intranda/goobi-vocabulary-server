@@ -219,10 +219,18 @@ public class DTOMapperImpl implements DTOMapper {
             result.setSelectableValues(dto.getSelectableValues().stream()
                     .map(s -> {
                                 SelectableValue sv = new SelectableValue();
+                                sv.setFieldType(result);
                                 sv.setValue(s);
                                 return sv;
                             }
                     ).collect(Collectors.toSet()));
+            // Field instance equality is based on IDs, therefore we need to provide distinct IDs for all field instances.
+            // Otherwise, after collecting them in sets will result in only one field.
+            // The IDs are ignored by JPA anyway.
+            Iterator<SelectableValue> selectableValueIterator = result.getSelectableValues().iterator();
+            for (int i = 1; i <= dto.getSelectableValues().size(); i++) {
+                selectableValueIterator.next().setId((long) i);
+            }
         }
         return result;
     }

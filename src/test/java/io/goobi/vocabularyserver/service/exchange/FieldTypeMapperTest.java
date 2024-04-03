@@ -5,12 +5,14 @@ import io.goobi.vocabularyserver.model.FieldType;
 import io.goobi.vocabularyserver.model.SelectableValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -117,7 +119,18 @@ class FieldTypeMapperTest {
     void existingSelectableValues_fromDTO() {
         FieldType result = mapper.toEntity(fieldTypeDTO);
 
-        assertEquals(FIELD_TYPE_SELECTABLE_VALUES, result.getSelectableValues().stream().map(SelectableValue::getValue).collect(Collectors.toSet()));
+        assertAll(
+                () -> assertEquals(FIELD_TYPE_SELECTABLE_VALUES, result.getSelectableValues().stream().map(SelectableValue::getValue).collect(Collectors.toSet())),
+                () -> assertCorrectFieldTypeReference(result, result.getSelectableValues())
+        );
+    }
+
+    private void assertCorrectFieldTypeReference(FieldType result, Set<SelectableValue> selectableValues) {
+        assertAll(
+                selectableValues.stream()
+                        .map(v -> (Executable) () -> assertEquals(result, v.getFieldType()))
+                        .collect(Collectors.toSet())
+        );
     }
 
     @Test
