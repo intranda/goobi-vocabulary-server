@@ -1,6 +1,7 @@
 package io.goobi.vocabularyserver.exchange;
 
 import lombok.Data;
+import org.springframework.hateoas.EntityModel;
 
 import java.util.Set;
 
@@ -10,5 +11,5 @@ public class VocabularyRecordDTO {
     private Long parentId;
     private long vocabularyId;
     private Set<FieldInstanceDTO> fields;
-    private Set<VocabularyRecordDTO> children;
+    private Set<EntityModel<VocabularyRecordDTO>> children;
 }

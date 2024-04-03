@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.service.exchange;
 
+import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.FieldDefinition;
@@ -15,9 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,6 +53,8 @@ class VocabularyRecordMapperTest {
     private FieldDefinitionRepository fieldDefinitionRepository;
     @InjectMocks
     private DTOMapperImpl mapper;
+    @Spy
+    private RecordAssembler recordAssembler = new RecordAssembler();
 
     private Vocabulary vocabulary;
     private FieldDefinition fieldDefinition1;
@@ -182,41 +187,48 @@ class VocabularyRecordMapperTest {
 
         assertAll("Verify child record",
                 () -> assertEquals(1, result.getChildren().size()),
-                () -> assertEquals(927394672364L, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(927394672364L, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getId()),
-                () -> assertEquals(VOCABULARY_ID, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(VOCABULARY_ID, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getVocabularyId()),
-                () -> assertEquals(RECORD_ID, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(RECORD_ID, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getParentId()),
-                () -> assertNull(result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertNull(Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getChildren()),
-                () -> assertEquals(641565L, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(641565L, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getFields()
                         .stream()
                         .findAny()
                         .orElseThrow()
                         .getId()),
-                () -> assertEquals(FIELD_DEFINITION_1_ID, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(FIELD_DEFINITION_1_ID, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getFields()
                         .stream()
                         .findAny()
                         .orElseThrow()
                         .getDefinitionId()),
-                () -> assertEquals(927394672364L, result.getChildren().stream()
-                        .findAny()
-                        .orElseThrow()
+                () -> assertEquals(927394672364L, Objects.requireNonNull(result.getChildren().stream()
+                                .findAny()
+                                .orElseThrow()
+                                .getContent())
                         .getFields()
                         .stream()
                         .findAny()
@@ -285,7 +297,7 @@ class VocabularyRecordMapperTest {
         child.setFields(Set.of(fieldInstance));
         child.setParentId(RECORD_ID);
 
-        vocabularyRecordDTO.setChildren(Set.of(child));
+        vocabularyRecordDTO.setChildren(Set.of(recordAssembler.toModel(child)));
 
         VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
 

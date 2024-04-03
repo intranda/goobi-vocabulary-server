@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.service.exchange;
 
+import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
 import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
@@ -29,10 +30,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class DTOMapperImpl implements DTOMapper {
+    private final RecordAssembler recordAssembler;
     private final FieldTypeRepository fieldTypeRepository;
     private final VocabularySchemaRepository vocabularySchemaRepository;
     private final VocabularyRecordRepository vocabularyRecordRepository;
@@ -41,12 +44,13 @@ public class DTOMapperImpl implements DTOMapper {
     private final FieldInstanceRepository fieldInstanceRepository;
     private final LanguageRepository languageRepository;
 
-    public DTOMapperImpl(FieldTypeRepository fieldTypeRepository, VocabularySchemaRepository vocabularySchemaRepository,
+    public DTOMapperImpl(RecordAssembler recordAssembler, FieldTypeRepository fieldTypeRepository, VocabularySchemaRepository vocabularySchemaRepository,
                          VocabularyRecordRepository vocabularyRecordRepository,
                          VocabularyRepository vocabularyRepository,
                          FieldDefinitionRepository fieldDefinitionRepository,
                          FieldInstanceRepository fieldInstanceRepository,
                          LanguageRepository languageRepository) {
+        this.recordAssembler = recordAssembler;
         this.fieldTypeRepository = fieldTypeRepository;
         this.vocabularySchemaRepository = vocabularySchemaRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
@@ -292,7 +296,7 @@ public class DTOMapperImpl implements DTOMapper {
                 .collect(Collectors.toSet()));
         result.getFields().forEach(f -> f.setVocabularyRecord(result));
         if (dto.getChildren() != null) {
-            result.setChildren(dto.getChildren().stream().map(this::toEntity).collect(Collectors.toSet()));
+            result.setChildren(dto.getChildren().stream().map(c -> toEntity(Objects.requireNonNull(c.getContent()))).collect(Collectors.toSet()));
         }
         result.getChildren().forEach(c -> c.setParentRecord(result));
         return result;
@@ -307,8 +311,8 @@ public class DTOMapperImpl implements DTOMapper {
         }
         result.setVocabularyId(entity.getVocabulary().getId());
         result.setFields(entity.getFields().stream().map(this::toDTO).collect(Collectors.toSet()));
-        result.setChildren(entity.getChildren().stream().map(this::toDTO).collect(Collectors.toSet()));
-        result.getChildren().forEach(c -> c.setParentId(result.getId()));
+        result.setChildren(entity.getChildren().stream().map(c -> recordAssembler.toModel(toDTO(c))).collect(Collectors.toSet()));
+        result.getChildren().forEach(c -> Objects.requireNonNull(c.getContent()).setParentId(result.getId()));
         if (result.getChildren().isEmpty()) {
             result.setChildren(null);
         }
