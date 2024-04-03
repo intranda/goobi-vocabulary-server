@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class RecordManager {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
-
     private final Validator<VocabularyRecord> validator;
 
     public RecordManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecord> validator) {
