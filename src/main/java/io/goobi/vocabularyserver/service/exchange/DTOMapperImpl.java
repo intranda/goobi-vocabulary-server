@@ -269,7 +269,7 @@ public class DTOMapperImpl implements DTOMapper {
         VocabularyRecord result = new VocabularyRecord();
         result.setId(dto.getId());
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
-        // Field instance equality is based on IDs, therefore we need to provide distince IDs for all field instances.
+        // Field instance equality is based on IDs, therefore we need to provide distinct IDs for all field instances.
         // Otherwise, after collecting them in sets will result in only one field.
         // The IDs are ignored by JPA anyway.
         Iterator<FieldInstanceDTO> fieldIterator = dto.getFields().iterator();
