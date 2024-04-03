@@ -25,7 +25,7 @@ public class RecordManager {
     }
 
     public Page<VocabularyRecordDTO> listAll(long id, Pageable pageRequest) {
-        return vocabularyRecordRepository.findByVocabulary_Id(id, pageRequest)
+        return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
                 .map(modelMapper::toDTO);
     }
 
@@ -47,6 +47,7 @@ public class RecordManager {
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, newRecord.getParentId()));
         newRecord.setVocabularyId(jpaParent.getVocabulary().getId());
         VocabularyRecord jpaNewChildRecord = modelMapper.toEntity(newRecord);
+        jpaNewChildRecord.setParentRecord(jpaParent);
         jpaParent.getChildren().add(jpaNewChildRecord);
         validator.validate(jpaParent);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaParent));
