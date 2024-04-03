@@ -89,6 +89,6 @@ public class ControllerErrorHandlers {
         if (endIndex <= 0) {
             endIndex = e.getMessage().length();
         }
-        return e.getMessage().substring(startIndex, endIndex);
+        return "Data integrity violation:\n\t" + e.getMessage().substring(startIndex, endIndex);
     }
 }
