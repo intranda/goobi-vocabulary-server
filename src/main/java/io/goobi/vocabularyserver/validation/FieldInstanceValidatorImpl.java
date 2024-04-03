@@ -1,6 +1,6 @@
 package io.goobi.vocabularyserver.validation;
 
-import io.goobi.vocabularyserver.exception.RecordValidationException;
+import io.goobi.vocabularyserver.exception.FieldInstanceValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.model.FieldInstance;
 import io.goobi.vocabularyserver.model.FieldValue;
@@ -19,11 +19,12 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstance> {
         super("Field");
         this.fieldValueValidator = new FieldValueValidatorImpl(fieldInstanceRepository);
         setValidations(List.of(
-                this::perValueChecks
+                this::perValueChecks,
+                this::multiValueCheck
         ));
     }
 
-    private void perValueChecks(FieldInstance fieldInstance) throws RecordValidationException {
+    private void perValueChecks(FieldInstance fieldInstance) throws FieldInstanceValidationException {
         List<Throwable> errors = new LinkedList<>();
         for (FieldValue fv : fieldInstance.getFieldValues()) {
             try {
@@ -34,7 +35,15 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstance> {
         }
         if (!errors.isEmpty()) {
             String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
-            throw new RecordValidationException(errorMessages);
+            throw new FieldInstanceValidationException(errorMessages);
+        }
+    }
+
+    private void multiValueCheck(FieldInstance fieldInstance) throws FieldInstanceValidationException {
+        if (Boolean.FALSE.equals(fieldInstance.getDefinition().getMultiValued()) && fieldInstance.getFieldValues().size() > 1) {
+            throw new FieldInstanceValidationException("The field \"" + fieldInstance.getDefinition().getName() + "\" ["
+                    + fieldInstance.getDefinition().getId() + "] is not multi-valued, but " + fieldInstance.getFieldValues().size()
+                    + " values were provided");
         }
     }
 }

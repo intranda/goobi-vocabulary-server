@@ -110,6 +110,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setUnique(dto.isUnique());
         result.setMainEntry(dto.isMainEntry());
         result.setTitleField(dto.isTitleField());
+        result.setMultiValued(dto.isMultiValued());
         return result;
     }
 
@@ -124,6 +125,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setUnique(entity.getUnique());
         result.setMainEntry(entity.getMainEntry() != null);
         result.setTitleField(entity.getTitleField());
+        result.setMultiValued(entity.getMultiValued());
         return result;
     }
 

@@ -12,4 +12,5 @@ public class FieldDefinitionDTO {
     private boolean unique;
     private boolean mainEntry;
     private boolean titleField;
+    private boolean multiValued;
 }

@@ -134,6 +134,15 @@ class FieldDefinitionMapperTest {
     }
 
     @Test
+    void notMultiValued_toDTO() {
+        fieldDefinition.setMultiValued(false);
+
+        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+
+        assertFalse(result.isMultiValued());
+    }
+
+    @Test
     void isRequired_toDTO() {
         fieldDefinition.setRequired(true);
 
@@ -167,6 +176,15 @@ class FieldDefinitionMapperTest {
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.isTitleField());
+    }
+
+    @Test
+    void isMultiValued_toDTO() {
+        fieldDefinition.setMultiValued(true);
+
+        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+
+        assertTrue(result.isMultiValued());
     }
 
     @Test
@@ -234,6 +252,15 @@ class FieldDefinitionMapperTest {
     }
 
     @Test
+    void notMultiValued_fromDTO() {
+        fieldDefinitionDTO.setMultiValued(false);
+
+        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+
+        assertFalse(result.getMultiValued());
+    }
+
+    @Test
     void isRequired_fromDTO() {
         fieldDefinitionDTO.setRequired(true);
 
@@ -267,5 +294,14 @@ class FieldDefinitionMapperTest {
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.getTitleField());
+    }
+
+    @Test
+    void isMultiValued_fromDTO() {
+        fieldDefinitionDTO.setMultiValued(true);
+
+        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+
+        assertTrue(result.getMultiValued());
     }
 }

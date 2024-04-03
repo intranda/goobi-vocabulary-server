@@ -61,6 +61,9 @@ public class FieldDefinition {
     @Column(name = "title_field", nullable = false)
     private Boolean titleField = false;
 
+    @Column(name = "multi_valued", nullable = false)
+    private Boolean multiValued = false;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) {
