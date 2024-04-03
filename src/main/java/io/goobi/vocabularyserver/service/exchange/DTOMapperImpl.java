@@ -251,6 +251,7 @@ public class DTOMapperImpl implements DTOMapper {
                 .map(d -> this.toEntity(d, false)
                 ).collect(Collectors.toList()));
         result.getDefinitions().forEach(d -> d.setSchema(result));
+        result.setHierarchicalRecords(Boolean.TRUE.equals(dto.getHierarchicalRecords()));
         return result;
     }
 
@@ -259,6 +260,7 @@ public class DTOMapperImpl implements DTOMapper {
         VocabularySchemaDTO result = new VocabularySchemaDTO();
         result.setId(entity.getId());
         result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
+        result.setHierarchicalRecords(Boolean.TRUE.equals(entity.getHierarchicalRecords()));
         return result;
     }
 

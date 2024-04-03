@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -112,6 +114,24 @@ class VocabularySchemaMapperTest {
     }
 
     @Test
+    void noHierarchicalRecords_toDTO() {
+        vocabularySchema.setHierarchicalRecords(false);
+
+        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+
+        assertFalse(result.getHierarchicalRecords());
+    }
+
+    @Test
+    void hierarchicalRecords_toDTO() {
+        vocabularySchema.setHierarchicalRecords(true);
+
+        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+
+        assertTrue(result.getHierarchicalRecords());
+    }
+
+    @Test
     void validId_fromDTO() {
         VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
 
@@ -130,5 +150,23 @@ class VocabularySchemaMapperTest {
                 () -> assertEquals(FIELD_DEFINITION_2_ID, result.getDefinitions().get(1).getId()),
                 () -> assertEquals(FIELD_DEFINITION_2_NAME, result.getDefinitions().get(1).getName())
         );
+    }
+
+    @Test
+    void noHierarchicalRecords_fromDTO() {
+        vocabularySchemaDTO.setHierarchicalRecords(false);
+
+        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertFalse(result.getHierarchicalRecords());
+    }
+
+    @Test
+    void hierarchicalRecords_fromDTO() {
+        vocabularySchemaDTO.setHierarchicalRecords(true);
+
+        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertTrue(result.getHierarchicalRecords());
     }
 }

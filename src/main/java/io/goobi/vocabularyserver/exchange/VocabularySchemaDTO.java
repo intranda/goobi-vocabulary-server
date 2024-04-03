@@ -8,4 +8,5 @@ import java.util.List;
 public class VocabularySchemaDTO {
     private long id;
     private List<FieldDefinitionDTO> definitions;
+    private Boolean hierarchicalRecords;
 }
