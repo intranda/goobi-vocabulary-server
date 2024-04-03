@@ -302,6 +302,9 @@ public class DTOMapperImpl implements DTOMapper {
     public VocabularyRecordDTO toDTO(VocabularyRecord entity) {
         VocabularyRecordDTO result = new VocabularyRecordDTO();
         result.setId(entity.getId());
+        if (entity.getParentRecord() != null) {
+            result.setParentId(entity.getParentRecord().getId());
+        }
         result.setVocabularyId(entity.getVocabulary().getId());
         result.setFields(entity.getFields().stream().map(this::toDTO).collect(Collectors.toSet()));
         result.setChildren(entity.getChildren().stream().map(this::toDTO).collect(Collectors.toSet()));
