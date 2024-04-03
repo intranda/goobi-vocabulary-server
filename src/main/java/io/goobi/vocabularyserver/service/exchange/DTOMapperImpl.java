@@ -6,6 +6,7 @@ import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
 import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
 import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
 import io.goobi.vocabularyserver.exchange.FieldValueDTO;
+import io.goobi.vocabularyserver.exchange.LanguageDTO;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
@@ -316,6 +317,24 @@ public class DTOMapperImpl implements DTOMapper {
         if (result.getChildren().isEmpty()) {
             result.setChildren(null);
         }
+        return result;
+    }
+
+    @Override
+    public Language toEntity(LanguageDTO dto) {
+        Language result = new Language();
+        result.setId(dto.getId());
+        result.setAbbreviation(dto.getAbbreviation());
+        result.setName(dto.getName());
+        return result;
+    }
+
+    @Override
+    public LanguageDTO toDTO(Language entity) {
+        LanguageDTO result = new LanguageDTO();
+        result.setId(entity.getId());
+        result.setAbbreviation(entity.getAbbreviation());
+        result.setName(entity.getName());
         return result;
     }
 }
