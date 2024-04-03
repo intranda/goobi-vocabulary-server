@@ -9,11 +9,12 @@ import io.goobi.vocabularyserver.model.VocabularySchema;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.validation.Validator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
@@ -29,11 +30,9 @@ public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
     }
 
     @Override
-    public List<VocabularySchemaDTO> listAll() {
-        return vocabularySchemaRepository.findAll()
-                .stream()
-                .map(modelMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<VocabularySchemaDTO> listAll(Pageable pageable) {
+        return vocabularySchemaRepository.findAll(pageable)
+                .map(modelMapper::toDTO);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
     public EntityModel<VocabularyDTO> toModel(VocabularyDTO entity) {
         return EntityModel.of(entity,
                 linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(VocabularyController.class).all()).withRel("vocabularies"),
+                linkTo(methodOn(VocabularyController.class).all(null, null)).withRel("vocabularies"),
                 linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
                 linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getId(), null, null)).withRel("records"),
                 linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete")

@@ -1,11 +1,11 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.ValidationException;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface Manager<T> {
-    default List<T> listAll() {
+    default Page<T> listAll(Pageable pageable) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

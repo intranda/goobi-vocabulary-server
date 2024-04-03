@@ -7,11 +7,12 @@ import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VocabularyManager implements Manager<VocabularyDTO> {
@@ -24,11 +25,9 @@ public class VocabularyManager implements Manager<VocabularyDTO> {
     }
 
     @Override
-    public List<VocabularyDTO> listAll() {
-        return vocabularyRepository.findAll()
-                .stream()
-                .map(modelMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<VocabularyDTO> listAll(Pageable pageable) {
+        return vocabularyRepository.findAll(pageable)
+                .map(modelMapper::toDTO);
     }
 
     @Override

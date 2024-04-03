@@ -5,8 +5,10 @@ import io.goobi.vocabularyserver.api.assemblers.VocabularyAssembler;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.service.manager.Manager;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +33,8 @@ public class VocabularyController {
     }
 
     @GetMapping("/vocabularies")
-    public CollectionModel<EntityModel<VocabularyDTO>> all() {
-        return assembler.toCollectionModel(manager.listAll());
+    public PagedModel<EntityModel<VocabularyDTO>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularyDTO> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/vocabularies/{id}")

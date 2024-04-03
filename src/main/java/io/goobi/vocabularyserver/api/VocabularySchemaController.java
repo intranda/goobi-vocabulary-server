@@ -4,8 +4,10 @@ import io.goobi.vocabularyserver.api.assemblers.VocabularySchemaAssembler;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
 import io.goobi.vocabularyserver.service.manager.VocabularySchemaManager;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,8 +32,8 @@ public class VocabularySchemaController {
     }
 
     @GetMapping("/schemas")
-    public CollectionModel<EntityModel<VocabularySchemaDTO>> all() {
-        return assembler.toCollectionModel(manager.listAll());
+    public PagedModel<EntityModel<VocabularySchemaDTO>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularySchemaDTO> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/schemas/{id}")

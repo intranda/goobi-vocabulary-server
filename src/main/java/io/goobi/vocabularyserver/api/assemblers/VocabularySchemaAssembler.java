@@ -15,7 +15,7 @@ public class VocabularySchemaAssembler implements RepresentationModelAssembler<V
     public EntityModel<VocabularySchemaDTO> toModel(VocabularySchemaDTO entity) {
         return EntityModel.of(entity,
                 linkTo(methodOn(VocabularySchemaController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(VocabularySchemaController.class).all()).withRel("schemas")
+                linkTo(methodOn(VocabularySchemaController.class).all(null, null)).withRel("schemas")
         );
     }
 }
