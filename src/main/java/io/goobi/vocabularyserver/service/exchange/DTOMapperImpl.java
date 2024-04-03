@@ -280,6 +280,10 @@ public class DTOMapperImpl implements DTOMapper {
                 .map(f -> this.toEntity(f, false))
                 .collect(Collectors.toSet()));
         result.getFields().forEach(f -> f.setVocabularyRecord(result));
+        if (dto.getChildren() != null) {
+            result.setChildren(dto.getChildren().stream().map(this::toEntity).collect(Collectors.toSet()));
+        }
+        result.getChildren().forEach(c -> c.setParentRecord(result));
         return result;
     }
 
@@ -289,6 +293,11 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setVocabularyId(entity.getVocabulary().getId());
         result.setFields(entity.getFields().stream().map(this::toDTO).collect(Collectors.toSet()));
+        result.setChildren(entity.getChildren().stream().map(this::toDTO).collect(Collectors.toSet()));
+        result.getChildren().forEach(c -> c.setParentId(result.getId()));
+        if (result.getChildren().isEmpty()) {
+            result.setChildren(null);
+        }
         return result;
     }
 }
