@@ -18,7 +18,7 @@ clean_table() {
 }
 
 clean_tables() {
-  TABLES=$(get_tables)
+  TABLES=$(get_tables | grep -v "flyway_schema_history")
   for T in $TABLES
   do
     clean_table $T
