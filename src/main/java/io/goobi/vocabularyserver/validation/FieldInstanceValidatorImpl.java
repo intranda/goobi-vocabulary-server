@@ -41,7 +41,7 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstance> {
 
     private void multiValueCheck(FieldInstance fieldInstance) throws FieldInstanceValidationException {
         if (Boolean.FALSE.equals(fieldInstance.getDefinition().getMultiValued()) && fieldInstance.getFieldValues().size() > 1) {
-            throw new FieldInstanceValidationException("The field \"" + fieldInstance.getDefinition().getName() + "\" ["
+            throw new FieldInstanceValidationException("The field definition \"" + fieldInstance.getDefinition().getName() + "\" ["
                     + fieldInstance.getDefinition().getId() + "] is not multi-valued, but " + fieldInstance.getFieldValues().size()
                     + " values were provided");
         }

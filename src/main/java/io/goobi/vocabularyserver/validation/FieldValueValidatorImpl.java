@@ -70,7 +70,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
 
     private void checkForbiddenBlankValue(FieldValue fieldValue) throws FieldValueValidationException {
         if (fieldValue.getTranslations().stream().anyMatch(t -> t.getValue().isBlank())) {
-            throw new FieldValueValidationException("Field \"" + fieldValue.getFieldInstance().getDefinition().getName()
+            throw new FieldValueValidationException("Field definition \"" + fieldValue.getFieldInstance().getDefinition().getName()
                     + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] value is not allowed to be blank");
         }
     }
@@ -87,7 +87,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
                     ))
                     .collect(Collectors.toSet());
             if (!duplicateUniqueValues.isEmpty()) {
-                throw new FieldValueValidationException("Unique field value(s) \"" + String.join("\", \"", duplicateUniqueValues)
+                throw new FieldValueValidationException("Unique value(s) \"" + String.join("\", \"", duplicateUniqueValues)
                         + "\" for field \"" + fieldValue.getFieldInstance().getDefinition().getName() + "\" ["
                         + fieldValue.getFieldInstance().getDefinition().getId() + "] is already present in vocabulary");
             }
