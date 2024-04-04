@@ -2,18 +2,22 @@ package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.FieldTypeValidationException;
 import io.goobi.vocabularyserver.model.FieldType;
+import io.goobi.vocabularyserver.model.SelectableValue;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 @Service
 public class FieldTypeValidatorImpl extends BaseValidator<FieldType> {
     public FieldTypeValidatorImpl() {
-        super("Schema");
+        super("Type");
         setValidations(List.of(
-                this::checkValidRegex
+                this::checkValidRegex,
+                this::checkSelectableValuesMatchValidation
         ));
     }
 
@@ -22,7 +26,20 @@ public class FieldTypeValidatorImpl extends BaseValidator<FieldType> {
             try {
                 Pattern.compile(fieldType.getValidation());
             } catch (PatternSyntaxException e) {
-                throw new FieldTypeValidationException("FieldType validation \"" + fieldType.getValidation() + "\" is no valid regex expression");
+                throw new FieldTypeValidationException("Validation \"" + fieldType.getValidation() + "\" is no valid regex expression");
+            }
+        }
+    }
+
+    private void checkSelectableValuesMatchValidation(FieldType fieldType) throws FieldTypeValidationException {
+        if (!fieldType.getSelectableValues().isEmpty() && fieldType.getValidation() != null && !fieldType.getValidation().isEmpty()) {
+            Set<String> errorValues = fieldType.getSelectableValues().stream()
+                    .map(SelectableValue::getValue)
+                    .filter(v -> !Pattern.matches(fieldType.getValidation(), v))
+                    .collect(Collectors.toSet());
+            if (!errorValues.isEmpty()) {
+                throw new FieldTypeValidationException("Selectable value(s) do not satisfy validation \""
+                        + fieldType.getValidation() + "\": \"" + String.join("\", \"", errorValues) + "\"");
             }
         }
     }
