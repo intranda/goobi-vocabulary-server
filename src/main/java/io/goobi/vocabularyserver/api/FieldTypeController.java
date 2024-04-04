@@ -50,7 +50,7 @@ public class FieldTypeController {
 
     @PutMapping("/types/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<FieldTypeDTO> update(@RequestBody FieldTypeDTO newFieldType, @PathVariable long id) {
+    public EntityModel<FieldTypeDTO> update(@RequestBody FieldTypeDTO newFieldType, @PathVariable long id) throws ValidationException {
         return assembler.toModel(manager.replace(newFieldType, id));
     }
 

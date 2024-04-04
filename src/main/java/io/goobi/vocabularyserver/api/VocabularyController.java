@@ -50,7 +50,7 @@ public class VocabularyController {
 
     @PutMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularyDTO> update(@RequestBody VocabularyDTO vocabularyDTO, @PathVariable long id) {
+    public EntityModel<VocabularyDTO> update(@RequestBody VocabularyDTO vocabularyDTO, @PathVariable long id) throws ValidationException {
         return assembler.toModel(manager.replace(vocabularyDTO, id));
     }
 
