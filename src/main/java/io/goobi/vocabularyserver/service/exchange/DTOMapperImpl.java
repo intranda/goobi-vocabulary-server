@@ -2,6 +2,7 @@ package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.MissingAttributeException;
 import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
 import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
 import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
@@ -108,7 +109,13 @@ public class DTOMapperImpl implements DTOMapper {
             result.setId(dto.getId());
         }
         if (fullInitialization) {
+            if (dto.getSchemaId() == null) {
+                throw new MissingAttributeException(FieldInstance.class, "schemaId");
+            }
             result.setSchema(lookUpSchema(dto.getSchemaId()));
+        }
+        if (dto.getTypeId() == null) {
+            throw new MissingAttributeException(FieldInstance.class, "typeId");
         }
         result.setType(lookUpFieldType(dto.getTypeId()));
         result.setName(dto.getName());
@@ -142,7 +149,13 @@ public class DTOMapperImpl implements DTOMapper {
             result.setId(dto.getId());
         }
         if (fullInitialization) {
+            if (dto.getRecordId() == null) {
+                throw new MissingAttributeException(FieldInstance.class, "recordId");
+            }
             result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
+        }
+        if (dto.getDefinitionId() == null) {
+            throw new MissingAttributeException(FieldInstance.class, "definitionId");
         }
         result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         result.setFieldValues(dto.getValues().stream()
@@ -175,6 +188,9 @@ public class DTOMapperImpl implements DTOMapper {
         }
         // TODO: Maybe manual initialization
         if (fullInitialization) {
+            if (dto.getFieldId() == null) {
+                throw new MissingAttributeException(FieldInstance.class, "fieldId");
+            }
             result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
         }
         // TODO: Maybe issue with same IDs
@@ -245,6 +261,9 @@ public class DTOMapperImpl implements DTOMapper {
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
+        if (dto.getSchemaId() == null) {
+            throw new MissingAttributeException(FieldInstance.class, "schemaId");
+        }
         result.setSchema(lookUpSchema(dto.getSchemaId()));
         result.setName(dto.getName());
         result.setDescription(dto.getDescription());
@@ -289,6 +308,9 @@ public class DTOMapperImpl implements DTOMapper {
         VocabularyRecord result = new VocabularyRecord();
         if (dto.getId() != null) {
             result.setId(dto.getId());
+        }
+        if (dto.getVocabularyId() == null) {
+            throw new MissingAttributeException(FieldInstance.class, "vocabularyId");
         }
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
         result.setFields(dto.getFields().stream()

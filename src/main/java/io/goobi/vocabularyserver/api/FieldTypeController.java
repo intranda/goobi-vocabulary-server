@@ -2,6 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.api.assemblers.FieldTypeAssembler;
+import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
 import io.goobi.vocabularyserver.service.manager.Manager;
@@ -51,6 +52,9 @@ public class FieldTypeController {
     @PutMapping("/types/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<FieldTypeDTO> update(@RequestBody FieldTypeDTO newFieldType, @PathVariable long id) throws ValidationException {
+        if (newFieldType.getId() != null) {
+            throw new IllegalAttributeProvidedException("id");
+        }
         newFieldType.setId(id);
         return assembler.toModel(manager.replace(newFieldType));
     }

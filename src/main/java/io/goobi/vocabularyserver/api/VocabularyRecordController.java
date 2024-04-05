@@ -1,6 +1,7 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
+import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.service.manager.RecordManager;
@@ -48,11 +49,11 @@ public class VocabularyRecordController {
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
-        if (vocabularyRecordDTO.getVocabularyId() != null && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
-            throw new IllegalArgumentException("Inconsistency in passed id's");
+        if (vocabularyRecordDTO.getVocabularyId() != null) {
+            throw new IllegalAttributeProvidedException("vocabularyId");
         }
         if (vocabularyRecordDTO.getParentId() != null) {
-            throw new IllegalArgumentException("You cannot provide parentId explicitly, please use the correct endpoint to add hierarchical records");
+            throw new IllegalAttributeProvidedException("parentId", "please use the correct endpoint to add hierarchical records");
         }
         vocabularyRecordDTO.setVocabularyId(vocabularyId);
         return assembler.toModel(manager.create(vocabularyRecordDTO));
@@ -62,7 +63,7 @@ public class VocabularyRecordController {
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
         if (vocabularyRecordDTO.getParentId() != null) {
-            throw new IllegalArgumentException("You cannot provide parentId explicitly, it is set implicitly");
+            throw new IllegalAttributeProvidedException("parentId", "it is set implicitly");
         }
         vocabularyRecordDTO.setParentId(recordId);
         return assembler.toModel(manager.createSubRecord(vocabularyRecordDTO));

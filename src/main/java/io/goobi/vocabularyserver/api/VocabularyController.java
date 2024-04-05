@@ -2,6 +2,7 @@ package io.goobi.vocabularyserver.api;
 
 
 import io.goobi.vocabularyserver.api.assemblers.VocabularyAssembler;
+import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
 import io.goobi.vocabularyserver.service.manager.Manager;
@@ -51,6 +52,9 @@ public class VocabularyController {
     @PutMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<VocabularyDTO> update(@RequestBody VocabularyDTO vocabularyDTO, @PathVariable long id) throws ValidationException {
+        if (vocabularyDTO.getId() != null) {
+            throw new IllegalAttributeProvidedException("id");
+        }
         vocabularyDTO.setId(id);
         return assembler.toModel(manager.replace(vocabularyDTO));
     }

@@ -1,6 +1,8 @@
 package io.goobi.vocabularyserver.api;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
+import io.goobi.vocabularyserver.exception.MissingAttributeException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exception.ValidationException;
@@ -51,6 +53,20 @@ public class ControllerErrorHandlers {
     @ExceptionHandler(MissingValuesException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String missingValuesHandler(MissingValuesException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MissingAttributeException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String missingAttributesHandler(MissingAttributeException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(IllegalAttributeProvidedException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String illegalAttributeHandler(IllegalAttributeProvidedException e) {
         return e.getMessage();
     }
 
