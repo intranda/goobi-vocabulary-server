@@ -51,7 +51,8 @@ public class LanguageController {
     @PutMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<LanguageDTO> update(@RequestBody LanguageDTO newLanguage, @PathVariable long id) throws ValidationException {
-        return assembler.toModel(manager.replace(newLanguage, id));
+        newLanguage.setId(id);
+        return assembler.toModel(manager.replace(newLanguage));
     }
 
     @DeleteMapping("/languages/{id}")

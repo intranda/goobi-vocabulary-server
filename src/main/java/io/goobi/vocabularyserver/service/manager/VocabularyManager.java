@@ -46,10 +46,10 @@ public class VocabularyManager implements Manager<VocabularyDTO> {
 
     // TODO: This is not working correctly: Impossible to pass id for replace insertion
     @Override
-    public VocabularyDTO replace(VocabularyDTO newVocabularyDTO, long id) {
+    public VocabularyDTO replace(VocabularyDTO newVocabularyDTO) {
         Vocabulary jpaVocabulary = vocabularyRepository
-                .findById(id)
-                .orElseThrow(() -> new UnsupportedEntityReplacementException(newVocabularyDTO.getClass(), id));
+                .findById(newVocabularyDTO.getId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newVocabularyDTO.getClass(), newVocabularyDTO.getId()));
 //                .orElseGet(() -> transformVocabulary(newVocabulary));
 
         List<Runnable> replacements = new LinkedList<>();

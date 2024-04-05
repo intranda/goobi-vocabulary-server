@@ -52,10 +52,10 @@ public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
 
     // TODO: This is not working correctly: Impossible to pass id for replace insertion
     @Override
-    public VocabularySchemaDTO replace(VocabularySchemaDTO newSchema, long id) {
+    public VocabularySchemaDTO replace(VocabularySchemaDTO newSchema) {
         VocabularySchema jpaSchema = vocabularySchemaRepository
-                .findById(id)
-                .orElseThrow(() -> new UnsupportedEntityReplacementException(newSchema.getClass(), id));
+                .findById(newSchema.getId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newSchema.getClass(), newSchema.getId()));
 
         List<Runnable> replacements = new LinkedList<>();
         if (newSchema.getHierarchicalRecords() != null) {

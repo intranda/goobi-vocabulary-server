@@ -50,7 +50,8 @@ public class VocabularySchemaController {
     @PutMapping("/schemas/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<VocabularySchemaDTO> update(@RequestBody VocabularySchemaDTO vocabularySchemaDTO, @PathVariable long id) {
-        return assembler.toModel(manager.replace(vocabularySchemaDTO, id));
+        vocabularySchemaDTO.setId(id);
+        return assembler.toModel(manager.replace(vocabularySchemaDTO));
     }
 
     @DeleteMapping("/schemas/{id}")

@@ -53,10 +53,10 @@ public class FieldTypeManager implements Manager<FieldTypeDTO> {
     }
 
     @Override
-    public FieldTypeDTO replace(FieldTypeDTO newFieldTypeDTO, long id) throws ValidationException {
+    public FieldTypeDTO replace(FieldTypeDTO newFieldTypeDTO) throws ValidationException {
         FieldType jpaFieldType = fieldTypeRepository
-                .findById(id)
-                .orElseThrow(() -> new UnsupportedEntityReplacementException(newFieldTypeDTO.getClass(), id));
+                .findById(newFieldTypeDTO.getId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newFieldTypeDTO.getClass(), newFieldTypeDTO.getId()));
 
         FieldType transformed = modelMapper.toEntity(newFieldTypeDTO);
 

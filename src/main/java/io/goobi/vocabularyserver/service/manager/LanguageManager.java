@@ -46,10 +46,10 @@ public class LanguageManager implements Manager<LanguageDTO> {
     }
 
     @Override
-    public LanguageDTO replace(LanguageDTO newLanguageDTO, long id) {
+    public LanguageDTO replace(LanguageDTO newLanguageDTO) {
         Language jpaLanguage = languageRepository
-                .findById(id)
-                .orElseThrow(() -> new UnsupportedEntityReplacementException(newLanguageDTO.getClass(), id));
+                .findById(newLanguageDTO.getId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newLanguageDTO.getClass(), newLanguageDTO.getId()));
 
         List<Runnable> replacements = new LinkedList<>();
         if (newLanguageDTO.getAbbreviation() != null) {
