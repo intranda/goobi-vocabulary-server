@@ -62,6 +62,9 @@ public class VocabularyRecordController {
     @PostMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
+        if (vocabularyRecordDTO.getVocabularyId() != null) {
+            throw new IllegalAttributeProvidedException("vocabularyId");
+        }
         if (vocabularyRecordDTO.getParentId() != null) {
             throw new IllegalAttributeProvidedException("parentId", "it is set implicitly");
         }
