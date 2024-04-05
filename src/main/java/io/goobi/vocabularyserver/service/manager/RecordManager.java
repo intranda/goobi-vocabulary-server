@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RecordManager {
+public class RecordManager implements Manager<VocabularyRecordDTO> {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecord> validator;
@@ -28,6 +28,7 @@ public class RecordManager {
                 .map(modelMapper::toDTO);
     }
 
+    @Override
     public VocabularyRecordDTO get(long id) {
         return modelMapper.toDTO(
                 vocabularyRecordRepository.findById(id)
@@ -35,6 +36,7 @@ public class RecordManager {
         );
     }
 
+    @Override
     public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws ValidationException {
         VocabularyRecord jpaVocabularyRecord = modelMapper.toEntity(newRecord);
         validator.validate(jpaVocabularyRecord);
@@ -52,6 +54,7 @@ public class RecordManager {
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaParent));
     }
 
+    @Override
     public VocabularyRecordDTO delete(long id) {
         if (!vocabularyRecordRepository.existsById(id)) {
             throw new EntityNotFoundException(VocabularyRecord.class, id);
