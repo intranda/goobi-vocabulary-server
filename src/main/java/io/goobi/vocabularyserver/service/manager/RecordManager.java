@@ -1,6 +1,7 @@
 package io.goobi.vocabularyserver.service.manager;
 
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
+import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
@@ -10,6 +11,10 @@ import io.goobi.vocabularyserver.validation.Validator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RecordManager implements Manager<VocabularyRecordDTO> {
@@ -50,8 +55,29 @@ public class RecordManager implements Manager<VocabularyRecordDTO> {
         VocabularyRecord jpaNewChildRecord = modelMapper.toEntity(newRecord);
         jpaNewChildRecord.setParentRecord(jpaParent);
         jpaParent.getChildren().add(jpaNewChildRecord);
-        validator.validate(jpaParent);
-        return modelMapper.toDTO(vocabularyRecordRepository.save(jpaParent));
+        recursiveRecordValidation(jpaParent);
+        jpaNewChildRecord = vocabularyRecordRepository.save(jpaNewChildRecord);
+        vocabularyRecordRepository.save(jpaParent);
+        return modelMapper.toDTO(jpaNewChildRecord);
+    }
+
+    private void recursiveRecordValidation(VocabularyRecord recordToValidate) throws ValidationException {
+        List<Throwable> errors = new LinkedList<>();
+        try {
+            validator.validate(recordToValidate);
+        } catch (ValidationException e) {
+            errors.add(e);
+        }
+        for (VocabularyRecord r : recordToValidate.getChildren()) {
+            try {
+                validator.validate(r);
+            } catch (ValidationException e) {
+                errors.add(e);
+            }
+        }
+        if (!errors.isEmpty()) {
+            throw new RecordValidationException(errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n")));
+        }
     }
 
     @Override
