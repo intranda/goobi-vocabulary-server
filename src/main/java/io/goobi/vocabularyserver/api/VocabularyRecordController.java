@@ -48,7 +48,7 @@ public class VocabularyRecordController {
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
-        if (vocabularyRecordDTO.getVocabularyId() != 0 && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
+        if (vocabularyRecordDTO.getVocabularyId() != null && vocabularyRecordDTO.getVocabularyId() != vocabularyId) {
             throw new IllegalArgumentException("Inconsistency in passed id's");
         }
         if (vocabularyRecordDTO.getParentId() != null) {

@@ -158,7 +158,7 @@ class VocabularySchemaMapperTest {
 
         VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
 
-        assertFalse(result.getHierarchicalRecords());
+        assertFalse(result.isHierarchicalRecords());
     }
 
     @Test
@@ -167,6 +167,6 @@ class VocabularySchemaMapperTest {
 
         VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
 
-        assertTrue(result.getHierarchicalRecords());
+        assertTrue(result.isHierarchicalRecords());
     }
 }

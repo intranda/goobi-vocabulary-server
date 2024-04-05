@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class VocabularySchemaDTO {
-    private long id;
+    private Long id;
     private List<FieldDefinitionDTO> definitions;
     private Boolean hierarchicalRecords;
 }

@@ -29,7 +29,6 @@ import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -105,17 +104,19 @@ public class DTOMapperImpl implements DTOMapper {
     @Override
     public FieldDefinition toEntity(FieldDefinitionDTO dto, boolean fullInitialization) {
         FieldDefinition result = new FieldDefinition();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         if (fullInitialization) {
             result.setSchema(lookUpSchema(dto.getSchemaId()));
         }
         result.setType(lookUpFieldType(dto.getTypeId()));
         result.setName(dto.getName());
-        result.setRequired(dto.isRequired());
-        result.setUnique(dto.isUnique());
-        result.setMainEntry(dto.isMainEntry());
-        result.setTitleField(dto.isTitleField());
-        result.setMultiValued(dto.isMultiValued());
+        result.setRequired(Boolean.TRUE.equals(dto.getRequired()));
+        result.setUnique(Boolean.TRUE.equals(dto.getUnique()));
+        result.setMainEntry(Boolean.TRUE.equals(dto.getMainEntry()));
+        result.setTitleField(Boolean.TRUE.equals(dto.getTitleField()));
+        result.setMultiValued(Boolean.TRUE.equals(dto.getMultiValued()));
         return result;
     }
 
@@ -126,32 +127,27 @@ public class DTOMapperImpl implements DTOMapper {
         result.setSchemaId(entity.getSchema().getId());
         result.setName(entity.getName());
         result.setTypeId(entity.getType().getId());
-        result.setRequired(entity.getRequired());
-        result.setUnique(entity.getUnique());
-        result.setMainEntry(entity.getMainEntry() != null);
-        result.setTitleField(entity.getTitleField());
-        result.setMultiValued(entity.getMultiValued());
+        result.setRequired(entity.isRequired());
+        result.setUnique(entity.isUnique());
+        result.setMainEntry(Boolean.TRUE.equals(entity.getMainEntry()));
+        result.setTitleField(entity.isTitleField());
+        result.setMultiValued(entity.isMultiValued());
         return result;
     }
 
     @Override
     public FieldInstance toEntity(FieldInstanceDTO dto, boolean fullInitialization) {
         FieldInstance result = new FieldInstance();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         if (fullInitialization) {
             result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
         }
         result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
-        // Field instance equality is based on IDs, therefore we need to provide distinct IDs for all field values.
-        // Otherwise, after collecting them in sets will result in only one field value.
-        // The IDs are ignored by JPA anyway.
-        Iterator<FieldValueDTO> fieldValueIterator = dto.getValues().iterator();
-        for (int i = 1; i <= dto.getValues().size(); i++) {
-            fieldValueIterator.next().setId(i);
-        }
         result.setFieldValues(dto.getValues().stream()
                 .map(fv -> toEntity(fv, false))
-                .collect(Collectors.toSet())
+                .collect(Collectors.toList())
         );
         result.getFieldValues().forEach(fv -> fv.setFieldInstance(result));
         return result;
@@ -174,7 +170,9 @@ public class DTOMapperImpl implements DTOMapper {
     // TODO: Test this
     public FieldValue toEntity(FieldValueDTO dto, boolean fullInitialization) {
         FieldValue result = new FieldValue();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         // TODO: Maybe manual initialization
         if (fullInitialization) {
             result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
@@ -182,7 +180,7 @@ public class DTOMapperImpl implements DTOMapper {
         // TODO: Maybe issue with same IDs
         result.setTranslations(dto.getTranslations().entrySet().stream()
                 .map(e -> toEntity(e, result))
-                .collect(Collectors.toSet())
+                .collect(Collectors.toList())
         );
         return result;
     }
@@ -211,10 +209,11 @@ public class DTOMapperImpl implements DTOMapper {
     @Override
     public FieldType toEntity(FieldTypeDTO dto) {
         FieldType result = new FieldType();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         result.setName(dto.getName());
         result.setValidation(dto.getValidation());
-        // TODO: Check this, might be broken due to same ID issue with Set
         if (dto.getSelectableValues() != null) {
             result.setSelectableValues(dto.getSelectableValues().stream()
                     .map(s -> {
@@ -223,14 +222,7 @@ public class DTOMapperImpl implements DTOMapper {
                                 sv.setValue(s);
                                 return sv;
                             }
-                    ).collect(Collectors.toSet()));
-            // Field instance equality is based on IDs, therefore we need to provide distinct IDs for all field instances.
-            // Otherwise, after collecting them in sets will result in only one field.
-            // The IDs are ignored by JPA anyway.
-            Iterator<SelectableValue> selectableValueIterator = result.getSelectableValues().iterator();
-            for (int i = 1; i <= dto.getSelectableValues().size(); i++) {
-                selectableValueIterator.next().setId((long) i);
-            }
+                    ).collect(Collectors.toList()));
         }
         return result;
     }
@@ -250,7 +242,9 @@ public class DTOMapperImpl implements DTOMapper {
     @Override
     public Vocabulary toEntity(VocabularyDTO dto) {
         Vocabulary result = new Vocabulary();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         result.setSchema(lookUpSchema(dto.getSchemaId()));
         result.setName(dto.getName());
         result.setDescription(dto.getDescription());
@@ -270,7 +264,9 @@ public class DTOMapperImpl implements DTOMapper {
     @Override
     public VocabularySchema toEntity(VocabularySchemaDTO dto) {
         VocabularySchema result = new VocabularySchema();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         result.setDefinitions(dto.getDefinitions().stream()
                 .map(d -> this.toEntity(d, false)
                 ).collect(Collectors.toList()));
@@ -284,28 +280,23 @@ public class DTOMapperImpl implements DTOMapper {
         VocabularySchemaDTO result = new VocabularySchemaDTO();
         result.setId(entity.getId());
         result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
-        result.setHierarchicalRecords(Boolean.TRUE.equals(entity.getHierarchicalRecords()));
+        result.setHierarchicalRecords(Boolean.TRUE.equals(entity.isHierarchicalRecords()));
         return result;
     }
 
     @Override
     public VocabularyRecord toEntity(VocabularyRecordDTO dto) {
         VocabularyRecord result = new VocabularyRecord();
-        result.setId(dto.getId());
-        result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
-        // Field instance equality is based on IDs, therefore we need to provide distinct IDs for all field instances.
-        // Otherwise, after collecting them in sets will result in only one field.
-        // The IDs are ignored by JPA anyway.
-        Iterator<FieldInstanceDTO> fieldIterator = dto.getFields().iterator();
-        for (int i = 1; i <= dto.getFields().size(); i++) {
-            fieldIterator.next().setId(i);
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
         }
+        result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
         result.setFields(dto.getFields().stream()
                 .map(f -> this.toEntity(f, false))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toList()));
         result.getFields().forEach(f -> f.setVocabularyRecord(result));
         if (dto.getChildren() != null) {
-            result.setChildren(dto.getChildren().stream().map(c -> toEntity(Objects.requireNonNull(c.getContent()))).collect(Collectors.toSet()));
+            result.setChildren(dto.getChildren().stream().map(c -> toEntity(Objects.requireNonNull(c.getContent()))).collect(Collectors.toList()));
         }
         result.getChildren().forEach(c -> c.setParentRecord(result));
         return result;
@@ -331,7 +322,9 @@ public class DTOMapperImpl implements DTOMapper {
     @Override
     public Language toEntity(LanguageDTO dto) {
         Language result = new Language();
-        result.setId(dto.getId());
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
         result.setAbbreviation(dto.getAbbreviation());
         result.setName(dto.getName());
         return result;

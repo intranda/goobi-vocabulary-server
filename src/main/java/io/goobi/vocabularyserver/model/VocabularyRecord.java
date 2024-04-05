@@ -13,9 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,21 +24,21 @@ public class VocabularyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "vocabulary_id", nullable = false)
     private Vocabulary vocabulary;
 
     @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FieldInstance> fields = new LinkedHashSet<>();
+    private List<FieldInstance> fields = new LinkedList<>();
 
     @ManyToOne
     @JoinColumn(name = "parent_record_id")
     private VocabularyRecord parentRecord;
 
     @OneToMany(mappedBy = "parentRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VocabularyRecord> children = new LinkedHashSet<>();
+    private List<VocabularyRecord> children = new LinkedList<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -55,7 +54,7 @@ public class VocabularyRecord {
             return false;
         }
         VocabularyRecord vocabularyRecord = (VocabularyRecord) o;
-        return getId() != null && Objects.equals(getId(), vocabularyRecord.getId());
+        return id == vocabularyRecord.id;
     }
 
     @Override

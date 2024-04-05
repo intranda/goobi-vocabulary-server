@@ -37,7 +37,7 @@ class FieldTypeValidationTests {
                     sv.setValue(values[i]);
                     return sv;
                 })
-                .collect(Collectors.toSet())
+                .collect(Collectors.toList())
         );
     }
 

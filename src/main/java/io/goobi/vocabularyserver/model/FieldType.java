@@ -10,8 +10,8 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +20,7 @@ public class FieldType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     // `name` is a reserved Mysql keyword
     @Column(name = "type_name", nullable = false, unique = true)
@@ -30,5 +30,5 @@ public class FieldType {
     private String validation;
 
     @OneToMany(mappedBy = "fieldType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<SelectableValue> selectableValues = new LinkedHashSet<>();
+    private List<SelectableValue> selectableValues = new LinkedList<>();
 }

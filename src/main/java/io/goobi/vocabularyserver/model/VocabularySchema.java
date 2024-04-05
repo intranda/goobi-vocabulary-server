@@ -20,11 +20,11 @@ public class VocabularySchema {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @OneToMany(mappedBy = "schema", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FieldDefinition> definitions = new ArrayList<>();
 
     @Column(name = "hierarchical_records")
-    private Boolean hierarchicalRecords;
+    private boolean hierarchicalRecords;
 }

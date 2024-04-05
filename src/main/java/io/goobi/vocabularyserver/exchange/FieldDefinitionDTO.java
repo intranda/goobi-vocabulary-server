@@ -4,13 +4,13 @@ import lombok.Data;
 
 @Data
 public class FieldDefinitionDTO {
-    private long id;
-    private long schemaId;
+    private Long id;
+    private Long schemaId;
     private String name;
-    private long typeId;
-    private boolean required;
-    private boolean unique;
-    private boolean mainEntry;
-    private boolean titleField;
-    private boolean multiValued;
+    private Long typeId;
+    private Boolean required;
+    private Boolean unique;
+    private Boolean mainEntry;
+    private Boolean titleField;
+    private Boolean multiValued;
 }

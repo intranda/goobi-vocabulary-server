@@ -9,6 +9,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ class FieldTypeMapperTest {
             SelectableValue sv = new SelectableValue();
             sv.setValue(s);
             return sv;
-        }).collect(Collectors.toSet()));
+        }).collect(Collectors.toList()));
         fieldTypeDTO = new FieldTypeDTO();
         fieldTypeDTO.setId(FIELD_TYPE_ID);
         fieldTypeDTO.setName(FIELD_TYPE_NAME);
@@ -125,7 +126,7 @@ class FieldTypeMapperTest {
         );
     }
 
-    private void assertCorrectFieldTypeReference(FieldType result, Set<SelectableValue> selectableValues) {
+    private void assertCorrectFieldTypeReference(FieldType result, List<SelectableValue> selectableValues) {
         assertAll(
                 selectableValues.stream()
                         .map(v -> (Executable) () -> assertEquals(result, v.getFieldType()))

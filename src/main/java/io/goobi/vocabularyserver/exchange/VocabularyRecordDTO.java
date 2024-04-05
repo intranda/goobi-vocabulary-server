@@ -7,9 +7,9 @@ import java.util.Set;
 
 @Data
 public class VocabularyRecordDTO {
-    private long id;
+    private Long id;
     private Long parentId;
-    private long vocabularyId;
+    private Long vocabularyId;
     private Set<FieldInstanceDTO> fields;
     private Set<EntityModel<VocabularyRecordDTO>> children;
 }

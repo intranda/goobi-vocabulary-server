@@ -51,7 +51,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
     }
 
     private void checkValueIsOneOfSelectableValues(FieldValue fieldValue) throws FieldValueValidationException {
-        Set<SelectableValue> selectableValues = fieldValue.getFieldInstance().getDefinition().getType().getSelectableValues();
+        List<SelectableValue> selectableValues = fieldValue.getFieldInstance().getDefinition().getType().getSelectableValues();
         if (selectableValues != null && !selectableValues.isEmpty()) {
             Set<String> selectableStringValues = selectableValues.stream()
                     .map(SelectableValue::getValue)
@@ -76,7 +76,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValue> {
     }
 
     private void checkValueUniqueness(FieldValue fieldValue) throws FieldValueValidationException {
-        if (Boolean.TRUE.equals(fieldValue.getFieldInstance().getDefinition().getUnique())) {
+        if (Boolean.TRUE.equals(fieldValue.getFieldInstance().getDefinition().isUnique())) {
             Set<String> duplicateUniqueValues = fieldValue.getTranslations().stream()
                     .map(FieldTranslation::getValue)
                     .filter(v -> fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(

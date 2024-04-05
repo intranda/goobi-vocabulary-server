@@ -43,7 +43,7 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchema> {
         List<FieldDefinition> mainEntries = schema.getDefinitions().stream()
                 .filter(d -> Boolean.TRUE.equals(d.getMainEntry())).collect(Collectors.toList());
         if (!mainEntries.isEmpty() && mainEntries.stream()
-                .filter(d -> Boolean.TRUE.equals(d.getUnique()))
+                .filter(d -> Boolean.TRUE.equals(d.isUnique()))
                 .count() != 1) {
             throw new SchemaValidationException("The main field needs to be set unique");
         }
@@ -53,7 +53,7 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchema> {
         List<FieldDefinition> mainEntries = schema.getDefinitions().stream()
                 .filter(d -> Boolean.TRUE.equals(d.getMainEntry())).collect(Collectors.toList());
         if (!mainEntries.isEmpty() && mainEntries.stream()
-                .filter(d -> Boolean.TRUE.equals(d.getRequired()))
+                .filter(d -> Boolean.TRUE.equals(d.isRequired()))
                 .count() != 1) {
             throw new SchemaValidationException("The main field needs to be set required");
         }
@@ -61,8 +61,8 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchema> {
 
     private void checkTitleFieldsAreRequired(VocabularySchema schema) throws SchemaValidationException {
         List<String> titleFieldsThatAreNotRequired = schema.getDefinitions().stream()
-                .filter(d -> Boolean.TRUE.equals(d.getTitleField()))
-                .filter(d -> Boolean.FALSE.equals(d.getRequired()))
+                .filter(d -> Boolean.TRUE.equals(d.isTitleField()))
+                .filter(d -> Boolean.FALSE.equals(d.isRequired()))
                 .map(FieldDefinition::getName)
                 .collect(Collectors.toList());
         if (!titleFieldsThatAreNotRequired.isEmpty()) {

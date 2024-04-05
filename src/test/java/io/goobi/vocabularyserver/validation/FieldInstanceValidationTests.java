@@ -58,7 +58,7 @@ class FieldInstanceValidationTests {
                 SelectableValue sv = new SelectableValue();
                 sv.setValue(s);
                 return sv;
-            }).collect(Collectors.toSet()));
+            }).collect(Collectors.toList()));
         }
         FieldDefinition definition = new FieldDefinition();
         definition.setSchema(schema);
@@ -78,11 +78,11 @@ class FieldInstanceValidationTests {
         field.setDefinition(definition);
         field.setVocabularyRecord(record);
         field.setFieldValues(transform(field, values));
-        record.setFields(Set.of(field));
+        record.setFields(List.of(field));
         return field;
     }
 
-    private Set<FieldValue> transform(FieldInstance field, Pair<String, String>[] values) {
+    private List<FieldValue> transform(FieldInstance field, Pair<String, String>[] values) {
         Map<String, Set<String>> valuesPerLanguage = new HashMap<>();
         for (Pair<String, String> p : values) {
             if (!valuesPerLanguage.containsKey(p.getFirst())) {
@@ -97,7 +97,7 @@ class FieldInstanceValidationTests {
                 .entrySet().stream()
                 .flatMap(e -> e.getValue().stream()
                         .map(v -> createFieldValue(field, e.getKey(), v)))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private Language createLanguage(String abbreviation) {
@@ -109,7 +109,7 @@ class FieldInstanceValidationTests {
     private FieldValue createFieldValue(FieldInstance field, Language language, String value) {
         FieldValue fieldValue = new FieldValue();
         fieldValue.setFieldInstance(field);
-        fieldValue.setTranslations(Set.of(createTranslation(fieldValue, language, value)));
+        fieldValue.setTranslations(List.of(createTranslation(fieldValue, language, value)));
         return fieldValue;
     }
 

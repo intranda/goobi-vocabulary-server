@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -89,7 +88,7 @@ class RecordValidationTests {
         unknown.setVocabularyRecord(record);
         unknown.setDefinition(os);
 
-        record.setFields(Set.of(name, unknown));
+        record.setFields(List.of(name, unknown));
 
         assertThrows(ValidationException.class, () -> validator.validate(record));
     }
@@ -101,20 +100,18 @@ class RecordValidationTests {
         VocabularyRecord parent = new VocabularyRecord();
         parent.setVocabulary(vocabulary);
         FieldInstance parentNameField = new FieldInstance();
-        parentNameField.setId(1L);
         parentNameField.setDefinition(fdName);
         parentNameField.setVocabularyRecord(parent);
-        parent.setFields(Set.of(parentNameField));
+        parent.setFields(List.of(parentNameField));
 
         VocabularyRecord child = new VocabularyRecord();
         child.setVocabulary(vocabulary);
         FieldInstance childNameField = new FieldInstance();
-        childNameField.setId(2L);
         childNameField.setDefinition(fdName);
         childNameField.setVocabularyRecord(child);
-        child.setFields(Set.of(childNameField));
+        child.setFields(List.of(childNameField));
         child.setParentRecord(parent);
-        parent.setChildren(Set.of(child));
+        parent.setChildren(List.of(child));
 
         assertAll("Parent and child validations",
                 () -> assertThrows(ValidationException.class, () -> validator.validate(parent)),
@@ -132,7 +129,7 @@ class RecordValidationTests {
         parentNameField.setId(1L);
         parentNameField.setDefinition(fdName);
         parentNameField.setVocabularyRecord(parent);
-        parent.setFields(Set.of(parentNameField));
+        parent.setFields(List.of(parentNameField));
 
         VocabularyRecord child = new VocabularyRecord();
         child.setVocabulary(vocabulary);
@@ -140,9 +137,9 @@ class RecordValidationTests {
         childNameField.setId(2L);
         childNameField.setDefinition(fdName);
         childNameField.setVocabularyRecord(child);
-        child.setFields(Set.of(childNameField));
+        child.setFields(List.of(childNameField));
         child.setParentRecord(parent);
-        parent.setChildren(Set.of(child));
+        parent.setChildren(List.of(child));
 
         assertAll("Parent and child validations",
                 () -> validator.validate(parent),

@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,7 +109,7 @@ class VocabularyRecordMapperTest {
         fieldInstance2.setVocabularyRecord(vocabularyRecord);
 //        fieldInstance2.setValue(FIELD_INSTANCE_2_VALUE);
 
-        vocabularyRecord.setFields(Set.of(fieldInstance1, fieldInstance2));
+        vocabularyRecord.setFields(List.of(fieldInstance1, fieldInstance2));
 
         fieldInstanceDTO1 = new FieldInstanceDTO();
         fieldInstanceDTO1.setId(FIELD_INSTANCE_1_ID);
@@ -150,7 +151,7 @@ class VocabularyRecordMapperTest {
     void validChildFields_toDTO() {
         VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
 
-        assertFieldInstancesEquals(Set.of(fieldInstance1, fieldInstance2), result.getFields());
+        assertFieldInstancesEquals(List.of(fieldInstance1, fieldInstance2), new ArrayList<>(result.getFields()));
     }
 
     @Test
@@ -178,10 +179,10 @@ class VocabularyRecordMapperTest {
         fieldInstance.setDefinition(fieldDefinition1);
         fieldInstance.setVocabularyRecord(child);
 //        fieldInstance1.setValue(FIELD_INSTANCE_1_VALUE);
-        child.setFields(Set.of(fieldInstance));
+        child.setFields(List.of(fieldInstance));
         child.setParentRecord(vocabularyRecord);
 
-        vocabularyRecord.setChildren(Set.of(child));
+        vocabularyRecord.setChildren(List.of(child));
 
         VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
 
@@ -255,13 +256,13 @@ class VocabularyRecordMapperTest {
     void validChildFields_fromDTO() {
         VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
 
-        assertFieldInstancesEquals(result.getFields(), Set.of(fieldInstanceDTO1, fieldInstanceDTO2));
+        assertFieldInstancesEquals(result.getFields(), List.of(fieldInstanceDTO1, fieldInstanceDTO2));
     }
 
-    private void assertFieldInstancesEquals(Set<FieldInstance> a, Set<FieldInstanceDTO> b) {
+    private void assertFieldInstancesEquals(List<FieldInstance> a, List<FieldInstanceDTO> b) {
         assertEquals(a.size(), b.size());
         for (FieldInstanceDTO x : b) {
-            List<FieldInstance> matches = a.stream().filter(aa -> aa.getId().equals(x.getId())).collect(Collectors.toList());
+            List<FieldInstance> matches = a.stream().filter(aa -> aa.getId() == x.getId()).collect(Collectors.toList());
             assertEquals(1, matches.size());
             FieldInstance match = matches.get(0);
             assertEquals(x.getRecordId(), match.getVocabularyRecord().getId());

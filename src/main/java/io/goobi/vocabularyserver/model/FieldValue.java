@@ -13,9 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,14 +23,14 @@ public class FieldValue {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @ManyToOne
     @JoinColumn(name = "field_instance_id", nullable = false)
     private FieldInstance fieldInstance;
 
     @OneToMany(mappedBy = "fieldValue", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FieldTranslation> translations = new LinkedHashSet<>();
+    private List<FieldTranslation> translations = new LinkedList<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -47,7 +46,7 @@ public class FieldValue {
             return false;
         }
         FieldValue that = (FieldValue) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        return id == that.id;
     }
 
     @Override

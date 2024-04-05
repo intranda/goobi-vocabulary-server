@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -87,7 +88,7 @@ class FieldInstanceMapperTest {
         fieldTranslation1.setValue(FIELD_INSTANCE_VALUE1);
         fieldValue1 = new FieldValue();
         fieldValue1.setId(1L);
-        fieldValue1.setTranslations(Set.of(fieldTranslation1));
+        fieldValue1.setTranslations(List.of(fieldTranslation1));
         fieldTranslation1.setFieldValue(fieldValue1);
 
         FieldTranslation fieldTranslation2 = new FieldTranslation();
@@ -96,7 +97,7 @@ class FieldInstanceMapperTest {
         fieldTranslation2.setValue(FIELD_INSTANCE_VALUE2);
         fieldValue2 = new FieldValue();
         fieldValue2.setId(2L);
-        fieldValue2.setTranslations(Set.of(fieldTranslation2));
+        fieldValue2.setTranslations(List.of(fieldTranslation2));
         fieldTranslation2.setFieldValue(fieldValue2);
 
         fieldValue1DTO = new FieldValueDTO();
@@ -124,7 +125,7 @@ class FieldInstanceMapperTest {
     }
 
     private void setUpFieldValues(FieldValue... values) {
-        fieldInstance.setFieldValues(Set.of(values));
+        fieldInstance.setFieldValues(List.of(values));
         Arrays.stream(values).forEach(v -> v.setFieldInstance(fieldInstance));
     }
 
@@ -254,7 +255,7 @@ class FieldInstanceMapperTest {
         );
     }
 
-    private void assertEntityTranslations(Set<FieldValue> fieldValues, String... values) {
+    private void assertEntityTranslations(List<FieldValue> fieldValues, String... values) {
         Set<String> expectedValues = Set.of(values);
         Set<String> providedValues = fieldValues.stream()
                 .flatMap(fv -> fv.getTranslations().stream()

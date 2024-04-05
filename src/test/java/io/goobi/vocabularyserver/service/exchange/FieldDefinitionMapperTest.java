@@ -103,7 +103,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertFalse(result.isRequired());
+        assertFalse(result.getRequired());
     }
 
     @Test
@@ -112,7 +112,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertFalse(result.isUnique());
+        assertFalse(result.getUnique());
     }
 
     @Test
@@ -121,7 +121,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertFalse(result.isMainEntry());
+        assertFalse(result.getMainEntry());
     }
 
     @Test
@@ -130,7 +130,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertFalse(result.isTitleField());
+        assertFalse(result.getTitleField());
     }
 
     @Test
@@ -139,7 +139,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertFalse(result.isMultiValued());
+        assertFalse(result.getMultiValued());
     }
 
     @Test
@@ -148,7 +148,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertTrue(result.isRequired());
+        assertTrue(result.getRequired());
     }
 
     @Test
@@ -157,7 +157,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertTrue(result.isUnique());
+        assertTrue(result.getUnique());
     }
 
     @Test
@@ -166,7 +166,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertTrue(result.isMainEntry());
+        assertTrue(result.getMainEntry());
     }
 
     @Test
@@ -175,7 +175,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertTrue(result.isTitleField());
+        assertTrue(result.getTitleField());
     }
 
     @Test
@@ -184,7 +184,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
 
-        assertTrue(result.isMultiValued());
+        assertTrue(result.getMultiValued());
     }
 
     @Test
@@ -221,7 +221,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertFalse(result.getRequired());
+        assertFalse(result.isRequired());
     }
 
     @Test
@@ -230,7 +230,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertFalse(result.getUnique());
+        assertFalse(result.isUnique());
     }
 
     @Test
@@ -248,7 +248,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertFalse(result.getTitleField());
+        assertFalse(result.isTitleField());
     }
 
     @Test
@@ -257,7 +257,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertFalse(result.getMultiValued());
+        assertFalse(result.isMultiValued());
     }
 
     @Test
@@ -266,7 +266,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertTrue(result.getRequired());
+        assertTrue(result.isRequired());
     }
 
     @Test
@@ -275,7 +275,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertTrue(result.getUnique());
+        assertTrue(result.isUnique());
     }
 
     @Test
@@ -293,7 +293,7 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertTrue(result.getTitleField());
+        assertTrue(result.isTitleField());
     }
 
     @Test
@@ -302,6 +302,6 @@ class FieldDefinitionMapperTest {
 
         FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
 
-        assertTrue(result.getMultiValued());
+        assertTrue(result.isMultiValued());
     }
 }

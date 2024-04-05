@@ -33,7 +33,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
                 .getSchema()
                 .getDefinitions()
                 .stream()
-                .filter(FieldDefinition::getRequired)
+                .filter(FieldDefinition::isRequired)
                 .collect(Collectors.toList());
         List<FieldDefinition> providedFields = vocabularyRecord.getFields()
                 .stream()
@@ -70,7 +70,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
     }
 
     private void checkHierarchy(VocabularyRecord vocabularyRecord) throws RecordValidationException {
-        if (Boolean.FALSE.equals(vocabularyRecord.getVocabulary().getSchema().getHierarchicalRecords())) {
+        if (Boolean.FALSE.equals(vocabularyRecord.getVocabulary().getSchema().isHierarchicalRecords())) {
             Set<String> errors = new HashSet<>();
             if (vocabularyRecord.getParentRecord() != null) {
                 errors.add("can't define parent record if hierarchical records are deactivated in vocabulary schema");

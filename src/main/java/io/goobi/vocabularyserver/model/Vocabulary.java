@@ -12,8 +12,8 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,7 +22,7 @@ public class Vocabulary {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
@@ -36,5 +36,5 @@ public class Vocabulary {
     private String description;
 
     @OneToMany(mappedBy = "vocabulary", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VocabularyRecord> records = new LinkedHashSet<>();
+    private List<VocabularyRecord> records = new LinkedList<>();
 }

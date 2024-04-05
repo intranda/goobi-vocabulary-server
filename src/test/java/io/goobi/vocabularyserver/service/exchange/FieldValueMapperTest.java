@@ -14,9 +14,9 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -122,7 +122,7 @@ class FieldValueMapperTest {
     }
 
     private void setUpFieldValueDTOTranslations(FieldTranslation... translations) {
-        fieldValue.setTranslations(Set.of(translations));
+        fieldValue.setTranslations(List.of(translations));
         Arrays.stream(translations).forEach(t -> t.setFieldValue(fieldValue));
     }
 
@@ -196,7 +196,7 @@ class FieldValueMapperTest {
 
         FieldValue result = mapper.toEntity(fieldValueDTO);
 
-        Set<FieldTranslation> resultTranslations = result.getTranslations();
+        List<FieldTranslation> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(1, resultTranslations.size()),
@@ -223,7 +223,7 @@ class FieldValueMapperTest {
 
         FieldValue result = mapper.toEntity(fieldValueDTO);
 
-        Set<FieldTranslation> resultTranslations = result.getTranslations();
+        List<FieldTranslation> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(2, resultTranslations.size()),

@@ -13,8 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.Objects;
-
 @Entity
 @Getter
 @Setter
@@ -26,7 +24,7 @@ public class FieldDefinition {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "schema_id", nullable = false)
@@ -41,11 +39,11 @@ public class FieldDefinition {
     private FieldType type;
 
     @Column(name = "required", nullable = false)
-    private Boolean required = false;
+    private boolean required = false;
 
     // `unique` is a reserved MariaDB keyword
     @Column(name = "distinctive", nullable = false)
-    private Boolean unique = false;
+    private boolean unique = false;
 
     @Column(name = "main_entry")
     private Boolean mainEntry;
@@ -59,10 +57,10 @@ public class FieldDefinition {
     }
 
     @Column(name = "title_field", nullable = false)
-    private Boolean titleField = false;
+    private boolean titleField = false;
 
     @Column(name = "multi_valued", nullable = false)
-    private Boolean multiValued = false;
+    private boolean multiValued = false;
 
     @Override
     public final boolean equals(Object o) {
@@ -78,7 +76,7 @@ public class FieldDefinition {
             return false;
         }
         FieldDefinition that = (FieldDefinition) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        return id != that.id;
     }
 
     @Override

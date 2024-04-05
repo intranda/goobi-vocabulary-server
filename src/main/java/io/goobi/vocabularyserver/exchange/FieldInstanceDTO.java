@@ -7,8 +7,8 @@ import java.util.Set;
 
 @Data
 public class FieldInstanceDTO {
-    private long id;
-    private long recordId;
-    private long definitionId;
+    private Long id;
+    private Long recordId;
+    private Long definitionId;
     private Set<FieldValueDTO> values = new HashSet<>();
 }

@@ -1,7 +1,6 @@
 package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.exchange.VocabularyDTO;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.model.Vocabulary;
 import io.goobi.vocabularyserver.model.VocabularyRecord;
 import io.goobi.vocabularyserver.model.VocabularySchema;
@@ -12,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -53,7 +52,7 @@ class VocabularyMapperTest {
         vocabularyRecord2.setId(RECORD_2_ID);
         vocabularyRecord2.setVocabulary(vocabulary);
 
-        vocabulary.setRecords(Set.of(vocabularyRecord1, vocabularyRecord2));
+        vocabulary.setRecords(List.of(vocabularyRecord1, vocabularyRecord2));
 
         vocabularyDTO = new VocabularyDTO();
         vocabularyDTO.setId(VOCABULARY_ID);

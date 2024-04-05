@@ -11,8 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.Objects;
-
 @Entity
 @Getter
 @Setter
@@ -20,7 +18,7 @@ public class SelectableValue {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "field_type_id", nullable = false)
@@ -44,7 +42,7 @@ public class SelectableValue {
             return false;
         }
         SelectableValue that = (SelectableValue) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        return id == that.id;
     }
 
     @Override
