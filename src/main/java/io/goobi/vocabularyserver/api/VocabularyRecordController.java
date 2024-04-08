@@ -41,6 +41,11 @@ public class VocabularyRecordController {
         return assembler.toModel(manager.get(recordId));
     }
 
+    @GetMapping(value = "/records/{recordId}", produces = {"application/xml", "application/rdf+xml"})
+    public VocabularyRecordDTO oneAsXml(@PathVariable long recordId) {
+        return manager.get(recordId);
+    }
+
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
     public PagedModel<EntityModel<VocabularyRecordDTO>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecordDTO> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.search(vocabularyId, searchTerm, pageRequest), assembler);
