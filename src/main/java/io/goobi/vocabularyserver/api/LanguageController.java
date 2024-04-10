@@ -8,11 +8,13 @@ import io.goobi.vocabularyserver.exchange.Language;
 import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import io.goobi.vocabularyserver.service.rdf.RDFMapper;
+import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,9 +57,31 @@ public class LanguageController {
         return rdfMapper.toRDFXML(managerEntity.get(id));
     }
 
+    @GetMapping(
+            value = "/languages/{id}/export/rdfxml",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public @ResponseBody ResponseEntity<?> exportAsRdfXml(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"language_" + id + ".rdf\"")
+                .body(IOUtils.toByteArray(rdfMapper.toRDFXML(managerEntity.get(id))));
+    }
+
     @GetMapping(value = "/languages/{id}", produces = {"application/n-triples", "text/turtle"})
     public String oneAsRdfTurtle(@PathVariable long id) {
         return rdfMapper.toRDFTurtle(managerEntity.get(id));
+    }
+
+    @GetMapping(
+            value = "/languages/{id}/export/turtle",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public @ResponseBody ResponseEntity<?> exportAsRdfTurtle(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"language_" + id + ".ttl\"")
+                .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(managerEntity.get(id))));
     }
 
     @PostMapping("/languages")
