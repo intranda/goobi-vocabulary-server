@@ -5,7 +5,9 @@ import io.goobi.vocabularyserver.api.assemblers.LanguageAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.service.manager.Manager;
+import io.goobi.vocabularyserver.service.rdf.RDFMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -28,11 +30,13 @@ public class LanguageController {
     private final Manager<Language> DTOmanager;
     private final Manager<LanguageEntity> managerEntity;
     private final LanguageAssembler assembler;
+    private final RDFMapper rdfMapper;
 
-    public LanguageController(Manager<Language> managerDTO, Manager<LanguageEntity> managerEntity, LanguageAssembler assembler) {
+    public LanguageController(Manager<Language> managerDTO, Manager<LanguageEntity> managerEntity, LanguageAssembler assembler, RDFMapper rdfMapper) {
         this.DTOmanager = managerDTO;
         this.managerEntity = managerEntity;
         this.assembler = assembler;
+        this.rdfMapper = rdfMapper;
     }
 
     @GetMapping("/languages")
@@ -43,6 +47,16 @@ public class LanguageController {
     @GetMapping("/languages/{id}")
     public EntityModel<Language> one(@PathVariable long id) {
         return assembler.toModel(DTOmanager.get(id));
+    }
+
+    @GetMapping(value = "/languages/{id}", produces = {"application/rdf+xml"})
+    public String oneAsRdfXml(@PathVariable long id) {
+        return rdfMapper.toRDFXML(managerEntity.get(id));
+    }
+
+    @GetMapping(value = "/languages/{id}", produces = {"application/n-triples", "text/turtle"})
+    public String oneAsRdfTurtle(@PathVariable long id) {
+        return rdfMapper.toRDFTurtle(managerEntity.get(id));
     }
 
     @PostMapping("/languages")
