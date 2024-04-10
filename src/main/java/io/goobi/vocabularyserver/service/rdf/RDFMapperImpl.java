@@ -7,8 +7,8 @@ import io.goobi.vocabularyserver.service.rdf.vocabulary.LANGUAGE;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +20,8 @@ public class RDFMapperImpl implements RDFMapper {
     @Value("${vocabulary-server.base-url}")
     private String baseUrl;
 
-    public static final Lang RDF_XML_SYNTAX = Lang.RDFXML;
-    public static final Lang RDF_TURTLE_SYNTAX = Lang.TURTLE;
+    public static final RDFFormat RDF_XML_SYNTAX = RDFFormat.RDFXML;
+    public static final RDFFormat RDF_TURTLE_SYNTAX = RDFFormat.TURTLE_BLOCKS;
 
     @Override
     public String toRDFXML(LanguageEntity entity) {
@@ -33,7 +33,7 @@ public class RDFMapperImpl implements RDFMapper {
         return transform(entity, this::generateLanguageModel, RDF_TURTLE_SYNTAX);
     }
 
-    private <T> String transform(T entity, EntityToModelMappingFunction<T> function, Lang format) {
+    private <T> String transform(T entity, EntityToModelMappingFunction<T> function, RDFFormat format) {
         StringWriter out = new StringWriter();
         RDFDataMgr.write(out, function.map(entity), format);
         return out.toString();
