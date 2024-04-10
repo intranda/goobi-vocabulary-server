@@ -2,9 +2,9 @@ package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -14,10 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
-    private final Validator<FieldInstance> fieldValidator;
+public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
+    private final Validator<FieldInstanceEntity> fieldValidator;
 
-    public RecordValidatorImpl(Validator<FieldInstance> fieldValidator) {
+    public RecordValidatorImpl(Validator<FieldInstanceEntity> fieldValidator) {
         super("Record");
         this.fieldValidator = fieldValidator;
         setValidations(List.of(
@@ -28,16 +28,16 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         ));
     }
 
-    private void checkRequiredFieldsExistence(VocabularyRecord vocabularyRecord) throws RecordValidationException {
-        List<FieldDefinition> missingFields = vocabularyRecord.getVocabulary()
+    private void checkRequiredFieldsExistence(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
+        List<FieldDefinitionEntity> missingFields = vocabularyRecord.getVocabulary()
                 .getSchema()
                 .getDefinitions()
                 .stream()
-                .filter(FieldDefinition::isRequired)
+                .filter(FieldDefinitionEntity::isRequired)
                 .collect(Collectors.toList());
-        List<FieldDefinition> providedFields = vocabularyRecord.getFields()
+        List<FieldDefinitionEntity> providedFields = vocabularyRecord.getFields()
                 .stream()
-                .map(FieldInstance::getDefinition)
+                .map(FieldInstanceEntity::getDefinition)
                 .collect(Collectors.toList());
         missingFields.removeAll(providedFields);
         if (!missingFields.isEmpty()) {
@@ -53,10 +53,10 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         }
     }
 
-    private void checkOnlyAllowedFieldDefinitionsGiven(VocabularyRecord vocabularyRecord) throws RecordValidationException {
-        List<FieldDefinition> providedFields = vocabularyRecord.getFields()
+    private void checkOnlyAllowedFieldDefinitionsGiven(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
+        List<FieldDefinitionEntity> providedFields = vocabularyRecord.getFields()
                 .stream()
-                .map(FieldInstance::getDefinition)
+                .map(FieldInstanceEntity::getDefinition)
                 .collect(Collectors.toList());
         providedFields.removeAll(vocabularyRecord.getVocabulary().getSchema().getDefinitions());
         if (!providedFields.isEmpty()) {
@@ -69,7 +69,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         }
     }
 
-    private void checkHierarchy(VocabularyRecord vocabularyRecord) throws RecordValidationException {
+    private void checkHierarchy(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
         if (Boolean.FALSE.equals(vocabularyRecord.getVocabulary().getSchema().isHierarchicalRecords())) {
             Set<String> errors = new HashSet<>();
             if (vocabularyRecord.getParentRecord() != null) {
@@ -84,9 +84,9 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecord> {
         }
     }
 
-    private void perFieldInstanceChecks(VocabularyRecord vocabularyRecord) throws RecordValidationException {
+    private void perFieldInstanceChecks(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
         List<Throwable> errors = new LinkedList<>();
-        for (FieldInstance f : vocabularyRecord.getFields()) {
+        for (FieldInstanceEntity f : vocabularyRecord.getFields()) {
             try {
                 fieldValidator.validate(f);
             } catch (ValidationException e) {

@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -17,10 +18,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Entity
+@Table(name = "vocabulary_record")
 @Getter
 @Setter
 // Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
-public class VocabularyRecord {
+public class VocabularyRecordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -28,17 +30,17 @@ public class VocabularyRecord {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "vocabulary_id", nullable = false)
-    private Vocabulary vocabulary;
+    private VocabularyEntity vocabulary;
 
     @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FieldInstance> fields = new LinkedList<>();
+    private List<FieldInstanceEntity> fields = new LinkedList<>();
 
     @ManyToOne
     @JoinColumn(name = "parent_record_id")
-    private VocabularyRecord parentRecord;
+    private VocabularyRecordEntity parentRecord;
 
     @OneToMany(mappedBy = "parentRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VocabularyRecord> children = new LinkedList<>();
+    private List<VocabularyRecordEntity> children = new LinkedList<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -53,7 +55,7 @@ public class VocabularyRecord {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        VocabularyRecord vocabularyRecord = (VocabularyRecord) o;
+        VocabularyRecordEntity vocabularyRecord = (VocabularyRecordEntity) o;
         return id == vocabularyRecord.id;
     }
 

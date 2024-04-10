@@ -1,10 +1,10 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldValueDTO;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldTranslation;
-import io.goobi.vocabularyserver.model.FieldValue;
-import io.goobi.vocabularyserver.model.Language;
+import io.goobi.vocabularyserver.exchange.FieldValue;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTranslationEntity;
+import io.goobi.vocabularyserver.model.FieldValueEntity;
+import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import io.goobi.vocabularyserver.repositories.LanguageRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +36,11 @@ class FieldValueMapperTest {
     private static final String GERMAN_NAME = "Deutsch";
     private static final String GERMAN_VALUE_TRANSLATION_VALUE = "Wert";
 
-    private FieldValue fieldValue;
-    private FieldValueDTO fieldValueDTO;
+    private FieldValueEntity fieldValue;
+    private FieldValue fieldValueDTO;
 
-    private FieldTranslation englishValueTranslation;
-    private FieldTranslation germanValueTranslation;
+    private FieldTranslationEntity englishValueTranslation;
+    private FieldTranslationEntity germanValueTranslation;
     private Map.Entry<String, String> englishValueTranslationDTO;
     private Map.Entry<String, String> germanValueTranslationDTO;
 
@@ -53,16 +53,16 @@ class FieldValueMapperTest {
 
     @BeforeEach
     void setUp() {
-        FieldInstance parent = new FieldInstance();
+        FieldInstanceEntity parent = new FieldInstanceEntity();
         parent.setId(PARENT_FIELD_INSTANCE_ID);
         when(fieldInstanceRepository.findById(PARENT_FIELD_INSTANCE_ID)).thenReturn(Optional.of(parent));
 
-        Language english = new Language();
+        LanguageEntity english = new LanguageEntity();
         english.setId(ENGLISH_ID);
         english.setAbbreviation(ENGLISH_ABBREVIATION);
         english.setName(ENGLISH_NAME);
 
-        Language german = new Language();
+        LanguageEntity german = new LanguageEntity();
         german.setId(GERMAN_ID);
         german.setAbbreviation(GERMAN_ABBREVIATION);
         german.setName(GERMAN_NAME);
@@ -70,7 +70,7 @@ class FieldValueMapperTest {
         when(languageRepository.findByAbbreviation(ENGLISH_ABBREVIATION)).thenReturn(Optional.of(english));
         when(languageRepository.findByAbbreviation(GERMAN_ABBREVIATION)).thenReturn(Optional.of(german));
 
-        englishValueTranslation = new FieldTranslation();
+        englishValueTranslation = new FieldTranslationEntity();
         englishValueTranslation.setId(1L);
         englishValueTranslation.setValue(ENGLISH_VALUE_TRANSLATION_VALUE);
         englishValueTranslation.setLanguage(english);
@@ -107,21 +107,21 @@ class FieldValueMapperTest {
             }
         };
 
-        germanValueTranslation = new FieldTranslation();
+        germanValueTranslation = new FieldTranslationEntity();
         germanValueTranslation.setId(2L);
         germanValueTranslation.setValue(GERMAN_VALUE_TRANSLATION_VALUE);
         germanValueTranslation.setLanguage(german);
 
-        fieldValue = new FieldValue();
+        fieldValue = new FieldValueEntity();
         fieldValue.setId(FIELD_VALUE_ID);
         fieldValue.setFieldInstance(parent);
 
-        fieldValueDTO = new FieldValueDTO();
+        fieldValueDTO = new FieldValue();
         fieldValueDTO.setId(FIELD_VALUE_ID);
         fieldValueDTO.setFieldId(PARENT_FIELD_INSTANCE_ID);
     }
 
-    private void setUpFieldValueDTOTranslations(FieldTranslation... translations) {
+    private void setUpFieldValueDTOTranslations(FieldTranslationEntity... translations) {
         fieldValue.setTranslations(List.of(translations));
         Arrays.stream(translations).forEach(t -> t.setFieldValue(fieldValue));
     }
@@ -132,14 +132,14 @@ class FieldValueMapperTest {
 
     @Test
     void validId_toDTO() {
-        FieldValueDTO result = mapper.toDTO(fieldValue);
+        FieldValue result = mapper.toDTO(fieldValue);
 
         assertEquals(FIELD_VALUE_ID, result.getId());
     }
 
     @Test
     void validFieldInstanceId_toDTO() {
-        FieldValueDTO result = mapper.toDTO(fieldValue);
+        FieldValue result = mapper.toDTO(fieldValue);
 
         assertEquals(PARENT_FIELD_INSTANCE_ID, result.getFieldId());
     }
@@ -148,7 +148,7 @@ class FieldValueMapperTest {
     void validSingleLanguageTranslation_toDTO() {
         setUpFieldValueDTOTranslations(englishValueTranslation);
 
-        FieldValueDTO result = mapper.toDTO(fieldValue);
+        FieldValue result = mapper.toDTO(fieldValue);
 
         Map<String, String> resultTranslations = result.getTranslations();
         assertAll(
@@ -163,7 +163,7 @@ class FieldValueMapperTest {
     void validMultiLanguageTranslation_toDTO() {
         setUpFieldValueDTOTranslations(englishValueTranslation, germanValueTranslation);
 
-        FieldValueDTO result = mapper.toDTO(fieldValue);
+        FieldValue result = mapper.toDTO(fieldValue);
 
         Map<String, String> resultTranslations = result.getTranslations();
         assertAll(
@@ -178,14 +178,14 @@ class FieldValueMapperTest {
 
     @Test
     void validId_fromDTO() {
-        FieldValue result = mapper.toEntity(fieldValueDTO);
+        FieldValueEntity result = mapper.toEntity(fieldValueDTO);
 
         assertEquals(FIELD_VALUE_ID, result.getId());
     }
 
     @Test
     void validFieldInstanceId_fromDTO() {
-        FieldValue result = mapper.toEntity(fieldValueDTO);
+        FieldValueEntity result = mapper.toEntity(fieldValueDTO);
 
         assertEquals(PARENT_FIELD_INSTANCE_ID, result.getFieldInstance().getId());
     }
@@ -194,9 +194,9 @@ class FieldValueMapperTest {
     void validSingleLanguageTranslation_fromDTO() {
         setUpFieldValueDTOTranslations(englishValueTranslationDTO);
 
-        FieldValue result = mapper.toEntity(fieldValueDTO);
+        FieldValueEntity result = mapper.toEntity(fieldValueDTO);
 
-        List<FieldTranslation> resultTranslations = result.getTranslations();
+        List<FieldTranslationEntity> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(1, resultTranslations.size()),
@@ -221,9 +221,9 @@ class FieldValueMapperTest {
     void validMultiLanguageTranslation_fromDTO() {
         setUpFieldValueDTOTranslations(englishValueTranslationDTO, germanValueTranslationDTO);
 
-        FieldValue result = mapper.toEntity(fieldValueDTO);
+        FieldValueEntity result = mapper.toEntity(fieldValueDTO);
 
-        List<FieldTranslation> resultTranslations = result.getTranslations();
+        List<FieldTranslationEntity> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(2, resultTranslations.size()),

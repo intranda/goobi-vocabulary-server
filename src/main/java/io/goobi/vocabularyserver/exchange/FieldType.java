@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-public class FieldTypeDTO {
+public class FieldType {
     private Long id;
     private String name;
     private String validation;

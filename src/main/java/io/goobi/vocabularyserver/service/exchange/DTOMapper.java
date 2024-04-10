@@ -1,59 +1,59 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
-import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
-import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
-import io.goobi.vocabularyserver.exchange.FieldValueDTO;
-import io.goobi.vocabularyserver.exchange.LanguageDTO;
-import io.goobi.vocabularyserver.exchange.VocabularyDTO;
+import io.goobi.vocabularyserver.exchange.FieldDefinition;
+import io.goobi.vocabularyserver.exchange.FieldInstance;
+import io.goobi.vocabularyserver.exchange.FieldType;
+import io.goobi.vocabularyserver.exchange.FieldValue;
+import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.FieldValue;
-import io.goobi.vocabularyserver.model.Language;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.FieldValueEntity;
+import io.goobi.vocabularyserver.model.LanguageEntity;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 
 public interface DTOMapper {
-    default FieldDefinition toEntity(FieldDefinitionDTO dto) {
+    default FieldDefinitionEntity toEntity(FieldDefinition dto) {
         return toEntity(dto, true);
     }
-    FieldDefinition toEntity(FieldDefinitionDTO dto, boolean fullInitialization);
+    FieldDefinitionEntity toEntity(FieldDefinition dto, boolean fullInitialization);
 
-    FieldDefinitionDTO toDTO(FieldDefinition entity);
+    FieldDefinition toDTO(FieldDefinitionEntity entity);
 
-    default FieldInstance toEntity(FieldInstanceDTO dto) {
+    default FieldInstanceEntity toEntity(FieldInstance dto) {
         return toEntity(dto, true);
     }
-    FieldInstance toEntity(FieldInstanceDTO dto, boolean fullInitialization);
+    FieldInstanceEntity toEntity(FieldInstance dto, boolean fullInitialization);
 
-    FieldInstanceDTO toDTO(FieldInstance entity);
+    FieldInstance toDTO(FieldInstanceEntity entity);
 
-    default FieldValue toEntity(FieldValueDTO dto) {
+    default FieldValueEntity toEntity(FieldValue dto) {
         return toEntity(dto, true);
     }
-    FieldValue toEntity(FieldValueDTO dto, boolean fullInitialization);
-    FieldValueDTO toDTO(FieldValue entity);
+    FieldValueEntity toEntity(FieldValue dto, boolean fullInitialization);
+    FieldValue toDTO(FieldValueEntity entity);
 
-    FieldType toEntity(FieldTypeDTO dto);
+    FieldTypeEntity toEntity(FieldType dto);
 
-    FieldTypeDTO toDTO(FieldType entity);
+    FieldType toDTO(FieldTypeEntity entity);
 
-    Vocabulary toEntity(VocabularyDTO dto);
+    VocabularyEntity toEntity(Vocabulary dto);
 
-    VocabularyDTO toDTO(Vocabulary entity);
+    Vocabulary toDTO(VocabularyEntity entity);
 
-    VocabularySchema toEntity(VocabularySchemaDTO dto);
+    VocabularySchemaEntity toEntity(VocabularySchemaDTO dto);
 
-    VocabularySchemaDTO toDTO(VocabularySchema entity);
+    VocabularySchemaDTO toDTO(VocabularySchemaEntity entity);
 
-    VocabularyRecord toEntity(VocabularyRecordDTO dto);
+    VocabularyRecordEntity toEntity(VocabularyRecordDTO dto);
 
-    VocabularyRecordDTO toDTO(VocabularyRecord entity);
+    VocabularyRecordDTO toDTO(VocabularyRecordEntity entity);
 
-    Language toEntity(LanguageDTO dto);
-    LanguageDTO toDTO(Language entity);
+    LanguageEntity toEntity(Language dto);
+    Language toDTO(LanguageEntity entity);
 }

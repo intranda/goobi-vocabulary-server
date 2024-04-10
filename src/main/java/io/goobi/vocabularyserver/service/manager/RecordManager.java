@@ -4,7 +4,7 @@ import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.validation.Validator;
@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 public class RecordManager implements Manager<VocabularyRecordDTO> {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
-    private final Validator<VocabularyRecord> validator;
+    private final Validator<VocabularyRecordEntity> validator;
 
-    public RecordManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecord> validator) {
+    public RecordManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
@@ -37,22 +37,22 @@ public class RecordManager implements Manager<VocabularyRecordDTO> {
     public VocabularyRecordDTO get(long id) {
         return modelMapper.toDTO(
                 vocabularyRecordRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, id))
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id))
         );
     }
 
     @Override
     public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws ValidationException {
-        VocabularyRecord jpaVocabularyRecord = modelMapper.toEntity(newRecord);
+        VocabularyRecordEntity jpaVocabularyRecord = modelMapper.toEntity(newRecord);
         validator.validate(jpaVocabularyRecord);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
     public VocabularyRecordDTO createSubRecord(VocabularyRecordDTO newRecord) throws ValidationException {
-        VocabularyRecord jpaParent = vocabularyRecordRepository.findById(newRecord.getParentId())
-                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, newRecord.getParentId()));
+        VocabularyRecordEntity jpaParent = vocabularyRecordRepository.findById(newRecord.getParentId())
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, newRecord.getParentId()));
         newRecord.setVocabularyId(jpaParent.getVocabulary().getId());
-        VocabularyRecord jpaNewChildRecord = modelMapper.toEntity(newRecord);
+        VocabularyRecordEntity jpaNewChildRecord = modelMapper.toEntity(newRecord);
         jpaNewChildRecord.setParentRecord(jpaParent);
         jpaParent.getChildren().add(jpaNewChildRecord);
         recursiveRecordValidation(jpaParent);
@@ -61,14 +61,14 @@ public class RecordManager implements Manager<VocabularyRecordDTO> {
         return modelMapper.toDTO(jpaNewChildRecord);
     }
 
-    private void recursiveRecordValidation(VocabularyRecord recordToValidate) throws ValidationException {
+    private void recursiveRecordValidation(VocabularyRecordEntity recordToValidate) throws ValidationException {
         List<Throwable> errors = new LinkedList<>();
         try {
             validator.validate(recordToValidate);
         } catch (ValidationException e) {
             errors.add(e);
         }
-        for (VocabularyRecord r : recordToValidate.getChildren()) {
+        for (VocabularyRecordEntity r : recordToValidate.getChildren()) {
             try {
                 validator.validate(r);
             } catch (ValidationException e) {
@@ -83,7 +83,7 @@ public class RecordManager implements Manager<VocabularyRecordDTO> {
     @Override
     public VocabularyRecordDTO delete(long id) {
         if (!vocabularyRecordRepository.existsById(id)) {
-            throw new EntityNotFoundException(VocabularyRecord.class, id);
+            throw new EntityNotFoundException(VocabularyRecordEntity.class, id);
         }
         vocabularyRecordRepository.deleteById(id);
         return null;

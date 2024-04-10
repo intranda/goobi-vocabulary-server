@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.LanguageDTO;
-import io.goobi.vocabularyserver.model.Language;
+import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.model.LanguageEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +18,16 @@ class LanguageMapperTest {
     @Autowired
     private DTOMapper mapper;
 
-    private Language language;
-    private LanguageDTO languageDTO;
+    private LanguageEntity language;
+    private Language languageDTO;
 
     @BeforeEach
     void setUp() {
-        language = new Language();
+        language = new LanguageEntity();
         language.setId(LANGUAGE_ID);
         language.setAbbreviation(LANGUAGE_ABBREVIATION);
         language.setName(LANGUAGE_NAME);
-        languageDTO = new LanguageDTO();
+        languageDTO = new Language();
         languageDTO.setId(LANGUAGE_ID);
         languageDTO.setAbbreviation(LANGUAGE_ABBREVIATION);
         languageDTO.setName(LANGUAGE_NAME);
@@ -35,42 +35,42 @@ class LanguageMapperTest {
 
     @Test
     void validId_toDTO() {
-        LanguageDTO result = mapper.toDTO(language);
+        Language result = mapper.toDTO(language);
 
         assertEquals(LANGUAGE_ID, result.getId());
     }
 
     @Test
     void validAbbreviation_toDTO() {
-        LanguageDTO result = mapper.toDTO(language);
+        Language result = mapper.toDTO(language);
 
         assertEquals(LANGUAGE_ABBREVIATION, result.getAbbreviation());
     }
 
     @Test
     void validName_toDTO() {
-        LanguageDTO result = mapper.toDTO(language);
+        Language result = mapper.toDTO(language);
 
         assertEquals(LANGUAGE_NAME, result.getName());
     }
 
     @Test
     void validId_fromDTO() {
-        Language result = mapper.toEntity(languageDTO);
+        LanguageEntity result = mapper.toEntity(languageDTO);
 
         assertEquals(LANGUAGE_ID, result.getId());
     }
 
     @Test
     void validAbbreviation_fromDTO() {
-        Language result = mapper.toEntity(languageDTO);
+        LanguageEntity result = mapper.toEntity(languageDTO);
 
         assertEquals(LANGUAGE_ABBREVIATION, result.getAbbreviation());
     }
 
     @Test
     void validName_fromDTO() {
-        Language result = mapper.toEntity(languageDTO);
+        LanguageEntity result = mapper.toEntity(languageDTO);
 
         assertEquals(LANGUAGE_NAME, result.getName());
     }

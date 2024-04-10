@@ -1,14 +1,14 @@
 package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
-import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
+import io.goobi.vocabularyserver.exchange.FieldInstance;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
@@ -57,31 +57,31 @@ class VocabularyRecordMapperTest {
     @Spy
     private RecordAssembler recordAssembler = new RecordAssembler();
 
-    private Vocabulary vocabulary;
-    private FieldDefinition fieldDefinition1;
-    private FieldDefinition fieldDefinition2;
-    private VocabularyRecord vocabularyRecord;
+    private VocabularyEntity vocabulary;
+    private FieldDefinitionEntity fieldDefinition1;
+    private FieldDefinitionEntity fieldDefinition2;
+    private VocabularyRecordEntity vocabularyRecord;
     private VocabularyRecordDTO vocabularyRecordDTO;
-    private FieldInstance fieldInstance1;
-    private FieldInstance fieldInstance2;
-    private FieldInstanceDTO fieldInstanceDTO1;
-    private FieldInstanceDTO fieldInstanceDTO2;
+    private FieldInstanceEntity fieldInstance1;
+    private FieldInstanceEntity fieldInstance2;
+    private FieldInstance fieldInstanceDTO1;
+    private FieldInstance fieldInstanceDTO2;
 
     @BeforeEach
     void setUp() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
         schema.setId(SCHEMA_ID);
 
-        FieldType type = new FieldType();
+        FieldTypeEntity type = new FieldTypeEntity();
         type.setName("Text");
 
-        fieldDefinition1 = new FieldDefinition();
+        fieldDefinition1 = new FieldDefinitionEntity();
         fieldDefinition1.setId(FIELD_DEFINITION_1_ID);
         fieldDefinition1.setSchema(schema);
         fieldDefinition1.setName(FIELD_DEFINITION_1_NAME);
         fieldDefinition1.setType(type);
 
-        fieldDefinition2 = new FieldDefinition();
+        fieldDefinition2 = new FieldDefinitionEntity();
         fieldDefinition2.setId(FIELD_DEFINITION_2_ID);
         fieldDefinition2.setSchema(schema);
         fieldDefinition2.setName(FIELD_DEFINITION_2_NAME);
@@ -89,21 +89,21 @@ class VocabularyRecordMapperTest {
 
         schema.setDefinitions(List.of(fieldDefinition1, fieldDefinition2));
 
-        vocabulary = new Vocabulary();
+        vocabulary = new VocabularyEntity();
         vocabulary.setId(VOCABULARY_ID);
         vocabulary.setSchema(schema);
         vocabulary.setName("Some Vocabulary name");
 
-        vocabularyRecord = new VocabularyRecord();
+        vocabularyRecord = new VocabularyRecordEntity();
         vocabularyRecord.setId(RECORD_ID);
         vocabularyRecord.setVocabulary(vocabulary);
 
-        fieldInstance1 = new FieldInstance();
+        fieldInstance1 = new FieldInstanceEntity();
         fieldInstance1.setId(FIELD_INSTANCE_1_ID);
         fieldInstance1.setDefinition(fieldDefinition1);
         fieldInstance1.setVocabularyRecord(vocabularyRecord);
 //        fieldInstance1.setValue(FIELD_INSTANCE_1_VALUE);
-        fieldInstance2 = new FieldInstance();
+        fieldInstance2 = new FieldInstanceEntity();
         fieldInstance2.setId(FIELD_INSTANCE_2_ID);
         fieldInstance2.setDefinition(fieldDefinition2);
         fieldInstance2.setVocabularyRecord(vocabularyRecord);
@@ -111,12 +111,12 @@ class VocabularyRecordMapperTest {
 
         vocabularyRecord.setFields(List.of(fieldInstance1, fieldInstance2));
 
-        fieldInstanceDTO1 = new FieldInstanceDTO();
+        fieldInstanceDTO1 = new FieldInstance();
         fieldInstanceDTO1.setId(FIELD_INSTANCE_1_ID);
         fieldInstanceDTO1.setRecordId(RECORD_ID);
         fieldInstanceDTO1.setDefinitionId(FIELD_DEFINITION_1_ID);
 //        fieldInstanceDTO1.setValue(FIELD_INSTANCE_1_VALUE);
-        fieldInstanceDTO2 = new FieldInstanceDTO();
+        fieldInstanceDTO2 = new FieldInstance();
         fieldInstanceDTO2.setId(FIELD_INSTANCE_2_ID);
         fieldInstanceDTO2.setRecordId(RECORD_ID);
         fieldInstanceDTO2.setDefinitionId(FIELD_DEFINITION_2_ID);
@@ -170,11 +170,11 @@ class VocabularyRecordMapperTest {
 
     @Test
     void validChildrenRecords_toDTO() {
-        VocabularyRecord child = new VocabularyRecord();
+        VocabularyRecordEntity child = new VocabularyRecordEntity();
         child.setId(927394672364L);
         child.setVocabulary(vocabulary);
 
-        FieldInstance fieldInstance = new FieldInstance();
+        FieldInstanceEntity fieldInstance = new FieldInstanceEntity();
         fieldInstance.setId(641565L);
         fieldInstance.setDefinition(fieldDefinition1);
         fieldInstance.setVocabularyRecord(child);
@@ -240,31 +240,31 @@ class VocabularyRecordMapperTest {
 
     @Test
     void validId_fromDTO() {
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertEquals(RECORD_ID, result.getId());
     }
 
     @Test
     void validVocabularyId_fromDTO() {
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertEquals(VOCABULARY_ID, result.getVocabulary().getId());
     }
 
     @Test
     void validChildFields_fromDTO() {
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertFieldInstancesEquals(result.getFields(), List.of(fieldInstanceDTO1, fieldInstanceDTO2));
     }
 
-    private void assertFieldInstancesEquals(List<FieldInstance> a, List<FieldInstanceDTO> b) {
+    private void assertFieldInstancesEquals(List<FieldInstanceEntity> a, List<FieldInstance> b) {
         assertEquals(a.size(), b.size());
-        for (FieldInstanceDTO x : b) {
-            List<FieldInstance> matches = a.stream().filter(aa -> aa.getId() == x.getId()).collect(Collectors.toList());
+        for (FieldInstance x : b) {
+            List<FieldInstanceEntity> matches = a.stream().filter(aa -> aa.getId() == x.getId()).collect(Collectors.toList());
             assertEquals(1, matches.size());
-            FieldInstance match = matches.get(0);
+            FieldInstanceEntity match = matches.get(0);
             assertEquals(x.getRecordId(), match.getVocabularyRecord().getId());
 //            assertEquals(x.getValue(), match.getValue());
         }
@@ -272,14 +272,14 @@ class VocabularyRecordMapperTest {
 
     @Test
     void noParentRecord_fromDTO() {
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertNull(result.getParentRecord());
     }
 
     @Test
     void noChildrenRecords_fromDTO() {
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertTrue(result.getChildren().isEmpty());
     }
@@ -290,7 +290,7 @@ class VocabularyRecordMapperTest {
         child.setId(927394672364L);
         child.setVocabularyId(VOCABULARY_ID);
 
-        FieldInstanceDTO fieldInstance = new FieldInstanceDTO();
+        FieldInstance fieldInstance = new FieldInstance();
         fieldInstance.setId(641565L);
         fieldInstance.setDefinitionId(FIELD_DEFINITION_1_ID);
         fieldInstance.setRecordId(927394672364L);
@@ -300,7 +300,7 @@ class VocabularyRecordMapperTest {
 
         vocabularyRecordDTO.setChildren(Set.of(recordAssembler.toModel(child)));
 
-        VocabularyRecord result = mapper.toEntity(vocabularyRecordDTO);
+        VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
         assertAll("Verify child record",
                 () -> assertEquals(1, result.getChildren().size()),

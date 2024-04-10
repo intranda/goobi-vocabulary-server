@@ -3,8 +3,8 @@ package io.goobi.vocabularyserver.service.manager;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabularyserver.exchange.VocabularyDTO;
-import io.goobi.vocabularyserver.model.Vocabulary;
+import io.goobi.vocabularyserver.exchange.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
 import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class VocabularyManager implements Manager<VocabularyDTO> {
+public class VocabularyManager implements Manager<Vocabulary> {
     private final VocabularyRepository vocabularyRepository;
     private final DTOMapper modelMapper;
 
@@ -25,29 +25,29 @@ public class VocabularyManager implements Manager<VocabularyDTO> {
     }
 
     @Override
-    public Page<VocabularyDTO> listAll(Pageable pageable) {
+    public Page<Vocabulary> listAll(Pageable pageable) {
         return vocabularyRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }
 
     @Override
-    public VocabularyDTO get(long id) {
+    public Vocabulary get(long id) {
         return modelMapper.toDTO(
                 vocabularyRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id))
+                    .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, id))
         );
     }
 
     @Override
-    public VocabularyDTO create(VocabularyDTO newVocabularyDTO) {
-        Vocabulary jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
+    public Vocabulary create(Vocabulary newVocabularyDTO) {
+        VocabularyEntity jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
         return modelMapper.toDTO(vocabularyRepository.save(jpaVocabulary));
     }
 
     // TODO: This is not working correctly: Impossible to pass id for replace insertion
     @Override
-    public VocabularyDTO replace(VocabularyDTO newVocabularyDTO) {
-        Vocabulary jpaVocabulary = vocabularyRepository
+    public Vocabulary replace(Vocabulary newVocabularyDTO) {
+        VocabularyEntity jpaVocabulary = vocabularyRepository
                 .findById(newVocabularyDTO.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newVocabularyDTO.getClass(), newVocabularyDTO.getId()));
 //                .orElseGet(() -> transformVocabulary(newVocabulary));
@@ -67,9 +67,9 @@ public class VocabularyManager implements Manager<VocabularyDTO> {
     }
 
     @Override
-    public VocabularyDTO delete(long id) {
+    public Vocabulary delete(long id) {
         if (!vocabularyRepository.existsById(id)) {
-            throw new EntityNotFoundException(Vocabulary.class, id);
+            throw new EntityNotFoundException(VocabularyEntity.class, id);
         }
         vocabularyRepository.deleteById(id);
         return null;

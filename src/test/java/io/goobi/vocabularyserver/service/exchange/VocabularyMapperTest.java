@@ -1,9 +1,9 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.VocabularyDTO;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.exchange.Vocabulary;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,30 +31,30 @@ class VocabularyMapperTest {
     @InjectMocks
     private DTOMapperImpl mapper;
 
-    private Vocabulary vocabulary;
-    private VocabularyDTO vocabularyDTO;
+    private VocabularyEntity vocabulary;
+    private Vocabulary vocabularyDTO;
 
     @BeforeEach
     void setUp() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
         schema.setId(SCHEMA_ID);
 
-        vocabulary = new Vocabulary();
+        vocabulary = new VocabularyEntity();
         vocabulary.setId(VOCABULARY_ID);
         vocabulary.setSchema(schema);
         vocabulary.setName(VOCABULARY_NAME);
         vocabulary.setDescription(VOCABULARY_DESCRIPTION);
 
-        VocabularyRecord vocabularyRecord1 = new VocabularyRecord();
+        VocabularyRecordEntity vocabularyRecord1 = new VocabularyRecordEntity();
         vocabularyRecord1.setId(RECORD_1_ID);
         vocabularyRecord1.setVocabulary(vocabulary);
-        VocabularyRecord vocabularyRecord2 = new VocabularyRecord();
+        VocabularyRecordEntity vocabularyRecord2 = new VocabularyRecordEntity();
         vocabularyRecord2.setId(RECORD_2_ID);
         vocabularyRecord2.setVocabulary(vocabulary);
 
         vocabulary.setRecords(List.of(vocabularyRecord1, vocabularyRecord2));
 
-        vocabularyDTO = new VocabularyDTO();
+        vocabularyDTO = new Vocabulary();
         vocabularyDTO.setId(VOCABULARY_ID);
         vocabularyDTO.setSchemaId(SCHEMA_ID);
         vocabularyDTO.setName(VOCABULARY_NAME);
@@ -65,56 +65,56 @@ class VocabularyMapperTest {
 
     @Test
     void validId_toDTO() {
-        VocabularyDTO result = mapper.toDTO(vocabulary);
+        Vocabulary result = mapper.toDTO(vocabulary);
 
         assertEquals(VOCABULARY_ID, result.getId());
     }
 
     @Test
     void validSchemaId_toDTO() {
-        VocabularyDTO result = mapper.toDTO(vocabulary);
+        Vocabulary result = mapper.toDTO(vocabulary);
 
         assertEquals(SCHEMA_ID, result.getSchemaId());
     }
 
     @Test
     void validName_toDTO() {
-        VocabularyDTO result = mapper.toDTO(vocabulary);
+        Vocabulary result = mapper.toDTO(vocabulary);
 
         assertEquals(VOCABULARY_NAME, result.getName());
     }
 
     @Test
     void validDescription_toDTO() {
-        VocabularyDTO result = mapper.toDTO(vocabulary);
+        Vocabulary result = mapper.toDTO(vocabulary);
 
         assertEquals(VOCABULARY_DESCRIPTION, result.getDescription());
     }
 
     @Test
     void validId_fromDTO() {
-        Vocabulary result = mapper.toEntity(vocabularyDTO);
+        VocabularyEntity result = mapper.toEntity(vocabularyDTO);
 
         assertEquals(VOCABULARY_ID, result.getId());
     }
 
     @Test
     void validSchemaId_fromDTO() {
-        Vocabulary result = mapper.toEntity(vocabularyDTO);
+        VocabularyEntity result = mapper.toEntity(vocabularyDTO);
 
         assertEquals(SCHEMA_ID, result.getSchema().getId());
     }
 
     @Test
     void validName_fromDTO() {
-        Vocabulary result = mapper.toEntity(vocabularyDTO);
+        VocabularyEntity result = mapper.toEntity(vocabularyDTO);
 
         assertEquals(VOCABULARY_NAME, result.getName());
     }
 
     @Test
     void validDescription_fromDTO() {
-        Vocabulary result = mapper.toEntity(vocabularyDTO);
+        VocabularyEntity result = mapper.toEntity(vocabularyDTO);
 
         assertEquals(VOCABULARY_DESCRIPTION, result.getDescription());
     }

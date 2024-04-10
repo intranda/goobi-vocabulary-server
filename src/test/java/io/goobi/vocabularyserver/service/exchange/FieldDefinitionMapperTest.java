@@ -1,9 +1,9 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.exchange.FieldDefinition;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,31 +35,31 @@ class FieldDefinitionMapperTest {
     @InjectMocks
     private DTOMapperImpl mapper;
 
-    private VocabularySchema schema;
-    private FieldType fieldType;
-    private FieldDefinition fieldDefinition;
-    private FieldDefinitionDTO fieldDefinitionDTO;
+    private VocabularySchemaEntity schema;
+    private FieldTypeEntity fieldType;
+    private FieldDefinitionEntity fieldDefinition;
+    private FieldDefinition fieldDefinitionDTO;
 
     @BeforeEach
     void setUp() {
-        schema = new VocabularySchema();
+        schema = new VocabularySchemaEntity();
         schema.setId(SCHEMA_ID);
 
-        fieldType = new FieldType();
+        fieldType = new FieldTypeEntity();
         fieldType.setId(FIELD_TYPE_ID);
 
-        FieldDefinition child = new FieldDefinition();
+        FieldDefinitionEntity child = new FieldDefinitionEntity();
         child.setSchema(schema);
         child.setName("Child");
         child.setType(fieldType);
         schema.getDefinitions().add(child);
 
-        fieldDefinition = new FieldDefinition();
+        fieldDefinition = new FieldDefinitionEntity();
         fieldDefinition.setId(FIELD_DEFINITION_ID);
         fieldDefinition.setSchema(schema);
         fieldDefinition.setName(FIELD_DEFINITION_NAME);
         fieldDefinition.setType(fieldType);
-        fieldDefinitionDTO = new FieldDefinitionDTO();
+        fieldDefinitionDTO = new FieldDefinition();
         fieldDefinitionDTO.setId(FIELD_DEFINITION_ID);
         fieldDefinitionDTO.setSchemaId(SCHEMA_ID);
         fieldDefinitionDTO.setName(FIELD_DEFINITION_NAME);
@@ -71,28 +71,28 @@ class FieldDefinitionMapperTest {
 
     @Test
     void validId_toDTO() {
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertEquals(FIELD_DEFINITION_ID, result.getId());
     }
 
     @Test
     void validSchema_toDTO() {
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertEquals(SCHEMA_ID, result.getSchemaId());
     }
 
     @Test
     void validName_toDTO() {
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertEquals(FIELD_DEFINITION_NAME, result.getName());
     }
 
     @Test
     void validType_toDTO() {
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertEquals(FIELD_TYPE_ID, result.getTypeId());
     }
@@ -101,7 +101,7 @@ class FieldDefinitionMapperTest {
     void notRequired_toDTO() {
         fieldDefinition.setRequired(false);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertFalse(result.getRequired());
     }
@@ -110,7 +110,7 @@ class FieldDefinitionMapperTest {
     void notUnique_toDTO() {
         fieldDefinition.setUnique(false);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertFalse(result.getUnique());
     }
@@ -119,7 +119,7 @@ class FieldDefinitionMapperTest {
     void notMainEntry_toDTO() {
         fieldDefinition.setMainEntry(false);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertFalse(result.getMainEntry());
     }
@@ -128,7 +128,7 @@ class FieldDefinitionMapperTest {
     void notTitleField_toDTO() {
         fieldDefinition.setTitleField(false);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertFalse(result.getTitleField());
     }
@@ -137,7 +137,7 @@ class FieldDefinitionMapperTest {
     void notMultiValued_toDTO() {
         fieldDefinition.setMultiValued(false);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertFalse(result.getMultiValued());
     }
@@ -146,7 +146,7 @@ class FieldDefinitionMapperTest {
     void isRequired_toDTO() {
         fieldDefinition.setRequired(true);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.getRequired());
     }
@@ -155,7 +155,7 @@ class FieldDefinitionMapperTest {
     void isUnique_toDTO() {
         fieldDefinition.setUnique(true);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.getUnique());
     }
@@ -164,7 +164,7 @@ class FieldDefinitionMapperTest {
     void isMainEntry_toDTO() {
         fieldDefinition.setMainEntry(true);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.getMainEntry());
     }
@@ -173,7 +173,7 @@ class FieldDefinitionMapperTest {
     void isTitleField_toDTO() {
         fieldDefinition.setTitleField(true);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.getTitleField());
     }
@@ -182,35 +182,35 @@ class FieldDefinitionMapperTest {
     void isMultiValued_toDTO() {
         fieldDefinition.setMultiValued(true);
 
-        FieldDefinitionDTO result = mapper.toDTO(fieldDefinition);
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertTrue(result.getMultiValued());
     }
 
     @Test
     void validId_fromDTO() {
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertEquals(FIELD_DEFINITION_ID, result.getId());
     }
 
     @Test
     void validSchema_fromDTO() {
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertEquals(schema, result.getSchema());
     }
 
     @Test
     void validName_fromDTO() {
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertEquals(FIELD_DEFINITION_NAME, result.getName());
     }
 
     @Test
     void validType_fromDTO() {
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertEquals(fieldType, result.getType());
     }
@@ -219,7 +219,7 @@ class FieldDefinitionMapperTest {
     void notRequired_fromDTO() {
         fieldDefinitionDTO.setRequired(false);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertFalse(result.isRequired());
     }
@@ -228,7 +228,7 @@ class FieldDefinitionMapperTest {
     void notUnique_fromDTO() {
         fieldDefinitionDTO.setUnique(false);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertFalse(result.isUnique());
     }
@@ -237,7 +237,7 @@ class FieldDefinitionMapperTest {
     void notMainEntry_fromDTO() {
         fieldDefinitionDTO.setMainEntry(false);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertNull(result.getMainEntry());
     }
@@ -246,7 +246,7 @@ class FieldDefinitionMapperTest {
     void notTitleField_fromDTO() {
         fieldDefinitionDTO.setTitleField(false);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertFalse(result.isTitleField());
     }
@@ -255,7 +255,7 @@ class FieldDefinitionMapperTest {
     void notMultiValued_fromDTO() {
         fieldDefinitionDTO.setMultiValued(false);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertFalse(result.isMultiValued());
     }
@@ -264,7 +264,7 @@ class FieldDefinitionMapperTest {
     void isRequired_fromDTO() {
         fieldDefinitionDTO.setRequired(true);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.isRequired());
     }
@@ -273,7 +273,7 @@ class FieldDefinitionMapperTest {
     void isUnique_fromDTO() {
         fieldDefinitionDTO.setUnique(true);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.isUnique());
     }
@@ -282,7 +282,7 @@ class FieldDefinitionMapperTest {
     void isMainEntry_fromDTO() {
         fieldDefinitionDTO.setMainEntry(true);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.getMainEntry());
     }
@@ -291,7 +291,7 @@ class FieldDefinitionMapperTest {
     void isTitleField_fromDTO() {
         fieldDefinitionDTO.setTitleField(true);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.isTitleField());
     }
@@ -300,7 +300,7 @@ class FieldDefinitionMapperTest {
     void isMultiValued_fromDTO() {
         fieldDefinitionDTO.setMultiValued(true);
 
-        FieldDefinition result = mapper.toEntity(fieldDefinitionDTO);
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertTrue(result.isMultiValued());
     }

@@ -4,7 +4,7 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.LanguageAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.LanguageDTO;
+import io.goobi.vocabularyserver.exchange.Language;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -25,33 +25,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class LanguageController {
-    private final Manager<LanguageDTO> manager;
+    private final Manager<Language> manager;
     private final LanguageAssembler assembler;
 
-    public LanguageController(Manager<LanguageDTO> manager, LanguageAssembler assembler) {
+    public LanguageController(Manager<Language> manager, LanguageAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }
 
     @GetMapping("/languages")
-    public PagedModel<EntityModel<LanguageDTO>> all(Pageable pageRequest, PagedResourcesAssembler<LanguageDTO> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<Language>> all(Pageable pageRequest, PagedResourcesAssembler<Language> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/languages/{id}")
-    public EntityModel<LanguageDTO> one(@PathVariable long id) {
+    public EntityModel<Language> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
     }
 
     @PostMapping("/languages")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<LanguageDTO> create(@RequestBody LanguageDTO newLanguage) throws ValidationException {
+    public EntityModel<Language> create(@RequestBody Language newLanguage) throws ValidationException {
         return assembler.toModel(manager.create(newLanguage));
     }
 
     @PutMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<LanguageDTO> update(@RequestBody LanguageDTO newLanguage, @PathVariable long id) throws ValidationException {
+    public EntityModel<Language> update(@RequestBody Language newLanguage, @PathVariable long id) throws ValidationException {
         if (newLanguage.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }
@@ -61,7 +61,7 @@ public class LanguageController {
 
     @DeleteMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<LanguageDTO> delete(@PathVariable long id) {
+    public ResponseEntity<Language> delete(@PathVariable long id) {
         return ResponseEntity.ok(manager.delete(id));
     }
 }

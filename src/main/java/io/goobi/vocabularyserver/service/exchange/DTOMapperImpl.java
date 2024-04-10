@@ -3,24 +3,24 @@ package io.goobi.vocabularyserver.service.exchange;
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingAttributeException;
-import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
-import io.goobi.vocabularyserver.exchange.FieldInstanceDTO;
-import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
-import io.goobi.vocabularyserver.exchange.FieldValueDTO;
-import io.goobi.vocabularyserver.exchange.LanguageDTO;
-import io.goobi.vocabularyserver.exchange.VocabularyDTO;
+import io.goobi.vocabularyserver.exchange.FieldDefinition;
+import io.goobi.vocabularyserver.exchange.FieldInstance;
+import io.goobi.vocabularyserver.exchange.FieldType;
+import io.goobi.vocabularyserver.exchange.FieldValue;
+import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldTranslation;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.FieldValue;
-import io.goobi.vocabularyserver.model.Language;
-import io.goobi.vocabularyserver.model.SelectableValue;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTranslationEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.FieldValueEntity;
+import io.goobi.vocabularyserver.model.LanguageEntity;
+import io.goobi.vocabularyserver.model.SelectableValueEntity;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.FieldDefinitionRepository;
 import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
@@ -61,61 +61,61 @@ public class DTOMapperImpl implements DTOMapper {
         this.languageRepository = languageRepository;
     }
 
-    private Vocabulary lookUpVocabulary(Long id) {
+    private VocabularyEntity lookUpVocabulary(Long id) {
         return vocabularyRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, id));
     }
 
-    private VocabularySchema lookUpSchema(Long id) {
+    private VocabularySchemaEntity lookUpSchema(Long id) {
         return vocabularySchemaRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(VocabularySchema.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(VocabularySchemaEntity.class, id));
     }
 
-    private VocabularyRecord lookUpRecord(Long id) {
+    private VocabularyRecordEntity lookUpRecord(Long id) {
         return vocabularyRecordRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecord.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id));
     }
 
-    private FieldDefinition lookUpFieldDefinition(Long id) {
+    private FieldDefinitionEntity lookUpFieldDefinition(Long id) {
         return fieldDefinitionRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(FieldDefinition.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(FieldDefinitionEntity.class, id));
     }
 
-    private FieldInstance lookupFieldInstance(Long id) {
+    private FieldInstanceEntity lookupFieldInstance(Long id) {
         return fieldInstanceRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(FieldInstance.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(FieldInstanceEntity.class, id));
     }
 
-    private FieldType lookUpFieldType(Long id) {
+    private FieldTypeEntity lookUpFieldType(Long id) {
         return fieldTypeRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(FieldType.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(FieldTypeEntity.class, id));
     }
 
-    private Language lookUpLanguage(String abbreviation) {
+    private LanguageEntity lookUpLanguage(String abbreviation) {
         return languageRepository.findByAbbreviation(abbreviation)
-                .orElseThrow(() -> new EntityNotFoundException(Language.class, abbreviation));
+                .orElseThrow(() -> new EntityNotFoundException(LanguageEntity.class, abbreviation));
     }
 
     @Override
-    public FieldDefinition toEntity(FieldDefinitionDTO dto, boolean fullInitialization) {
-        FieldDefinition result = new FieldDefinition();
+    public FieldDefinitionEntity toEntity(FieldDefinition dto, boolean fullInitialization) {
+        FieldDefinitionEntity result = new FieldDefinitionEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
         if (fullInitialization) {
             if (dto.getSchemaId() == null) {
-                throw new MissingAttributeException(FieldInstance.class, "schemaId");
+                throw new MissingAttributeException(FieldInstanceEntity.class, "schemaId");
             }
             result.setSchema(lookUpSchema(dto.getSchemaId()));
         }
         if (dto.getTypeId() == null) {
-            throw new MissingAttributeException(FieldInstance.class, "typeId");
+            throw new MissingAttributeException(FieldInstanceEntity.class, "typeId");
         }
         result.setType(lookUpFieldType(dto.getTypeId()));
         result.setName(dto.getName());
@@ -128,8 +128,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldDefinitionDTO toDTO(FieldDefinition entity) {
-        FieldDefinitionDTO result = new FieldDefinitionDTO();
+    public FieldDefinition toDTO(FieldDefinitionEntity entity) {
+        FieldDefinition result = new FieldDefinition();
         result.setId(entity.getId());
         result.setSchemaId(entity.getSchema().getId());
         result.setName(entity.getName());
@@ -143,19 +143,19 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldInstance toEntity(FieldInstanceDTO dto, boolean fullInitialization) {
-        FieldInstance result = new FieldInstance();
+    public FieldInstanceEntity toEntity(FieldInstance dto, boolean fullInitialization) {
+        FieldInstanceEntity result = new FieldInstanceEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
         if (fullInitialization) {
             if (dto.getRecordId() == null) {
-                throw new MissingAttributeException(FieldInstance.class, "recordId");
+                throw new MissingAttributeException(FieldInstanceEntity.class, "recordId");
             }
             result.setVocabularyRecord(lookUpRecord(dto.getRecordId()));
         }
         if (dto.getDefinitionId() == null) {
-            throw new MissingAttributeException(FieldInstance.class, "definitionId");
+            throw new MissingAttributeException(FieldInstanceEntity.class, "definitionId");
         }
         result.setDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         result.setFieldValues(dto.getValues().stream()
@@ -167,8 +167,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldInstanceDTO toDTO(FieldInstance entity) {
-        FieldInstanceDTO result = new FieldInstanceDTO();
+    public FieldInstance toDTO(FieldInstanceEntity entity) {
+        FieldInstance result = new FieldInstance();
         result.setId(entity.getId());
         result.setRecordId(entity.getVocabularyRecord().getId());
         result.setDefinitionId(entity.getDefinition().getId());
@@ -181,15 +181,15 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     // TODO: Test this
-    public FieldValue toEntity(FieldValueDTO dto, boolean fullInitialization) {
-        FieldValue result = new FieldValue();
+    public FieldValueEntity toEntity(FieldValue dto, boolean fullInitialization) {
+        FieldValueEntity result = new FieldValueEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
         // TODO: Maybe manual initialization
         if (fullInitialization) {
             if (dto.getFieldId() == null) {
-                throw new MissingAttributeException(FieldInstance.class, "fieldId");
+                throw new MissingAttributeException(FieldInstanceEntity.class, "fieldId");
             }
             result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
         }
@@ -201,8 +201,8 @@ public class DTOMapperImpl implements DTOMapper {
         return result;
     }
 
-    private FieldTranslation toEntity(Map.Entry<String, String> entry, FieldValue fieldValue) {
-        FieldTranslation result = new FieldTranslation();
+    private FieldTranslationEntity toEntity(Map.Entry<String, String> entry, FieldValueEntity fieldValue) {
+        FieldTranslationEntity result = new FieldTranslationEntity();
         // ID is not present but will be auto-generated anyway
         result.setLanguage(lookUpLanguage(entry.getKey()));
         result.setFieldValue(fieldValue);
@@ -212,19 +212,19 @@ public class DTOMapperImpl implements DTOMapper {
 
     @Override
     // TODO: Test this
-    public FieldValueDTO toDTO(FieldValue entity) {
-        FieldValueDTO result = new FieldValueDTO();
+    public FieldValue toDTO(FieldValueEntity entity) {
+        FieldValue result = new FieldValue();
         result.setId(entity.getId());
         result.setFieldId(entity.getFieldInstance().getId());
         result.setTranslations(entity.getTranslations().stream()
-                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), FieldTranslation::getValue))
+                .collect(Collectors.toMap(t -> t.getLanguage().getAbbreviation(), FieldTranslationEntity::getValue))
         );
         return result;
     }
 
     @Override
-    public FieldType toEntity(FieldTypeDTO dto) {
-        FieldType result = new FieldType();
+    public FieldTypeEntity toEntity(FieldType dto) {
+        FieldTypeEntity result = new FieldTypeEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
@@ -233,7 +233,7 @@ public class DTOMapperImpl implements DTOMapper {
         if (dto.getSelectableValues() != null) {
             result.setSelectableValues(dto.getSelectableValues().stream()
                     .map(s -> {
-                                SelectableValue sv = new SelectableValue();
+                                SelectableValueEntity sv = new SelectableValueEntity();
                                 sv.setFieldType(result);
                                 sv.setValue(s);
                                 return sv;
@@ -244,25 +244,25 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public FieldTypeDTO toDTO(FieldType entity) {
-        FieldTypeDTO result = new FieldTypeDTO();
+    public FieldType toDTO(FieldTypeEntity entity) {
+        FieldType result = new FieldType();
         result.setId(entity.getId());
         result.setName(entity.getName());
         result.setValidation(entity.getValidation());
         if (entity.getSelectableValues() != null) {
-            result.setSelectableValues(entity.getSelectableValues().stream().map(SelectableValue::getValue).collect(Collectors.toSet()));
+            result.setSelectableValues(entity.getSelectableValues().stream().map(SelectableValueEntity::getValue).collect(Collectors.toSet()));
         }
         return result;
     }
 
     @Override
-    public Vocabulary toEntity(VocabularyDTO dto) {
-        Vocabulary result = new Vocabulary();
+    public VocabularyEntity toEntity(Vocabulary dto) {
+        VocabularyEntity result = new VocabularyEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
         if (dto.getSchemaId() == null) {
-            throw new MissingAttributeException(FieldInstance.class, "schemaId");
+            throw new MissingAttributeException(FieldInstanceEntity.class, "schemaId");
         }
         result.setSchema(lookUpSchema(dto.getSchemaId()));
         result.setName(dto.getName());
@@ -271,8 +271,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularyDTO toDTO(Vocabulary entity) {
-        VocabularyDTO result = new VocabularyDTO();
+    public Vocabulary toDTO(VocabularyEntity entity) {
+        Vocabulary result = new Vocabulary();
         result.setId(entity.getId());
         result.setSchemaId(entity.getSchema().getId());
         result.setName(entity.getName());
@@ -281,8 +281,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularySchema toEntity(VocabularySchemaDTO dto) {
-        VocabularySchema result = new VocabularySchema();
+    public VocabularySchemaEntity toEntity(VocabularySchemaDTO dto) {
+        VocabularySchemaEntity result = new VocabularySchemaEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
@@ -295,7 +295,7 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularySchemaDTO toDTO(VocabularySchema entity) {
+    public VocabularySchemaDTO toDTO(VocabularySchemaEntity entity) {
         VocabularySchemaDTO result = new VocabularySchemaDTO();
         result.setId(entity.getId());
         result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
@@ -304,13 +304,13 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularyRecord toEntity(VocabularyRecordDTO dto) {
-        VocabularyRecord result = new VocabularyRecord();
+    public VocabularyRecordEntity toEntity(VocabularyRecordDTO dto) {
+        VocabularyRecordEntity result = new VocabularyRecordEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
         if (dto.getVocabularyId() == null) {
-            throw new MissingAttributeException(FieldInstance.class, "vocabularyId");
+            throw new MissingAttributeException(FieldInstanceEntity.class, "vocabularyId");
         }
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
         result.setFields(dto.getFields().stream()
@@ -325,7 +325,7 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularyRecordDTO toDTO(VocabularyRecord entity) {
+    public VocabularyRecordDTO toDTO(VocabularyRecordEntity entity) {
         VocabularyRecordDTO result = new VocabularyRecordDTO();
         result.setId(entity.getId());
         if (entity.getParentRecord() != null) {
@@ -342,8 +342,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public Language toEntity(LanguageDTO dto) {
-        Language result = new Language();
+    public LanguageEntity toEntity(Language dto) {
+        LanguageEntity result = new LanguageEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
@@ -353,8 +353,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public LanguageDTO toDTO(Language entity) {
-        LanguageDTO result = new LanguageDTO();
+    public Language toDTO(LanguageEntity entity) {
+        Language result = new Language();
         result.setId(entity.getId());
         result.setAbbreviation(entity.getAbbreviation());
         result.setName(entity.getName());

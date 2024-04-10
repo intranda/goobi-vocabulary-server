@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,9 +15,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Entity
+@Table(name = "field_type")
 @Getter
 @Setter
-public class FieldType {
+public class FieldTypeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -30,5 +32,5 @@ public class FieldType {
     private String validation;
 
     @OneToMany(mappedBy = "fieldType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SelectableValue> selectableValues = new LinkedList<>();
+    private List<SelectableValueEntity> selectableValues = new LinkedList<>();
 }

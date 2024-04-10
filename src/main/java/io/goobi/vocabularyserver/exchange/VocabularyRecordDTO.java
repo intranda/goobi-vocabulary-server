@@ -12,6 +12,6 @@ public class VocabularyRecordDTO {
     private Long id;
     private Long parentId;
     private Long vocabularyId;
-    private Set<FieldInstanceDTO> fields;
+    private Set<FieldInstance> fields;
     private Set<EntityModel<VocabularyRecordDTO>> children;
 }

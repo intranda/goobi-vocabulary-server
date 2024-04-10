@@ -1,10 +1,10 @@
 package io.goobi.vocabularyserver.service.exchange;
 
-import io.goobi.vocabularyserver.exchange.FieldDefinitionDTO;
+import io.goobi.vocabularyserver.exchange.FieldDefinition;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,14 +31,14 @@ class VocabularySchemaMapperTest {
     private static final Long FIELD_DEFINITION_2_ID = 423455234L;
     private static final String FIELD_DEFINITION_2_NAME = "Last name";
 
-    private VocabularySchema vocabularySchema;
+    private VocabularySchemaEntity vocabularySchema;
     private VocabularySchemaDTO vocabularySchemaDTO;
 
-    private FieldDefinition fieldDefinition1;
-    private FieldDefinitionDTO fieldDefinitionDTO1;
+    private FieldDefinitionEntity fieldDefinition1;
+    private FieldDefinition fieldDefinitionDTO1;
 
-    private FieldDefinition fieldDefinition2;
-    private FieldDefinitionDTO fieldDefinitionDTO2;
+    private FieldDefinitionEntity fieldDefinition2;
+    private FieldDefinition fieldDefinitionDTO2;
 
 
     @Mock
@@ -50,20 +50,20 @@ class VocabularySchemaMapperTest {
 
     @BeforeEach
     void setUp() {
-        FieldType fieldType = new FieldType();
+        FieldTypeEntity fieldType = new FieldTypeEntity();
         fieldType.setId(FIELD_TYPE_ID);
         fieldType.setName("Text");
 
-        vocabularySchema = new VocabularySchema();
+        vocabularySchema = new VocabularySchemaEntity();
         vocabularySchema.setId(SCHEMA_ID);
 
-        fieldDefinition1 = new FieldDefinition();
+        fieldDefinition1 = new FieldDefinitionEntity();
         fieldDefinition1.setId(FIELD_DEFINITION_1_ID);
         fieldDefinition1.setSchema(vocabularySchema);
         fieldDefinition1.setName(FIELD_DEFINITION_1_NAME);
         fieldDefinition1.setType(fieldType);
 
-        fieldDefinition2 = new FieldDefinition();
+        fieldDefinition2 = new FieldDefinitionEntity();
         fieldDefinition2.setId(FIELD_DEFINITION_2_ID);
         fieldDefinition2.setSchema(vocabularySchema);
         fieldDefinition2.setName(FIELD_DEFINITION_2_NAME);
@@ -74,13 +74,13 @@ class VocabularySchemaMapperTest {
         vocabularySchemaDTO = new VocabularySchemaDTO();
         vocabularySchemaDTO.setId(SCHEMA_ID);
 
-        fieldDefinitionDTO1 = new FieldDefinitionDTO();
+        fieldDefinitionDTO1 = new FieldDefinition();
         fieldDefinitionDTO1.setId(FIELD_DEFINITION_1_ID);
         fieldDefinitionDTO1.setSchemaId(SCHEMA_ID);
         fieldDefinitionDTO1.setTypeId(FIELD_TYPE_ID);
         fieldDefinitionDTO1.setName(FIELD_DEFINITION_1_NAME);
 
-        fieldDefinitionDTO2 = new FieldDefinitionDTO();
+        fieldDefinitionDTO2 = new FieldDefinition();
         fieldDefinitionDTO2.setId(FIELD_DEFINITION_2_ID);
         fieldDefinitionDTO2.setSchemaId(SCHEMA_ID);
         fieldDefinitionDTO2.setTypeId(FIELD_TYPE_ID);
@@ -133,14 +133,14 @@ class VocabularySchemaMapperTest {
 
     @Test
     void validId_fromDTO() {
-        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
         assertEquals(SCHEMA_ID, result.getId());
     }
 
     @Test
     void childDefinitions_fromDTO() {
-        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
         assertAll("Verify child definitions",
                 () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchema().getId()),
@@ -156,7 +156,7 @@ class VocabularySchemaMapperTest {
     void noHierarchicalRecords_fromDTO() {
         vocabularySchemaDTO.setHierarchicalRecords(false);
 
-        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
         assertFalse(result.isHierarchicalRecords());
     }
@@ -165,7 +165,7 @@ class VocabularySchemaMapperTest {
     void hierarchicalRecords_fromDTO() {
         vocabularySchemaDTO.setHierarchicalRecords(true);
 
-        VocabularySchema result = mapper.toEntity(vocabularySchemaDTO);
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
         assertTrue(result.isHierarchicalRecords());
     }

@@ -1,8 +1,8 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.SelectableValue;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.SelectableValueEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,11 +18,11 @@ class FieldTypeValidationTests {
     @InjectMocks
     private FieldTypeValidatorImpl validator;
 
-    private FieldType fieldType;
+    private FieldTypeEntity fieldType;
 
     @BeforeEach
     public void setUp() {
-        fieldType = new FieldType();
+        fieldType = new FieldTypeEntity();
         fieldType.setId(1L);
         fieldType.setName("Type");
     }
@@ -31,7 +31,7 @@ class FieldTypeValidationTests {
         fieldType.setSelectableValues(IntStream
                 .range(0, values.length)
                 .mapToObj(i -> {
-                    SelectableValue sv = new SelectableValue();
+                    SelectableValueEntity sv = new SelectableValueEntity();
                     sv.setId((long) i);
                     sv.setFieldType(fieldType);
                     sv.setValue(values[i]);

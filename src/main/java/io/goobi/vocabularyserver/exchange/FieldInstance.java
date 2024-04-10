@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class FieldInstanceDTO {
+public class FieldInstance {
     private Long id;
     private Long recordId;
     private Long definitionId;
-    private Set<FieldValueDTO> values = new HashSet<>();
+    private Set<FieldValue> values = new HashSet<>();
 }

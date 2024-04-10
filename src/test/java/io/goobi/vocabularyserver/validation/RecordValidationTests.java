@@ -1,12 +1,12 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,29 +24,29 @@ class RecordValidationTests {
     private static final String FIELD_TYPE_TEXT_NAME = "Text";
 
     @Mock
-    private Validator<FieldInstance> fieldInstanceValidator;
+    private Validator<FieldInstanceEntity> fieldInstanceValidator;
     @InjectMocks
     private RecordValidatorImpl validator;
 
-    private VocabularySchema schema;
-    private Vocabulary vocabulary;
-    private FieldType ftText;
-    private FieldDefinition fdName;
+    private VocabularySchemaEntity schema;
+    private VocabularyEntity vocabulary;
+    private FieldTypeEntity ftText;
+    private FieldDefinitionEntity fdName;
 
 
     @BeforeEach
     public void setUp() {
-        ftText = new FieldType();
+        ftText = new FieldTypeEntity();
         ftText.setName(FIELD_TYPE_TEXT_NAME);
         ftText.setId(FIELD_TYPE_TEXT_ID);
         ftText.setValidation("\\w+");
 
-        schema = new VocabularySchema();
-        vocabulary = new Vocabulary();
+        schema = new VocabularySchemaEntity();
+        vocabulary = new VocabularyEntity();
         vocabulary.setSchema(schema);
         vocabulary.setName("Test vocabulary");
 
-        fdName = new FieldDefinition();
+        fdName = new FieldDefinitionEntity();
         fdName.setSchema(schema);
         fdName.setName("Name");
         fdName.setType(ftText);
@@ -60,7 +60,7 @@ class RecordValidationTests {
 
     @Test
     void missingRequiredField_fails() {
-        VocabularyRecord record = new VocabularyRecord();
+        VocabularyRecordEntity record = new VocabularyRecordEntity();
         record.setVocabulary(vocabulary);
 
         assertThrows(ValidationException.class, () -> validator.validate(record));
@@ -68,14 +68,14 @@ class RecordValidationTests {
 
     @Test
     void insertingUnspecifiedField_fails() {
-        VocabularyRecord record = new VocabularyRecord();
+        VocabularyRecordEntity record = new VocabularyRecordEntity();
         record.setVocabulary(vocabulary);
 
-        FieldInstance name = new FieldInstance();
+        FieldInstanceEntity name = new FieldInstanceEntity();
         name.setVocabularyRecord(record);
         name.setDefinition(fdName);
 
-        FieldDefinition os = new FieldDefinition();
+        FieldDefinitionEntity os = new FieldDefinitionEntity();
         os.setSchema(schema);
         os.setName("Name");
         os.setType(ftText);
@@ -84,7 +84,7 @@ class RecordValidationTests {
         os.setUnique(true);
         os.setRequired(true);
 
-        FieldInstance unknown = new FieldInstance();
+        FieldInstanceEntity unknown = new FieldInstanceEntity();
         unknown.setVocabularyRecord(record);
         unknown.setDefinition(os);
 
@@ -97,16 +97,16 @@ class RecordValidationTests {
     void hierarchicalRecordsIfNotEnabled_fails() {
         schema.setHierarchicalRecords(false);
 
-        VocabularyRecord parent = new VocabularyRecord();
+        VocabularyRecordEntity parent = new VocabularyRecordEntity();
         parent.setVocabulary(vocabulary);
-        FieldInstance parentNameField = new FieldInstance();
+        FieldInstanceEntity parentNameField = new FieldInstanceEntity();
         parentNameField.setDefinition(fdName);
         parentNameField.setVocabularyRecord(parent);
         parent.setFields(List.of(parentNameField));
 
-        VocabularyRecord child = new VocabularyRecord();
+        VocabularyRecordEntity child = new VocabularyRecordEntity();
         child.setVocabulary(vocabulary);
-        FieldInstance childNameField = new FieldInstance();
+        FieldInstanceEntity childNameField = new FieldInstanceEntity();
         childNameField.setDefinition(fdName);
         childNameField.setVocabularyRecord(child);
         child.setFields(List.of(childNameField));
@@ -123,17 +123,17 @@ class RecordValidationTests {
     void hierarchicalRecordsIfEnabled_success() {
         schema.setHierarchicalRecords(true);
 
-        VocabularyRecord parent = new VocabularyRecord();
+        VocabularyRecordEntity parent = new VocabularyRecordEntity();
         parent.setVocabulary(vocabulary);
-        FieldInstance parentNameField = new FieldInstance();
+        FieldInstanceEntity parentNameField = new FieldInstanceEntity();
         parentNameField.setId(1L);
         parentNameField.setDefinition(fdName);
         parentNameField.setVocabularyRecord(parent);
         parent.setFields(List.of(parentNameField));
 
-        VocabularyRecord child = new VocabularyRecord();
+        VocabularyRecordEntity child = new VocabularyRecordEntity();
         child.setVocabulary(vocabulary);
-        FieldInstance childNameField = new FieldInstance();
+        FieldInstanceEntity childNameField = new FieldInstanceEntity();
         childNameField.setId(2L);
         childNameField.setDefinition(fdName);
         childNameField.setVocabularyRecord(child);

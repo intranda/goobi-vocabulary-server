@@ -1,10 +1,10 @@
 package io.goobi.vocabularyserver.repositories;
 
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.ListCrudRepository;
 
-public interface VocabularySchemaRepository extends ListCrudRepository<VocabularySchema, Long> {
-    Page<VocabularySchema> findAll(Pageable pageable);
+public interface VocabularySchemaRepository extends ListCrudRepository<VocabularySchemaEntity, Long> {
+    Page<VocabularySchemaEntity> findAll(Pageable pageable);
 }

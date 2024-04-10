@@ -1,6 +1,5 @@
 package io.goobi.vocabularyserver.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,35 +7,28 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 @Entity
+@Table(name = "selectable_value")
 @Getter
 @Setter
-public class FieldInstance {
-    private static final int MAX_LANGUAGE_LENGTH = 3;
-
+public class SelectableValueEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "field_definition_id", nullable = false)
-    private FieldDefinition definition;
+    @JoinColumn(name = "field_type_id", nullable = false)
+    private FieldTypeEntity fieldType;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "record_id", nullable = false)
-    private VocabularyRecord vocabularyRecord;
-
-    @OneToMany(mappedBy = "fieldInstance", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FieldValue> fieldValues = new LinkedList<>();
+    // `value` is a reserved Mysql keyword
+    @Column(name = "selection_value", nullable = false)
+    private String value;
 
     @Override
     public final boolean equals(Object o) {
@@ -51,7 +43,7 @@ public class FieldInstance {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        FieldInstance that = (FieldInstance) o;
+        SelectableValueEntity that = (SelectableValueEntity) o;
         return id == that.id;
     }
 

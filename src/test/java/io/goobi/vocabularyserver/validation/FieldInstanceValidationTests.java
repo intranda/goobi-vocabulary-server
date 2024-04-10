@@ -1,16 +1,16 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldInstance;
-import io.goobi.vocabularyserver.model.FieldTranslation;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.FieldValue;
-import io.goobi.vocabularyserver.model.Language;
-import io.goobi.vocabularyserver.model.SelectableValue;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.FieldInstanceEntity;
+import io.goobi.vocabularyserver.model.FieldTranslationEntity;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.FieldValueEntity;
+import io.goobi.vocabularyserver.model.LanguageEntity;
+import io.goobi.vocabularyserver.model.SelectableValueEntity;
+import io.goobi.vocabularyserver.model.VocabularyEntity;
+import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,31 +36,31 @@ class FieldInstanceValidationTests {
     @InjectMocks
     private FieldInstanceValidatorImpl validator;
 
-    private VocabularySchema schema;
-    private VocabularyRecord record;
+    private VocabularySchemaEntity schema;
+    private VocabularyRecordEntity record;
 
 
     @BeforeEach
     public void setUp() {
-        schema = new VocabularySchema();
-        Vocabulary vocabulary = new Vocabulary();
+        schema = new VocabularySchemaEntity();
+        VocabularyEntity vocabulary = new VocabularyEntity();
         vocabulary.setSchema(schema);
         vocabulary.setName("Test vocabulary");
-        record = new VocabularyRecord();
+        record = new VocabularyRecordEntity();
         record.setVocabulary(vocabulary);
     }
 
-    private FieldDefinition setupFieldDefinition(String name, String validation, List<String> selectableValues, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
-        FieldType type = new FieldType();
+    private FieldDefinitionEntity setupFieldDefinition(String name, String validation, List<String> selectableValues, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
+        FieldTypeEntity type = new FieldTypeEntity();
         type.setValidation(validation);
         if (selectableValues != null) {
             type.setSelectableValues(selectableValues.stream().map(s -> {
-                SelectableValue sv = new SelectableValue();
+                SelectableValueEntity sv = new SelectableValueEntity();
                 sv.setValue(s);
                 return sv;
             }).collect(Collectors.toList()));
         }
-        FieldDefinition definition = new FieldDefinition();
+        FieldDefinitionEntity definition = new FieldDefinitionEntity();
         definition.setSchema(schema);
         definition.setName(name);
         definition.setType(type);
@@ -73,8 +73,8 @@ class FieldInstanceValidationTests {
         return definition;
     }
 
-    private FieldInstance setupFieldInstance(FieldDefinition definition, Pair<String, String>... values) {
-        FieldInstance field = new FieldInstance();
+    private FieldInstanceEntity setupFieldInstance(FieldDefinitionEntity definition, Pair<String, String>... values) {
+        FieldInstanceEntity field = new FieldInstanceEntity();
         field.setDefinition(definition);
         field.setVocabularyRecord(record);
         field.setFieldValues(transform(field, values));
@@ -82,7 +82,7 @@ class FieldInstanceValidationTests {
         return field;
     }
 
-    private List<FieldValue> transform(FieldInstance field, Pair<String, String>[] values) {
+    private List<FieldValueEntity> transform(FieldInstanceEntity field, Pair<String, String>[] values) {
         Map<String, Set<String>> valuesPerLanguage = new HashMap<>();
         for (Pair<String, String> p : values) {
             if (!valuesPerLanguage.containsKey(p.getFirst())) {
@@ -100,21 +100,21 @@ class FieldInstanceValidationTests {
                 .collect(Collectors.toList());
     }
 
-    private Language createLanguage(String abbreviation) {
-        Language language = new Language();
+    private LanguageEntity createLanguage(String abbreviation) {
+        LanguageEntity language = new LanguageEntity();
         language.setAbbreviation(abbreviation);
         return language;
     }
 
-    private FieldValue createFieldValue(FieldInstance field, Language language, String value) {
-        FieldValue fieldValue = new FieldValue();
+    private FieldValueEntity createFieldValue(FieldInstanceEntity field, LanguageEntity language, String value) {
+        FieldValueEntity fieldValue = new FieldValueEntity();
         fieldValue.setFieldInstance(field);
         fieldValue.setTranslations(List.of(createTranslation(fieldValue, language, value)));
         return fieldValue;
     }
 
-    private FieldTranslation createTranslation(FieldValue field, Language language, String value) {
-        FieldTranslation translation = new FieldTranslation();
+    private FieldTranslationEntity createTranslation(FieldValueEntity field, LanguageEntity language, String value) {
+        FieldTranslationEntity translation = new FieldTranslationEntity();
         translation.setFieldValue(field);
         translation.setLanguage(language);
         translation.setValue(value);
@@ -123,7 +123,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void textFieldValueNotMatchingValidation_fails() {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("name", "\\w+", null, true, true, true, true, false),
                 Pair.of("none", "Thomas Lastname"));
 
@@ -132,7 +132,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void textFieldValueMatchingValidation_success() throws ValidationException {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("name", "\\w+", null, true, true, true, true, false),
                 Pair.of("none", "Thomas"));
 
@@ -141,7 +141,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void numberFieldValueNotMatchingValidation_fails() {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("age", "\\d+", null, true, true, true, true, false),
                 Pair.of("none", "Thomas"));
 
@@ -150,7 +150,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void numberFieldValueMatchingValidation_fails() throws ValidationException {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("age", "\\d+", null, true, true, true, true, false),
                 Pair.of("none", "32"));
 
@@ -159,7 +159,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void valueIsOneOfTheSelectableValues_success() throws ValidationException {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false, false),
                 Pair.of("none", "Linux"));
 
@@ -168,7 +168,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void valueIsNotOneOfTheSelectableValues_success() {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false, false),
                 Pair.of("none", "MacOS"));
 
@@ -177,7 +177,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void emptyFieldValue_fails() {
-        FieldInstance field = setupFieldInstance(
+        FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("hobbies", null, null, true, true, true, true, false),
                 Pair.of("none", ""));
 
@@ -189,12 +189,12 @@ class FieldInstanceValidationTests {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, 11L, "Bob")).thenReturn(true);
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 12L, "Bob")).thenReturn(false);
 
-        FieldInstance fieldFriend = setupFieldInstance(
+        FieldInstanceEntity fieldFriend = setupFieldInstance(
                 setupFieldDefinition("Best Friend", null, null, false, true, false, true, false),
                 Pair.of("none", "Thomas"));
         fieldFriend.getDefinition().setId(1L);
         fieldFriend.setId(11L);
-        FieldInstance fieldName = setupFieldInstance(
+        FieldInstanceEntity fieldName = setupFieldInstance(
                 setupFieldDefinition("Name", null, null, true, true, true, true, false),
                 Pair.of("none", "Bob"));
         fieldName.getDefinition().setId(2L);
@@ -208,7 +208,7 @@ class FieldInstanceValidationTests {
     void duplicateUniqueFieldValueForTheSameFieldDefinition_fails() {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 10L, "Bob")).thenReturn(true);
 
-        FieldInstance fieldName = setupFieldInstance(
+        FieldInstanceEntity fieldName = setupFieldInstance(
                 setupFieldDefinition("Name", null, null, true, true, true, true, false),
                 Pair.of("none", "Bob"));
         fieldName.getDefinition().setId(2L);
@@ -219,7 +219,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void multipleFieldValuesIfMultiValuedIsDisabled_fails() {
-        FieldInstance multiValuedInstance = setupFieldInstance(
+        FieldInstanceEntity multiValuedInstance = setupFieldInstance(
                 setupFieldDefinition("Fruit", null, null, false, true, false, true, false),
                 Pair.of("none", "Apple"), Pair.of("none", "Banana"));
 
@@ -228,7 +228,7 @@ class FieldInstanceValidationTests {
 
     @Test
     void multipleFieldValuesIfMultiValuedIsEnabled_success() throws ValidationException {
-        FieldInstance multiValuedInstance = setupFieldInstance(
+        FieldInstanceEntity multiValuedInstance = setupFieldInstance(
                 setupFieldDefinition("Fruit", null, null, false, true, false, true, true),
                 Pair.of("none", "Apple"), Pair.of("none", "Banana"));
 

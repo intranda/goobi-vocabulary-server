@@ -4,7 +4,7 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.VocabularyAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.VocabularyDTO;
+import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.service.manager.Manager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -25,33 +25,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyController {
-    private final Manager<VocabularyDTO> manager;
+    private final Manager<Vocabulary> manager;
     private final VocabularyAssembler assembler;
 
-    public VocabularyController(Manager<VocabularyDTO> manager, VocabularyAssembler assembler) {
+    public VocabularyController(Manager<Vocabulary> manager, VocabularyAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }
 
     @GetMapping("/vocabularies")
-    public PagedModel<EntityModel<VocabularyDTO>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularyDTO> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<Vocabulary>> all(Pageable pageRequest, PagedResourcesAssembler<Vocabulary> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/vocabularies/{id}")
-    public EntityModel<VocabularyDTO> one(@PathVariable long id) {
+    public EntityModel<Vocabulary> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
     }
 
     @PostMapping("/vocabularies")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyDTO> create(@RequestBody VocabularyDTO vocabularyDTO) throws ValidationException {
+    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws ValidationException {
         return assembler.toModel(manager.create(vocabularyDTO));
     }
 
     @PutMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularyDTO> update(@RequestBody VocabularyDTO vocabularyDTO, @PathVariable long id) throws ValidationException {
+    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabularyDTO, @PathVariable long id) throws ValidationException {
         if (vocabularyDTO.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }
@@ -61,7 +61,7 @@ public class VocabularyController {
 
     @DeleteMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<VocabularyDTO> delete(@PathVariable long id) {
+    public ResponseEntity<Vocabulary> delete(@PathVariable long id) {
         return ResponseEntity.ok(manager.delete(id));
     }
 }

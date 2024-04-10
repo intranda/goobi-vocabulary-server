@@ -4,10 +4,10 @@ import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.FieldTypeDTO;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.Language;
-import io.goobi.vocabularyserver.model.SelectableValue;
+import io.goobi.vocabularyserver.exchange.FieldType;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.LanguageEntity;
+import io.goobi.vocabularyserver.model.SelectableValueEntity;
 import io.goobi.vocabularyserver.repositories.FieldTypeRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import io.goobi.vocabularyserver.validation.Validator;
@@ -19,45 +19,45 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class FieldTypeManager implements Manager<FieldTypeDTO> {
+public class FieldTypeManager implements Manager<FieldType> {
     private final FieldTypeRepository fieldTypeRepository;
     private final DTOMapper modelMapper;
-    private final Validator<FieldType> validator;
+    private final Validator<FieldTypeEntity> validator;
 
-    public FieldTypeManager(FieldTypeRepository fieldTypeRepository, DTOMapper modelMapper, Validator<FieldType> validator) {
+    public FieldTypeManager(FieldTypeRepository fieldTypeRepository, DTOMapper modelMapper, Validator<FieldTypeEntity> validator) {
         this.fieldTypeRepository = fieldTypeRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
     }
 
     @Override
-    public Page<FieldTypeDTO> listAll(Pageable pageable) {
+    public Page<FieldType> listAll(Pageable pageable) {
         return fieldTypeRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }
 
     @Override
-    public FieldTypeDTO get(long id) {
+    public FieldType get(long id) {
         return modelMapper.toDTO(
                 fieldTypeRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(FieldType.class, id))
+                        .orElseThrow(() -> new EntityNotFoundException(FieldTypeEntity.class, id))
         );
     }
 
     @Override
-    public FieldTypeDTO create(FieldTypeDTO newFieldTypeDTO) throws ValidationException {
-        FieldType jpaType = modelMapper.toEntity(newFieldTypeDTO);
+    public FieldType create(FieldType newFieldTypeDTO) throws ValidationException {
+        FieldTypeEntity jpaType = modelMapper.toEntity(newFieldTypeDTO);
         validator.validate(jpaType);
         return modelMapper.toDTO(fieldTypeRepository.save(jpaType));
     }
 
     @Override
-    public FieldTypeDTO replace(FieldTypeDTO newFieldTypeDTO) throws ValidationException {
-        FieldType jpaFieldType = fieldTypeRepository
+    public FieldType replace(FieldType newFieldTypeDTO) throws ValidationException {
+        FieldTypeEntity jpaFieldType = fieldTypeRepository
                 .findById(newFieldTypeDTO.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newFieldTypeDTO.getClass(), newFieldTypeDTO.getId()));
 
-        FieldType transformed = modelMapper.toEntity(newFieldTypeDTO);
+        FieldTypeEntity transformed = modelMapper.toEntity(newFieldTypeDTO);
 
         List<Runnable> replacements = new LinkedList<>();
         if (newFieldTypeDTO.getName() != null) {
@@ -73,7 +73,7 @@ public class FieldTypeManager implements Manager<FieldTypeDTO> {
         if (newFieldTypeDTO.getSelectableValues() != null) {
             replacements.add(() -> {
                 jpaFieldType.getSelectableValues().clear();
-                List<SelectableValue> selectableValues = transformed.getSelectableValues();
+                List<SelectableValueEntity> selectableValues = transformed.getSelectableValues();
                 selectableValues.forEach(sv -> sv.setFieldType(jpaFieldType));
                 jpaFieldType.getSelectableValues().addAll(selectableValues);
             });
@@ -87,9 +87,9 @@ public class FieldTypeManager implements Manager<FieldTypeDTO> {
     }
 
     @Override
-    public FieldTypeDTO delete(long id) {
+    public FieldType delete(long id) {
         if (!fieldTypeRepository.existsById(id)) {
-            throw new EntityNotFoundException(Language.class, id);
+            throw new EntityNotFoundException(LanguageEntity.class, id);
         }
         fieldTypeRepository.deleteById(id);
         return null;

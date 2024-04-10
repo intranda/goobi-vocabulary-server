@@ -1,8 +1,8 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.FieldTypeValidationException;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.SelectableValue;
+import io.goobi.vocabularyserver.model.FieldTypeEntity;
+import io.goobi.vocabularyserver.model.SelectableValueEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 @Service
-public class FieldTypeValidatorImpl extends BaseValidator<FieldType> {
+public class FieldTypeValidatorImpl extends BaseValidator<FieldTypeEntity> {
     public FieldTypeValidatorImpl() {
         super("Type");
         setValidations(List.of(
@@ -21,7 +21,7 @@ public class FieldTypeValidatorImpl extends BaseValidator<FieldType> {
         ));
     }
 
-    private void checkValidRegex(FieldType fieldType) throws FieldTypeValidationException {
+    private void checkValidRegex(FieldTypeEntity fieldType) throws FieldTypeValidationException {
         if (fieldType.getValidation() != null && !fieldType.getValidation().isEmpty()) {
             try {
                 Pattern.compile(fieldType.getValidation());
@@ -31,10 +31,10 @@ public class FieldTypeValidatorImpl extends BaseValidator<FieldType> {
         }
     }
 
-    private void checkSelectableValuesMatchValidation(FieldType fieldType) throws FieldTypeValidationException {
+    private void checkSelectableValuesMatchValidation(FieldTypeEntity fieldType) throws FieldTypeValidationException {
         if (!fieldType.getSelectableValues().isEmpty() && fieldType.getValidation() != null && !fieldType.getValidation().isEmpty()) {
             Set<String> errorValues = fieldType.getSelectableValues().stream()
-                    .map(SelectableValue::getValue)
+                    .map(SelectableValueEntity::getValue)
                     .filter(v -> !Pattern.matches(fieldType.getValidation(), v))
                     .collect(Collectors.toSet());
             if (!errorValues.isEmpty()) {

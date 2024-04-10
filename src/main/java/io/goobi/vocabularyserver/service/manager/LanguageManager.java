@@ -4,8 +4,8 @@ import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.LanguageDTO;
-import io.goobi.vocabularyserver.model.Language;
+import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.repositories.LanguageRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class LanguageManager implements Manager<LanguageDTO> {
+public class LanguageManager implements Manager<Language> {
     private final LanguageRepository languageRepository;
     private final DTOMapper modelMapper;
 
@@ -26,28 +26,28 @@ public class LanguageManager implements Manager<LanguageDTO> {
     }
 
     @Override
-    public Page<LanguageDTO> listAll(Pageable pageable) {
+    public Page<Language> listAll(Pageable pageable) {
         return languageRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }
 
     @Override
-    public LanguageDTO get(long id) {
+    public Language get(long id) {
         return modelMapper.toDTO(
                 languageRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(Language.class, id))
+                        .orElseThrow(() -> new EntityNotFoundException(LanguageEntity.class, id))
         );
     }
 
     @Override
-    public LanguageDTO create(LanguageDTO newLanguageDTO) throws ValidationException {
-        Language jpaLanguage = modelMapper.toEntity(newLanguageDTO);
+    public Language create(Language newLanguageDTO) throws ValidationException {
+        LanguageEntity jpaLanguage = modelMapper.toEntity(newLanguageDTO);
         return modelMapper.toDTO(languageRepository.save(jpaLanguage));
     }
 
     @Override
-    public LanguageDTO replace(LanguageDTO newLanguageDTO) {
-        Language jpaLanguage = languageRepository
+    public Language replace(Language newLanguageDTO) {
+        LanguageEntity jpaLanguage = languageRepository
                 .findById(newLanguageDTO.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newLanguageDTO.getClass(), newLanguageDTO.getId()));
 
@@ -66,9 +66,9 @@ public class LanguageManager implements Manager<LanguageDTO> {
     }
 
     @Override
-    public LanguageDTO delete(long id) {
+    public Language delete(long id) {
         if (!languageRepository.existsById(id)) {
-            throw new EntityNotFoundException(Language.class, id);
+            throw new EntityNotFoundException(LanguageEntity.class, id);
         }
         languageRepository.deleteById(id);
         return null;

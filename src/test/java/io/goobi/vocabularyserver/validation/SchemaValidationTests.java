@@ -1,17 +1,12 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.model.FieldDefinition;
-import io.goobi.vocabularyserver.model.FieldType;
-import io.goobi.vocabularyserver.model.Vocabulary;
-import io.goobi.vocabularyserver.model.VocabularyRecord;
-import io.goobi.vocabularyserver.model.VocabularySchema;
-import org.junit.jupiter.api.BeforeEach;
+import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
+import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,8 +16,8 @@ class SchemaValidationTests {
     @InjectMocks
     private SchemaValidatorImpl validator;
 
-    private static FieldDefinition validMainField(VocabularySchema schema, String name) {
-        FieldDefinition mainEntryField = new FieldDefinition();
+    private static FieldDefinitionEntity validMainField(VocabularySchemaEntity schema, String name) {
+        FieldDefinitionEntity mainEntryField = new FieldDefinitionEntity();
         mainEntryField.setSchema(schema);
         mainEntryField.setName(name);
         mainEntryField.setMainEntry(true);
@@ -33,16 +28,16 @@ class SchemaValidationTests {
 
     @Test
     void noFieldDefinitions_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
         assertThrows(ValidationException.class, () -> validator.validate(schema));
     }
 
     @Test
     void noMainFieldDefinition_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition nonMainEntryField = new FieldDefinition();
+        FieldDefinitionEntity nonMainEntryField = new FieldDefinitionEntity();
         nonMainEntryField.setSchema(schema);
         nonMainEntryField.setName("Not main");
 
@@ -53,9 +48,9 @@ class SchemaValidationTests {
 
     @Test
     void exactlyOneMainFieldDefinition_success() throws ValidationException {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition mainEntryField = validMainField(schema, "Main");
+        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
 
         schema.setDefinitions(List.of(mainEntryField));
 
@@ -64,7 +59,7 @@ class SchemaValidationTests {
 
     @Test
     void twoMainFieldDefinitions_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
         schema.setDefinitions(List.of(validMainField(schema, "Main1"), validMainField(schema, "Main2")));
 
@@ -73,9 +68,9 @@ class SchemaValidationTests {
 
     @Test
     void exactlyOneMainFieldDefinitionThatIsNotUnique_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition mainEntryField = validMainField(schema, "Main");
+        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
         mainEntryField.setUnique(false);
 
         schema.setDefinitions(List.of(mainEntryField));
@@ -85,9 +80,9 @@ class SchemaValidationTests {
 
     @Test
     void exactlyOneMainFieldDefinitionThatIsNotRequired_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition mainEntryField = validMainField(schema, "Main");
+        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
         mainEntryField.setRequired(false);
 
         schema.setDefinitions(List.of(mainEntryField));
@@ -97,10 +92,10 @@ class SchemaValidationTests {
 
     @Test
     void titleFieldsThatIsNotRequired_fails() {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition mainEntryField = validMainField(schema, "Main");
-        FieldDefinition titleField = new FieldDefinition();
+        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
+        FieldDefinitionEntity titleField = new FieldDefinitionEntity();
         titleField.setSchema(schema);
         titleField.setName("Title");
         titleField.setTitleField(true);
@@ -113,10 +108,10 @@ class SchemaValidationTests {
 
     @Test
     void titleFieldsThatIsRequired_success() throws ValidationException {
-        VocabularySchema schema = new VocabularySchema();
+        VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        FieldDefinition mainEntryField = validMainField(schema, "Main");
-        FieldDefinition titleField = new FieldDefinition();
+        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
+        FieldDefinitionEntity titleField = new FieldDefinitionEntity();
         titleField.setSchema(schema);
         titleField.setName("Title");
         titleField.setTitleField(true);
