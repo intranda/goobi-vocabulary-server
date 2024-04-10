@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RecordManager implements Manager<VocabularyRecordDTO> {
+public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
 
-    public RecordManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator) {
+    public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;

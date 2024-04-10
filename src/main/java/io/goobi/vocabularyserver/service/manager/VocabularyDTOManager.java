@@ -15,11 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class VocabularyManager implements Manager<Vocabulary> {
+public class VocabularyDTOManager implements Manager<Vocabulary> {
     private final VocabularyRepository vocabularyRepository;
     private final DTOMapper modelMapper;
 
-    public VocabularyManager(VocabularyRepository vocabularyRepository, DTOMapper modelMapper) {
+    public VocabularyDTOManager(VocabularyRepository vocabularyRepository, DTOMapper modelMapper) {
         this.vocabularyRepository = vocabularyRepository;
         this.modelMapper = modelMapper;
     }

@@ -4,7 +4,7 @@ import io.goobi.vocabularyserver.api.assemblers.VocabularySchemaAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
-import io.goobi.vocabularyserver.service.manager.VocabularySchemaManager;
+import io.goobi.vocabularyserver.service.manager.VocabularySchemaDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularySchemaController {
-    private final VocabularySchemaManager manager;
+    private final VocabularySchemaDTOManager manager;
     private final VocabularySchemaAssembler assembler;
 
-    public VocabularySchemaController(VocabularySchemaManager manager, VocabularySchemaAssembler assembler) {
+    public VocabularySchemaController(VocabularySchemaDTOManager manager, VocabularySchemaAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }

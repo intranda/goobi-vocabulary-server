@@ -4,7 +4,7 @@ import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.service.manager.RecordManager;
+import io.goobi.vocabularyserver.service.manager.RecordDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyRecordController {
-    private final RecordManager manager;
+    private final RecordDTOManager manager;
     private final RecordAssembler assembler;
 
-    public VocabularyRecordController(RecordManager manager, RecordAssembler assembler) {
+    public VocabularyRecordController(RecordDTOManager manager, RecordAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }
@@ -41,7 +41,7 @@ public class VocabularyRecordController {
         return assembler.toModel(manager.get(recordId));
     }
 
-    @GetMapping(value = "/records/{recordId}", produces = {"application/xml", "application/rdf+xml"})
+    @GetMapping(value = "/records/{recordId}", produces = {"application/xml"})
     public VocabularyRecordDTO oneAsXml(@PathVariable long recordId) {
         return manager.get(recordId);
     }

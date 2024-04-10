@@ -19,12 +19,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class FieldTypeManager implements Manager<FieldType> {
+public class FieldTypeDTOManager implements Manager<FieldType> {
     private final FieldTypeRepository fieldTypeRepository;
     private final DTOMapper modelMapper;
     private final Validator<FieldTypeEntity> validator;
 
-    public FieldTypeManager(FieldTypeRepository fieldTypeRepository, DTOMapper modelMapper, Validator<FieldTypeEntity> validator) {
+    public FieldTypeDTOManager(FieldTypeRepository fieldTypeRepository, DTOMapper modelMapper, Validator<FieldTypeEntity> validator) {
         this.fieldTypeRepository = fieldTypeRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;

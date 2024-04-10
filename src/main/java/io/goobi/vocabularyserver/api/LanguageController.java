@@ -25,28 +25,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class LanguageController {
-    private final Manager<Language> manager;
+    private final Manager<Language> DTOmanager;
+    private final Manager<LanguageEntity> managerEntity;
     private final LanguageAssembler assembler;
 
-    public LanguageController(Manager<Language> manager, LanguageAssembler assembler) {
-        this.manager = manager;
+    public LanguageController(Manager<Language> managerDTO, Manager<LanguageEntity> managerEntity, LanguageAssembler assembler) {
+        this.DTOmanager = managerDTO;
+        this.managerEntity = managerEntity;
         this.assembler = assembler;
     }
 
     @GetMapping("/languages")
     public PagedModel<EntityModel<Language>> all(Pageable pageRequest, PagedResourcesAssembler<Language> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
+        return pagedResourcesAssembler.toModel(DTOmanager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/languages/{id}")
     public EntityModel<Language> one(@PathVariable long id) {
-        return assembler.toModel(manager.get(id));
+        return assembler.toModel(DTOmanager.get(id));
     }
 
     @PostMapping("/languages")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<Language> create(@RequestBody Language newLanguage) throws ValidationException {
-        return assembler.toModel(manager.create(newLanguage));
+        return assembler.toModel(DTOmanager.create(newLanguage));
     }
 
     @PutMapping("/languages/{id}")
@@ -56,12 +58,12 @@ public class LanguageController {
             throw new IllegalAttributeProvidedException("id");
         }
         newLanguage.setId(id);
-        return assembler.toModel(manager.replace(newLanguage));
+        return assembler.toModel(DTOmanager.replace(newLanguage));
     }
 
     @DeleteMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Language> delete(@PathVariable long id) {
-        return ResponseEntity.ok(manager.delete(id));
+        return ResponseEntity.ok(DTOmanager.delete(id));
     }
 }

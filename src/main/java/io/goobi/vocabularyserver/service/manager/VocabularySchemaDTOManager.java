@@ -17,13 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class VocabularySchemaManager implements Manager<VocabularySchemaDTO> {
+public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> {
 
     private final VocabularySchemaRepository vocabularySchemaRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularySchemaEntity> validator;
 
-    public VocabularySchemaManager(VocabularySchemaRepository vocabularySchemaRepository, DTOMapper modelMapper, Validator<VocabularySchemaEntity> validator) {
+    public VocabularySchemaDTOManager(VocabularySchemaRepository vocabularySchemaRepository, DTOMapper modelMapper, Validator<VocabularySchemaEntity> validator) {
         this.vocabularySchemaRepository = vocabularySchemaRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
