@@ -5,38 +5,48 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "language")
+@Table(name = "translation_definition",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"field_definition_id", "fallback"})
+        })
 @Getter
 @Setter
-public class LanguageEntity {
+public class TranslationDefinitionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
-    @Column(name = "abbreviation", nullable = false, unique = true)
-    private String abbreviation;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "language_id", nullable = false)
+    private LanguageEntity language;
 
-    // `name` is a reserved Mysql keyword
-    @Column(name = "full_name")
-    private String name;
+    @Column(name = "fallback")
+    private Boolean fallback;
 
-    @Column(name = "is_default", unique = true)
-    private Boolean isDefault;
+    @ManyToOne
+    @JoinColumn(name = "field_definition_id")
+    private FieldDefinitionEntity fieldDefinition;
 
-    public void setIsDefault(final Boolean newValue) {
+    public void setFallback(final Boolean newValue) {
         if (Boolean.TRUE.equals(newValue)) {
-            this.isDefault = true;
+            this.fallback = true;
         } else {
-            this.isDefault = null;
+            this.fallback = null;
         }
     }
+
+    @Column(name = "required", nullable = false)
+    private boolean required;
 
     @Override
     public final boolean equals(Object o) {
@@ -51,7 +61,7 @@ public class LanguageEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        LanguageEntity that = (LanguageEntity) o;
+        TranslationDefinitionEntity that = (TranslationDefinitionEntity) o;
         return id == that.id;
     }
 

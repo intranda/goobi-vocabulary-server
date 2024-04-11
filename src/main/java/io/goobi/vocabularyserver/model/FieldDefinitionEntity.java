@@ -1,5 +1,6 @@
 package io.goobi.vocabularyserver.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,11 +8,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "field_definition",
@@ -38,6 +43,9 @@ public class FieldDefinitionEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "type_id", nullable = false)
     private FieldTypeEntity type;
+
+    @OneToMany(mappedBy = "fieldDefinition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TranslationDefinitionEntity> translationDefinitions = new LinkedHashSet<>();
 
     @Column(name = "required", nullable = false)
     private boolean required = false;
