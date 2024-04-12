@@ -3,7 +3,7 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.service.manager.RecordDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -32,28 +32,28 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public PagedModel<EntityModel<VocabularyRecordDTO>> allInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecordDTO> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<VocabularyRecord>> allInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.listAll(vocabularyId, pageRequest), assembler);
     }
 
     @GetMapping("/records/{recordId}")
-    public EntityModel<VocabularyRecordDTO> one(@PathVariable long recordId) {
+    public EntityModel<VocabularyRecord> one(@PathVariable long recordId) {
         return assembler.toModel(manager.get(recordId));
     }
 
     @GetMapping(value = "/records/{recordId}", produces = {"application/xml"})
-    public VocabularyRecordDTO oneAsXml(@PathVariable long recordId) {
+    public VocabularyRecord oneAsXml(@PathVariable long recordId) {
         return manager.get(recordId);
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
-    public PagedModel<EntityModel<VocabularyRecordDTO>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecordDTO> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.search(vocabularyId, searchTerm, pageRequest), assembler);
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecordDTO> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
+    public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws ValidationException {
         if (vocabularyRecordDTO.getVocabularyId() != null) {
             throw new IllegalAttributeProvidedException("vocabularyId");
         }
@@ -66,7 +66,7 @@ public class VocabularyRecordController {
 
     @PostMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecordDTO> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecordDTO vocabularyRecordDTO) throws ValidationException {
+    public EntityModel<VocabularyRecord> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws ValidationException {
         if (vocabularyRecordDTO.getVocabularyId() != null) {
             throw new IllegalAttributeProvidedException("vocabularyId");
         }
@@ -79,7 +79,7 @@ public class VocabularyRecordController {
 
     @DeleteMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<VocabularyRecordDTO> delete(@PathVariable long recordId) {
+    public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
         return ResponseEntity.ok(manager.delete(recordId));
     }
 }

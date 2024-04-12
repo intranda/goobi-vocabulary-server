@@ -1,7 +1,7 @@
 package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.exchange.FieldDefinition;
-import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.FieldTypeEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
@@ -32,7 +32,7 @@ class VocabularySchemaMapperTest {
     private static final String FIELD_DEFINITION_2_NAME = "Last name";
 
     private VocabularySchemaEntity vocabularySchema;
-    private VocabularySchemaDTO vocabularySchemaDTO;
+    private VocabularySchema vocabularySchemaDTO;
 
     private FieldDefinitionEntity fieldDefinition1;
     private FieldDefinition fieldDefinitionDTO1;
@@ -71,7 +71,7 @@ class VocabularySchemaMapperTest {
 
         vocabularySchema.setDefinitions(List.of(fieldDefinition1, fieldDefinition2));
 
-        vocabularySchemaDTO = new VocabularySchemaDTO();
+        vocabularySchemaDTO = new VocabularySchema();
         vocabularySchemaDTO.setId(SCHEMA_ID);
 
         fieldDefinitionDTO1 = new FieldDefinition();
@@ -94,14 +94,14 @@ class VocabularySchemaMapperTest {
 
     @Test
     void validId_toDTO() {
-        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
 
         assertEquals(SCHEMA_ID, result.getId());
     }
 
     @Test
     void childDefinitions_toDTO() {
-        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
 
         assertAll("Verify child definitions",
                 () -> assertEquals(SCHEMA_ID, result.getDefinitions().get(0).getSchemaId()),
@@ -117,7 +117,7 @@ class VocabularySchemaMapperTest {
     void noHierarchicalRecords_toDTO() {
         vocabularySchema.setHierarchicalRecords(false);
 
-        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
 
         assertFalse(result.getHierarchicalRecords());
     }
@@ -126,7 +126,7 @@ class VocabularySchemaMapperTest {
     void hierarchicalRecords_toDTO() {
         vocabularySchema.setHierarchicalRecords(true);
 
-        VocabularySchemaDTO result = mapper.toDTO(vocabularySchema);
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
 
         assertTrue(result.getHierarchicalRecords());
     }

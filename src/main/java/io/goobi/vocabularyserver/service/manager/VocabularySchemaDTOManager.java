@@ -4,7 +4,7 @@ import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.MissingValuesException;
 import io.goobi.vocabularyserver.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> {
+public class VocabularySchemaDTOManager implements Manager<VocabularySchema> {
 
     private final VocabularySchemaRepository vocabularySchemaRepository;
     private final DTOMapper modelMapper;
@@ -30,13 +30,13 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> 
     }
 
     @Override
-    public Page<VocabularySchemaDTO> listAll(Pageable pageable) {
+    public Page<VocabularySchema> listAll(Pageable pageable) {
         return vocabularySchemaRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }
 
     @Override
-    public VocabularySchemaDTO get(long id) {
+    public VocabularySchema get(long id) {
         return modelMapper.toDTO(
                 vocabularySchemaRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException(VocabularySchemaEntity.class, id))
@@ -44,7 +44,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> 
     }
 
     @Override
-    public VocabularySchemaDTO create(VocabularySchemaDTO newSchema) throws ValidationException {
+    public VocabularySchema create(VocabularySchema newSchema) throws ValidationException {
         VocabularySchemaEntity jpaSchema = modelMapper.toEntity(newSchema);
         validator.validate(jpaSchema);
         return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));
@@ -52,7 +52,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> 
 
     // TODO: This is not working correctly: Impossible to pass id for replace insertion
     @Override
-    public VocabularySchemaDTO replace(VocabularySchemaDTO newSchema) {
+    public VocabularySchema replace(VocabularySchema newSchema) {
         VocabularySchemaEntity jpaSchema = vocabularySchemaRepository
                 .findById(newSchema.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newSchema.getClass(), newSchema.getId()));
@@ -69,7 +69,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchemaDTO> 
     }
 
     @Override
-    public VocabularySchemaDTO delete(long id) {
+    public VocabularySchema delete(long id) {
         if (!vocabularySchemaRepository.existsById(id)) {
             throw new EntityNotFoundException(VocabularySchemaEntity.class, id);
         }

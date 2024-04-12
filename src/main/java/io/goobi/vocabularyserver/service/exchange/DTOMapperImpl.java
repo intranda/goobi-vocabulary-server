@@ -9,8 +9,8 @@ import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.FieldValue;
 import io.goobi.vocabularyserver.exchange.Language;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
-import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
+import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.FieldInstanceEntity;
 import io.goobi.vocabularyserver.model.FieldTranslationEntity;
@@ -286,7 +286,7 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularySchemaEntity toEntity(VocabularySchemaDTO dto) {
+    public VocabularySchemaEntity toEntity(VocabularySchema dto) {
         VocabularySchemaEntity result = new VocabularySchemaEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
@@ -300,8 +300,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularySchemaDTO toDTO(VocabularySchemaEntity entity) {
-        VocabularySchemaDTO result = new VocabularySchemaDTO();
+    public VocabularySchema toDTO(VocabularySchemaEntity entity) {
+        VocabularySchema result = new VocabularySchema();
         result.setId(entity.getId());
         result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
         result.setHierarchicalRecords(Boolean.TRUE.equals(entity.isHierarchicalRecords()));
@@ -309,7 +309,7 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularyRecordEntity toEntity(VocabularyRecordDTO dto) {
+    public VocabularyRecordEntity toEntity(VocabularyRecord dto) {
         VocabularyRecordEntity result = new VocabularyRecordEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
@@ -330,8 +330,8 @@ public class DTOMapperImpl implements DTOMapper {
     }
 
     @Override
-    public VocabularyRecordDTO toDTO(VocabularyRecordEntity entity) {
-        VocabularyRecordDTO result = new VocabularyRecordDTO();
+    public VocabularyRecord toDTO(VocabularyRecordEntity entity) {
+        VocabularyRecord result = new VocabularyRecord();
         result.setId(entity.getId());
         if (entity.getParentRecord() != null) {
             result.setParentId(entity.getParentRecord().getId());

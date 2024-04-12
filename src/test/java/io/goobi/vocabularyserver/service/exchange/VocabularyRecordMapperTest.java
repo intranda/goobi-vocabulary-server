@@ -2,7 +2,7 @@ package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.api.assemblers.RecordAssembler;
 import io.goobi.vocabularyserver.exchange.FieldInstance;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.FieldInstanceEntity;
 import io.goobi.vocabularyserver.model.FieldTypeEntity;
@@ -61,7 +61,7 @@ class VocabularyRecordMapperTest {
     private FieldDefinitionEntity fieldDefinition1;
     private FieldDefinitionEntity fieldDefinition2;
     private VocabularyRecordEntity vocabularyRecord;
-    private VocabularyRecordDTO vocabularyRecordDTO;
+    private VocabularyRecord vocabularyRecordDTO;
     private FieldInstanceEntity fieldInstance1;
     private FieldInstanceEntity fieldInstance2;
     private FieldInstance fieldInstanceDTO1;
@@ -122,7 +122,7 @@ class VocabularyRecordMapperTest {
         fieldInstanceDTO2.setDefinitionId(FIELD_DEFINITION_2_ID);
 //        fieldInstanceDTO2.setValue(FIELD_INSTANCE_2_VALUE);
 
-        vocabularyRecordDTO = new VocabularyRecordDTO();
+        vocabularyRecordDTO = new VocabularyRecord();
         vocabularyRecordDTO.setId(RECORD_ID);
         vocabularyRecordDTO.setVocabularyId(VOCABULARY_ID);
         vocabularyRecordDTO.setFields(Set.of(fieldInstanceDTO1, fieldInstanceDTO2));
@@ -135,35 +135,35 @@ class VocabularyRecordMapperTest {
 
     @Test
     void validId_toDTO() {
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertEquals(RECORD_ID, result.getId());
     }
 
     @Test
     void validVocabularyId_toDTO() {
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertEquals(VOCABULARY_ID, result.getVocabularyId());
     }
 
     @Test
     void validChildFields_toDTO() {
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertFieldInstancesEquals(List.of(fieldInstance1, fieldInstance2), new ArrayList<>(result.getFields()));
     }
 
     @Test
     void noParentRecord_toDTO() {
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertNull(result.getParentId());
     }
 
     @Test
     void noChildrenRecords_toDTO() {
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertNull(result.getChildren());
     }
@@ -184,7 +184,7 @@ class VocabularyRecordMapperTest {
 
         vocabularyRecord.setChildren(List.of(child));
 
-        VocabularyRecordDTO result = mapper.toDTO(vocabularyRecord);
+        VocabularyRecord result = mapper.toDTO(vocabularyRecord);
 
         assertAll("Verify child record",
                 () -> assertEquals(1, result.getChildren().size()),
@@ -286,7 +286,7 @@ class VocabularyRecordMapperTest {
 
     @Test
     void validChildrenRecords_fromDTO() {
-        VocabularyRecordDTO child = new VocabularyRecordDTO();
+        VocabularyRecord child = new VocabularyRecord();
         child.setId(927394672364L);
         child.setVocabularyId(VOCABULARY_ID);
 

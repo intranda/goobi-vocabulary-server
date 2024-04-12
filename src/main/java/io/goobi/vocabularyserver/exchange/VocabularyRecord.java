@@ -8,10 +8,10 @@ import java.util.Set;
 
 @Data
 @JacksonXmlRootElement(localName = "record")
-public class VocabularyRecordDTO {
+public class VocabularyRecord {
     private Long id;
     private Long parentId;
     private Long vocabularyId;
     private Set<FieldInstance> fields;
-    private Set<EntityModel<VocabularyRecordDTO>> children;
+    private Set<EntityModel<VocabularyRecord>> children;
 }

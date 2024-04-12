@@ -3,7 +3,7 @@ package io.goobi.vocabularyserver.service.manager;
 import io.goobi.vocabularyserver.exception.EntityNotFoundException;
 import io.goobi.vocabularyserver.exception.RecordValidationException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import io.goobi.vocabularyserver.repositories.VocabularyRecordRepository;
 import io.goobi.vocabularyserver.service.exchange.DTOMapper;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
+public class RecordDTOManager implements Manager<VocabularyRecord> {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
@@ -28,13 +28,13 @@ public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
         this.validator = validator;
     }
 
-    public Page<VocabularyRecordDTO> listAll(long id, Pageable pageRequest) {
+    public Page<VocabularyRecord> listAll(long id, Pageable pageRequest) {
         return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
                 .map(modelMapper::toDTO);
     }
 
     @Override
-    public VocabularyRecordDTO get(long id) {
+    public VocabularyRecord get(long id) {
         return modelMapper.toDTO(
                 vocabularyRecordRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id))
@@ -42,13 +42,13 @@ public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
     }
 
     @Override
-    public VocabularyRecordDTO create(VocabularyRecordDTO newRecord) throws ValidationException {
+    public VocabularyRecord create(VocabularyRecord newRecord) throws ValidationException {
         VocabularyRecordEntity jpaVocabularyRecord = modelMapper.toEntity(newRecord);
         validator.validate(jpaVocabularyRecord);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
-    public VocabularyRecordDTO createSubRecord(VocabularyRecordDTO newRecord) throws ValidationException {
+    public VocabularyRecord createSubRecord(VocabularyRecord newRecord) throws ValidationException {
         VocabularyRecordEntity jpaParent = vocabularyRecordRepository.findById(newRecord.getParentId())
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, newRecord.getParentId()));
         newRecord.setVocabularyId(jpaParent.getVocabulary().getId());
@@ -81,7 +81,7 @@ public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
     }
 
     @Override
-    public VocabularyRecordDTO delete(long id) {
+    public VocabularyRecord delete(long id) {
         if (!vocabularyRecordRepository.existsById(id)) {
             throw new EntityNotFoundException(VocabularyRecordEntity.class, id);
         }
@@ -89,7 +89,7 @@ public class RecordDTOManager implements Manager<VocabularyRecordDTO> {
         return null;
     }
 
-    public Page<VocabularyRecordDTO> search(long id, String searchTerm, Pageable pageRequest) {
+    public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
         return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, searchTerm, pageRequest)
                 .map(modelMapper::toDTO);
     }

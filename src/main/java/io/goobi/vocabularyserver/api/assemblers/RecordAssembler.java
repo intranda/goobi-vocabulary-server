@@ -2,7 +2,7 @@ package io.goobi.vocabularyserver.api.assemblers;
 
 import io.goobi.vocabularyserver.api.VocabularyController;
 import io.goobi.vocabularyserver.api.VocabularyRecordController;
-import io.goobi.vocabularyserver.exchange.VocabularyRecordDTO;
+import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class RecordAssembler implements RepresentationModelAssembler<VocabularyRecordDTO, EntityModel<VocabularyRecordDTO>> {
+public class RecordAssembler implements RepresentationModelAssembler<VocabularyRecord, EntityModel<VocabularyRecord>> {
     @Override
-    public EntityModel<VocabularyRecordDTO> toModel(VocabularyRecordDTO entity) {
-        EntityModel<VocabularyRecordDTO> result = EntityModel.of(entity,
+    public EntityModel<VocabularyRecord> toModel(VocabularyRecord entity) {
+        EntityModel<VocabularyRecord> result = EntityModel.of(entity,
                 linkTo(methodOn(VocabularyRecordController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(VocabularyController.class).one(entity.getVocabularyId())).withRel("vocabulary"),
                 linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getVocabularyId(), null, null)).withRel("vocabulary_records"),

@@ -3,7 +3,7 @@ package io.goobi.vocabularyserver.api;
 import io.goobi.vocabularyserver.api.assemblers.VocabularySchemaAssembler;
 import io.goobi.vocabularyserver.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabularyserver.exception.ValidationException;
-import io.goobi.vocabularyserver.exchange.VocabularySchemaDTO;
+import io.goobi.vocabularyserver.exchange.VocabularySchema;
 import io.goobi.vocabularyserver.service.manager.VocabularySchemaDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -33,24 +33,24 @@ public class VocabularySchemaController {
     }
 
     @GetMapping("/schemas")
-    public PagedModel<EntityModel<VocabularySchemaDTO>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularySchemaDTO> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<VocabularySchema>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularySchema> pagedResourcesAssembler) {
         return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
     }
 
     @GetMapping("/schemas/{id}")
-    public EntityModel<VocabularySchemaDTO> one(@PathVariable long id) {
+    public EntityModel<VocabularySchema> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
     }
 
     @PostMapping("/schemas")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularySchemaDTO> create(@RequestBody VocabularySchemaDTO newSchema) throws ValidationException {
+    public EntityModel<VocabularySchema> create(@RequestBody VocabularySchema newSchema) throws ValidationException {
         return assembler.toModel(manager.create(newSchema));
     }
 
     @PutMapping("/schemas/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularySchemaDTO> update(@RequestBody VocabularySchemaDTO vocabularySchemaDTO, @PathVariable long id) {
+    public EntityModel<VocabularySchema> update(@RequestBody VocabularySchema vocabularySchemaDTO, @PathVariable long id) {
         if (vocabularySchemaDTO.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }
@@ -60,7 +60,7 @@ public class VocabularySchemaController {
 
     @DeleteMapping("/schemas/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<VocabularySchemaDTO> delete(@PathVariable long id) {
+    public ResponseEntity<VocabularySchema> delete(@PathVariable long id) {
         return ResponseEntity.ok(manager.delete(id));
     }
 }
