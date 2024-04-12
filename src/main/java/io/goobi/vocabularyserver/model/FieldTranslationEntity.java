@@ -27,8 +27,8 @@ public class FieldTranslationEntity {
     @JoinColumn(name = "field_value_id", nullable = false)
     private FieldValueEntity fieldValue;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "language_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "language_id")
     private LanguageEntity language;
 
     @Lob
