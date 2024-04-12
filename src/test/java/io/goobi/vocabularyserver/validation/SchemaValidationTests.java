@@ -5,6 +5,7 @@ import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -13,13 +14,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class SchemaValidationTests {
+    @Mock
+    private Validator<FieldDefinitionValidatorImpl> fieldDefinitionValidator;
     @InjectMocks
     private SchemaValidatorImpl validator;
 
-    private static FieldDefinitionEntity validMainField(VocabularySchemaEntity schema, String name) {
+
+    private static FieldDefinitionEntity allFalseField(VocabularySchemaEntity schema, String name) {
         FieldDefinitionEntity mainEntryField = new FieldDefinitionEntity();
         mainEntryField.setSchema(schema);
         mainEntryField.setName(name);
+        mainEntryField.setMainEntry(false);
+        mainEntryField.setRequired(false);
+        mainEntryField.setUnique(false);
+        mainEntryField.setTitleField(false);
+        mainEntryField.setMultiValued(false);
+        return mainEntryField;
+    }
+
+    private static FieldDefinitionEntity validMainField(VocabularySchemaEntity schema, String name) {
+        FieldDefinitionEntity mainEntryField = allFalseField(schema, name);
         mainEntryField.setMainEntry(true);
         mainEntryField.setRequired(true);
         mainEntryField.setUnique(true);

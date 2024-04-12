@@ -1,23 +1,29 @@
 package io.goobi.vocabularyserver.validation;
 
 import io.goobi.vocabularyserver.exception.SchemaValidationException;
+import io.goobi.vocabularyserver.exception.ValidationException;
 import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
-    public SchemaValidatorImpl() {
+    private final Validator<FieldDefinitionEntity> fieldDefinitionValidator;
+
+    public SchemaValidatorImpl(Validator<FieldDefinitionEntity> fieldDefinitionValidator) {
         super("Schema");
+        this.fieldDefinitionValidator = fieldDefinitionValidator;
         setValidations(List.of(
                 this::checkFieldDefinitionExistence,
                 this::checkSingleMainFieldDefinition,
                 this::checkMainFieldIsUnique,
                 this::checkMainFieldIsRequired,
-                this::checkTitleFieldsAreRequired
+                this::checkTitleFieldsAreRequired,
+                this::perFieldDefinitionChecks
         ));
     }
 
@@ -67,6 +73,21 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
                 .collect(Collectors.toList());
         if (!titleFieldsThatAreNotRequired.isEmpty()) {
             throw new SchemaValidationException("Title fields need to be required: " + String.join(", ", titleFieldsThatAreNotRequired));
+        }
+    }
+
+    private void perFieldDefinitionChecks(VocabularySchemaEntity schema) throws SchemaValidationException {
+        List<Throwable> errors = new LinkedList<>();
+        for (FieldDefinitionEntity d : schema.getDefinitions()) {
+            try {
+                fieldDefinitionValidator.validate(d);
+            } catch (ValidationException e) {
+                errors.add(e);
+            }
+        }
+        if (!errors.isEmpty()) {
+            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
+            throw new SchemaValidationException(errorMessages);
         }
     }
 }
