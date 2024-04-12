@@ -5,6 +5,7 @@ import io.goobi.vocabularyserver.exchange.FieldInstance;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.FieldValue;
 import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.exchange.TranslationDefinition;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
@@ -13,6 +14,7 @@ import io.goobi.vocabularyserver.model.FieldInstanceEntity;
 import io.goobi.vocabularyserver.model.FieldTypeEntity;
 import io.goobi.vocabularyserver.model.FieldValueEntity;
 import io.goobi.vocabularyserver.model.LanguageEntity;
+import io.goobi.vocabularyserver.model.TranslationDefinitionEntity;
 import io.goobi.vocabularyserver.model.VocabularyEntity;
 import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
@@ -24,6 +26,10 @@ public interface DTOMapper {
     FieldDefinitionEntity toEntity(FieldDefinition dto, boolean fullInitialization);
 
     FieldDefinition toDTO(FieldDefinitionEntity entity);
+
+    TranslationDefinitionEntity toEntity(TranslationDefinition dto);
+
+    TranslationDefinition toDTO(TranslationDefinitionEntity entity);
 
     default FieldInstanceEntity toEntity(FieldInstance dto) {
         return toEntity(dto, true);

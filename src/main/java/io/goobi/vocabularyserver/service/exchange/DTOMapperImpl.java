@@ -8,6 +8,7 @@ import io.goobi.vocabularyserver.exchange.FieldInstance;
 import io.goobi.vocabularyserver.exchange.FieldType;
 import io.goobi.vocabularyserver.exchange.FieldValue;
 import io.goobi.vocabularyserver.exchange.Language;
+import io.goobi.vocabularyserver.exchange.TranslationDefinition;
 import io.goobi.vocabularyserver.exchange.Vocabulary;
 import io.goobi.vocabularyserver.exchange.VocabularyRecord;
 import io.goobi.vocabularyserver.exchange.VocabularySchema;
@@ -18,6 +19,7 @@ import io.goobi.vocabularyserver.model.FieldTypeEntity;
 import io.goobi.vocabularyserver.model.FieldValueEntity;
 import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.model.SelectableValueEntity;
+import io.goobi.vocabularyserver.model.TranslationDefinitionEntity;
 import io.goobi.vocabularyserver.model.VocabularyEntity;
 import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
@@ -139,6 +141,36 @@ public class DTOMapperImpl implements DTOMapper {
         result.setMainEntry(Boolean.TRUE.equals(entity.getMainEntry()));
         result.setTitleField(entity.isTitleField());
         result.setMultiValued(entity.isMultiValued());
+        return result;
+    }
+
+    @Override
+    public TranslationDefinitionEntity toEntity(TranslationDefinition dto) {
+        TranslationDefinitionEntity result = new TranslationDefinitionEntity();
+        if (dto.getId() != null) {
+            result.setId(dto.getId());
+        }
+        if (dto.getDefinitionId() == null) {
+            throw new MissingAttributeException(TranslationDefinition.class, "definitionId");
+        }
+        result.setFieldDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
+        if (dto.getLanguage() == null) {
+            throw new MissingAttributeException(TranslationDefinition.class, "language");
+        }
+        result.setLanguage(lookUpLanguage(dto.getLanguage()));
+        result.setFallback(Boolean.TRUE.equals(dto.getFallback()));
+        result.setRequired(Boolean.TRUE.equals(dto.getRequired()));
+        return result;
+    }
+
+    @Override
+    public TranslationDefinition toDTO(TranslationDefinitionEntity entity) {
+        TranslationDefinition result = new TranslationDefinition();
+        result.setId(entity.getId());
+        result.setDefinitionId(entity.getFieldDefinition().getId());
+        result.setLanguage(entity.getLanguage().getAbbreviation());
+        result.setFallback(Boolean.TRUE.equals(entity.getFallback()));
+        result.setRequired(entity.isRequired());
         return result;
     }
 

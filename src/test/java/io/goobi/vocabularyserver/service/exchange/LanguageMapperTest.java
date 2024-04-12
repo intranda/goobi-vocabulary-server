@@ -21,16 +21,26 @@ class LanguageMapperTest {
     private LanguageEntity language;
     private Language languageDTO;
 
+    public static LanguageEntity createEntity(Long id, String abbreviation, String name) {
+        LanguageEntity result = new LanguageEntity();
+        result.setId(id);
+        result.setAbbreviation(abbreviation);
+        result.setName(name);
+        return result;
+    }
+
+    public static Language createDTO(Long id, String abbreviation, String name) {
+        Language result = new Language();
+        result.setId(id);
+        result.setAbbreviation(abbreviation);
+        result.setName(name);
+        return result;
+    }
+
     @BeforeEach
     void setUp() {
-        language = new LanguageEntity();
-        language.setId(LANGUAGE_ID);
-        language.setAbbreviation(LANGUAGE_ABBREVIATION);
-        language.setName(LANGUAGE_NAME);
-        languageDTO = new Language();
-        languageDTO.setId(LANGUAGE_ID);
-        languageDTO.setAbbreviation(LANGUAGE_ABBREVIATION);
-        languageDTO.setName(LANGUAGE_NAME);
+        language = createEntity(LANGUAGE_ID, LANGUAGE_ABBREVIATION, LANGUAGE_NAME);
+        languageDTO = createDTO(LANGUAGE_ID, LANGUAGE_ABBREVIATION, LANGUAGE_NAME);
     }
 
     @Test
