@@ -29,8 +29,8 @@ create_type() {
   fi
 }
 
-create_language "none" "non-translated value"
 create_language "eng" "English"
+create_language "ger" "Deutsch"
 create_type "Anything"
 create_type "Boolean" "" "\"true\",\"false\""
 create_type "Number" "\\\\d+"
