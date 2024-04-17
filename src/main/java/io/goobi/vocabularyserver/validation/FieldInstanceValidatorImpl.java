@@ -19,9 +19,19 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstanceEntit
         super("Field");
         this.fieldValueValidator = new FieldValueValidatorImpl(fieldInstanceRepository);
         setValidations(List.of(
+                this::fieldDefinitionBelongsToCorrectSchema,
                 this::perValueChecks,
                 this::multiValueCheck
         ));
+    }
+
+    private void fieldDefinitionBelongsToCorrectSchema(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
+        long instanceSchema = fieldInstance.getDefinition().getSchema().getId();
+        long correctSchema = fieldInstance.getVocabularyRecord().getVocabulary().getSchema().getId();
+        if (instanceSchema != correctSchema) {
+            throw new FieldInstanceValidationException("The field definition \"" + fieldInstance.getDefinition().getName() + "\" ["
+                    + fieldInstance.getDefinition().getId() + "] belongs to schema [" + instanceSchema + "], but this vocabulary uses schema [" + correctSchema + "]");
+        }
     }
 
     private void perValueChecks(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
