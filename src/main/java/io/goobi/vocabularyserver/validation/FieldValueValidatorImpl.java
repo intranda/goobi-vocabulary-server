@@ -108,7 +108,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                     .collect(Collectors.toSet());
             if (!nonDefinedTranslations.isEmpty()) {
                 throw new FieldValueValidationException("Non-translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
-                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] contains non-specified translations for the following languages: " + String.join(", ", nonDefinedTranslations));
+                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] contains translations for the following languages: " + String.join(", ", nonDefinedTranslations));
             }
         }
     }
