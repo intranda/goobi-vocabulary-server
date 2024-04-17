@@ -27,7 +27,10 @@ public interface DTOMapper {
 
     FieldDefinition toDTO(FieldDefinitionEntity entity);
 
-    TranslationDefinitionEntity toEntity(TranslationDefinition dto);
+    default TranslationDefinitionEntity toEntity(TranslationDefinition dto) {
+        return toEntity(dto, true);
+    }
+    TranslationDefinitionEntity toEntity(TranslationDefinition dto, boolean fullInitialization);
 
     TranslationDefinition toDTO(TranslationDefinitionEntity entity);
 

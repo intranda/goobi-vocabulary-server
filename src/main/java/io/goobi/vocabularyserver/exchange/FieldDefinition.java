@@ -2,6 +2,8 @@ package io.goobi.vocabularyserver.exchange;
 
 import lombok.Data;
 
+import java.util.Set;
+
 @Data
 public class FieldDefinition {
     private Long id;
@@ -13,4 +15,5 @@ public class FieldDefinition {
     private Boolean mainEntry;
     private Boolean titleField;
     private Boolean multiValued;
+    private Set<TranslationDefinition> translationDefinitions;
 }

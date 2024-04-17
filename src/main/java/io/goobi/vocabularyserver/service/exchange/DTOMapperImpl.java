@@ -32,9 +32,12 @@ import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @Service
 public class DTOMapperImpl implements DTOMapper {
@@ -126,6 +129,21 @@ public class DTOMapperImpl implements DTOMapper {
         result.setMainEntry(Boolean.TRUE.equals(dto.getMainEntry()));
         result.setTitleField(Boolean.TRUE.equals(dto.getTitleField()));
         result.setMultiValued(Boolean.TRUE.equals(dto.getMultiValued()));
+        if (dto.getTranslationDefinitions() != null) {
+            Iterator<TranslationDefinition> it = dto.getTranslationDefinitions().iterator();
+            LongStream.range(0, dto.getTranslationDefinitions().size())
+                            .forEach(i -> {
+                                TranslationDefinition td = it.next();
+                                if (td.getId() == null) {
+                                    td.setId(i);
+                                }
+                            });
+            result.setTranslationDefinitions(dto.getTranslationDefinitions().stream()
+                    .map(td -> toEntity(td, false))
+                    .collect(Collectors.toSet())
+            );
+            result.getTranslationDefinitions().forEach(fv -> fv.setFieldDefinition(result));
+        }
         return result;
     }
 
@@ -141,19 +159,25 @@ public class DTOMapperImpl implements DTOMapper {
         result.setMainEntry(Boolean.TRUE.equals(entity.getMainEntry()));
         result.setTitleField(entity.isTitleField());
         result.setMultiValued(entity.isMultiValued());
+        result.setTranslationDefinitions(entity.getTranslationDefinitions().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toSet())
+        );
         return result;
     }
 
     @Override
-    public TranslationDefinitionEntity toEntity(TranslationDefinition dto) {
+    public TranslationDefinitionEntity toEntity(TranslationDefinition dto, boolean fullInitialization) {
         TranslationDefinitionEntity result = new TranslationDefinitionEntity();
         if (dto.getId() != null) {
             result.setId(dto.getId());
         }
-        if (dto.getDefinitionId() == null) {
-            throw new MissingAttributeException(TranslationDefinition.class, "definitionId");
+        if (fullInitialization) {
+            if (dto.getDefinitionId() == null) {
+                throw new MissingAttributeException(TranslationDefinition.class, "definitionId");
+            }
+            result.setFieldDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         }
-        result.setFieldDefinition(lookUpFieldDefinition(dto.getDefinitionId()));
         if (dto.getLanguage() == null) {
             throw new MissingAttributeException(TranslationDefinition.class, "language");
         }
