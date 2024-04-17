@@ -35,3 +35,4 @@ build/
 
 ### Python ###
 /migration/vmenv
+__pycache__/

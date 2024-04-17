@@ -1,13 +1,10 @@
-import mysql.connector
+import logging
+import argparse
 import requests
 import json
-
-SCHEMA_INSERTION_URL = 'http://localhost:8080/api/v1/schemas'
-VOCABULARY_INSERTION_URL = 'http://localhost:8080/api/v1/vocabularies'
-RECORD_INSERTION_URL = 'http://localhost:8080/api/v1/vocabularies/{{vocabulary_id}}/records'
-HEADERS = {
-    'Content-Type': 'application/json'
-}
+from lib.db import DB
+from lib.api import API
+from lib.context import Context
 
 class Vocabulary(dict):
     def __init__(self, id, schema, name, description):
@@ -25,19 +22,11 @@ class Vocabulary(dict):
     def set_new_id(self, new_id):
         self.new_id = new_id
     
-    def insert(self):
+    def insert(self, api):
         self.schema.insert()
         self['schemaId'] = self.schema.new_id
-        payload = json.dumps(self)
-        #print(payload)
-        response = requests.request("POST", url=VOCABULARY_INSERTION_URL, headers=HEADERS, data=payload)
-        #print(response.text)
-        try:
-            inserted = response.json()
-            self.set_new_id(inserted['id'])
-        except:
-            print(response.text)
-            raise Exception('Error')
+        identifier = api.insert_vocabulary(self)
+        self.set_new_id(identifier)
     
     def insert_records(self):
         for r in self.records:
@@ -135,20 +124,6 @@ class FieldValue(dict):
     def __str__(self):
         return f"Field [{self.definition.id} -> {self.definition.new_id}] ({self['value']})"
 
-def setup_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        port='3326',
-        database='goobi',
-        user="goobi",
-        password="goobi"
-    )
-
-def query(db, q):
-    c = db.cursor()
-    c.execute(q)
-    return c.fetchall()
-
 def parse_schemas(raw_schema):
     schema_definitions = {}
     for line in raw_schema:
@@ -206,19 +181,32 @@ def parse_definition(raw_definition):
     return result
 
 def main():
-    db = setup_db_connection()
-    raw_schemas = query(db, 'SELECT * FROM vocabulary_structure')
+    args = parse_args()
+    db = DB(
+        host=args.goobi_database_host,
+        port=args.goobi_database_port,
+        database=args.goobi_database_name,
+        user=args.goobi_database_user,
+        password=args.goobi_database_password
+    )
+    api = API(
+        args.vocabulary_server_host,
+        args.vocabulary_server_port
+    )
+    ctx = Context(db, api)
+
+    raw_schemas = db.query('SELECT * FROM vocabulary_structure')
 
     schemas = parse_schemas(raw_schemas)
 
-    raw_vocabularies = query(db, 'SELECT * FROM vocabulary')
+    raw_vocabularies = db.query('SELECT * FROM vocabulary')
     vocabularies = parse_vocabularies(raw_vocabularies, schemas)
 
     for v in vocabularies:
         v.insert()
 
     for v in vocabularies:
-        raw_records = query(db, f'SELECT * FROM vocabulary_record WHERE vocabulary_id = {v.id}')
+        raw_records = db.query(f'SELECT * FROM vocabulary_record WHERE vocabulary_id = {v.id}')
         #records = parse_records(raw_records, v, db)
         parse_records(raw_records, v, db)
         #for r in records:
@@ -227,6 +215,26 @@ def main():
     #for v in vocabularies:
     #    v.insert_records()
             
+class RawTextDefaultsHelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
+    pass
+
+def parse_args():
+    parser = argparse.ArgumentParser(prog='vocabulary-migrator.py', formatter_class=RawTextDefaultsHelpFormatter, description='Vocabulary migration tool.')
+    parser.add_argument('--vocabulary-server-host', type=str, default='localhost', help='vocabulary server host')
+    parser.add_argument('--vocabulary-server-port', type=str, default='8080', help='vocabulary server port')
+    parser.add_argument('--goobi-database-host', type=str, default='localhost', help='Goobi database host')
+    parser.add_argument('--goobi-database-port', type=str, default='3306', help='Goobi database port')
+    parser.add_argument('--goobi-database-name', type=str, default='goobi', help='Goobi database name')
+    parser.add_argument('--goobi-database-user', type=str, default='goobi', help='Goobi database username')
+    parser.add_argument('--goobi-database-password', type=str, default='goobi', help='Goobi database password')
+    
+    #parser.add_argument('action', help='''action to be performed, possible actions:
+    #    status\t\tprint the state of all plugins
+    #    clean\t\tclean all installed plugins
+    #    install\t\tinstall all plugins that are not yet installed
+    #    upgrade\t\tupgrade all outdated plugins''')
+
+    return parser.parse_args()
 
 if __name__ == '__main__':
     main()
