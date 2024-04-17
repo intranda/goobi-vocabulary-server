@@ -51,7 +51,7 @@ class FieldInstanceValidationTests {
         record.setVocabulary(vocabulary);
     }
 
-    private FieldDefinitionEntity setupFieldDefinition(String name, String validation, List<String> selectableValues, Set<TranslationDefinitionEntity> translationDefinitions, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
+    private FieldDefinitionEntity setupFieldDefinition(String name, String validation, List<String> selectableValues, List<TranslationDefinitionEntity> translationDefinitions, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
         FieldTypeEntity type = new FieldTypeEntity();
         type.setValidation(validation);
         if (selectableValues != null) {
@@ -279,7 +279,7 @@ class FieldInstanceValidationTests {
     @Test
     void translationDefinitionGivenAndCorrectTranslationGiven_success() throws ValidationException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
                 ),false, false, false, true, false),
                 Pair.of("eng", "Apple"));
@@ -290,7 +290,7 @@ class FieldInstanceValidationTests {
     @Test
     void translationDefinitionGivenAndNonTranslatedValueGiven_fails() {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
                 ),false, false, false, true, false),
                 Pair.of("", "Apple"));
@@ -301,7 +301,7 @@ class FieldInstanceValidationTests {
     @Test
     void translationDefinitionGivenAndBothTranslatedAndNonTranslatedValueGiven_fails() {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
                 ),false, false, false, true, false),
                 Pair.of("eng", "Apple"), Pair.of("ger", "Apfel"));
@@ -312,7 +312,7 @@ class FieldInstanceValidationTests {
     @Test
     void translationDefinitionGivenAndIncorrectTranslationGiven_fails() {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
                 ),false, false, false, true, false),
                 Pair.of("ger", "Apfel"));
@@ -323,7 +323,7 @@ class FieldInstanceValidationTests {
     @Test
     void twoTranslationDefinitionsGivenAndBothTranslationsGiven_success() throws ValidationException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true),
                         createTranslationDefinition("ger", false, true)
                 ),false, false, false, true, false));
@@ -352,7 +352,7 @@ class FieldInstanceValidationTests {
     @Test
     void oneTranslationDefinitionsGivenAndBothOneCorrectAndOneIncorrectTranslationsGiven_fails() {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
                 ),false, false, false, true, false));
 
@@ -380,7 +380,7 @@ class FieldInstanceValidationTests {
     @Test
     void twoRequiredTranslationDefinitionsGivenAndOneTranslationMissing_fails() {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true),
                         createTranslationDefinition("ger", false, true)
                 ),false, false, false, true, false));
@@ -404,7 +404,7 @@ class FieldInstanceValidationTests {
     @Test
     void twoTranslationDefinitionsWithOnlyOneRequiredGivenAndOnlyRequiredTranslationGiven_success() throws ValidationException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
-                setupFieldDefinition("Description", null, null, Set.of(
+                setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true),
                         createTranslationDefinition("ger", false, false)
                 ),false, false, false, true, false));

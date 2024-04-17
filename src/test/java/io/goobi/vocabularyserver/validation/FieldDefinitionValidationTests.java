@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -62,7 +61,7 @@ class FieldDefinitionValidationTests {
         translationDefinition.setLanguage(english);
         translationDefinition.setFallback(true);
         translationDefinition.setRequired(true);
-        field.setTranslationDefinitions(Set.of(translationDefinition));
+        field.setTranslationDefinitions(List.of(translationDefinition));
 
         validator.validate(field);
     }
@@ -75,7 +74,7 @@ class FieldDefinitionValidationTests {
         translationDefinition.setLanguage(english);
         translationDefinition.setFallback(false);
         translationDefinition.setRequired(true);
-        field.setTranslationDefinitions(Set.of(translationDefinition));
+        field.setTranslationDefinitions(List.of(translationDefinition));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -88,7 +87,7 @@ class FieldDefinitionValidationTests {
         translationDefinition.setLanguage(english);
         translationDefinition.setFallback(true);
         translationDefinition.setRequired(false);
-        field.setTranslationDefinitions(Set.of(translationDefinition));
+        field.setTranslationDefinitions(List.of(translationDefinition));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -107,7 +106,7 @@ class FieldDefinitionValidationTests {
         germanTranslationDefinition.setLanguage(german);
         germanTranslationDefinition.setFallback(false);
         germanTranslationDefinition.setRequired(true);
-        field.setTranslationDefinitions(Set.of(englishTranslationDefinition, germanTranslationDefinition));
+        field.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
 
         validator.validate(field);
     }
@@ -126,7 +125,7 @@ class FieldDefinitionValidationTests {
         germanTranslationDefinition.setLanguage(german);
         germanTranslationDefinition.setFallback(true);
         germanTranslationDefinition.setRequired(true);
-        field.setTranslationDefinitions(Set.of(englishTranslationDefinition, germanTranslationDefinition));
+        field.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -145,7 +144,7 @@ class FieldDefinitionValidationTests {
         germanTranslationDefinition.setLanguage(german);
         germanTranslationDefinition.setFallback(false);
         germanTranslationDefinition.setRequired(true);
-        field.setTranslationDefinitions(Set.of(englishTranslationDefinition, germanTranslationDefinition));
+        field.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }

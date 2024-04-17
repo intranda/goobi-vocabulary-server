@@ -1,7 +1,6 @@
 package io.goobi.vocabularyserver.service.exchange;
 
 import io.goobi.vocabularyserver.exchange.FieldDefinition;
-import io.goobi.vocabularyserver.exchange.Language;
 import io.goobi.vocabularyserver.exchange.TranslationDefinition;
 import io.goobi.vocabularyserver.model.FieldDefinitionEntity;
 import io.goobi.vocabularyserver.model.FieldTypeEntity;
@@ -17,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -111,7 +111,7 @@ class FieldDefinitionMapperTest {
         fieldDefinition.setSchema(schema);
         fieldDefinition.setName(FIELD_DEFINITION_NAME);
         fieldDefinition.setType(fieldType);
-        fieldDefinition.setTranslationDefinitions(Set.of(englishTranslationDefinition, germanTranslationDefinition));
+        fieldDefinition.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
         englishTranslationDefinition.setFieldDefinition(fieldDefinition);
         germanTranslationDefinition.setFieldDefinition(fieldDefinition);
         fieldDefinitionDTO = new FieldDefinition();

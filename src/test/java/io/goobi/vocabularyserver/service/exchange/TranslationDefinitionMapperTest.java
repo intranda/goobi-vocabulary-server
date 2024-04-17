@@ -12,8 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,7 +52,7 @@ class TranslationDefinitionMapperTest {
         translationDefinition.setId(TRANSLATION_DEFINITION_ID);
         translationDefinition.setLanguage(english);
         translationDefinition.setFieldDefinition(fieldDefinition);
-        fieldDefinition.setTranslationDefinitions(Set.of(translationDefinition));
+        fieldDefinition.setTranslationDefinitions(List.of(translationDefinition));
 
         translationDefinitionDTO = new TranslationDefinition();
         translationDefinitionDTO.setId(TRANSLATION_DEFINITION_ID);

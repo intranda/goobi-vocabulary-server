@@ -32,12 +32,9 @@ import io.goobi.vocabularyserver.repositories.VocabularyRepository;
 import io.goobi.vocabularyserver.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 @Service
 public class DTOMapperImpl implements DTOMapper {
@@ -130,17 +127,9 @@ public class DTOMapperImpl implements DTOMapper {
         result.setTitleField(Boolean.TRUE.equals(dto.getTitleField()));
         result.setMultiValued(Boolean.TRUE.equals(dto.getMultiValued()));
         if (dto.getTranslationDefinitions() != null) {
-            Iterator<TranslationDefinition> it = dto.getTranslationDefinitions().iterator();
-            LongStream.range(0, dto.getTranslationDefinitions().size())
-                            .forEach(i -> {
-                                TranslationDefinition td = it.next();
-                                if (td.getId() == null) {
-                                    td.setId(i);
-                                }
-                            });
             result.setTranslationDefinitions(dto.getTranslationDefinitions().stream()
                     .map(td -> toEntity(td, false))
-                    .collect(Collectors.toSet())
+                    .collect(Collectors.toList())
             );
             result.getTranslationDefinitions().forEach(fv -> fv.setFieldDefinition(result));
         }

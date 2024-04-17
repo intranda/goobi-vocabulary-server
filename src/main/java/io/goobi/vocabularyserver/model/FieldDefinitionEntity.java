@@ -15,8 +15,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "field_definition",
@@ -45,7 +45,7 @@ public class FieldDefinitionEntity {
     private FieldTypeEntity type;
 
     @OneToMany(mappedBy = "fieldDefinition", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TranslationDefinitionEntity> translationDefinitions = new LinkedHashSet<>();
+    private List<TranslationDefinitionEntity> translationDefinitions = new LinkedList<>();
 
     @Column(name = "required", nullable = false)
     private boolean required = false;
