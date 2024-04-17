@@ -4,6 +4,7 @@ import io.goobi.vocabularyserver.exception.FieldValueValidationException;
 import io.goobi.vocabularyserver.model.FieldTranslationEntity;
 import io.goobi.vocabularyserver.model.FieldValueEntity;
 import io.goobi.vocabularyserver.model.SelectableValueEntity;
+import io.goobi.vocabularyserver.model.TranslationDefinitionEntity;
 import io.goobi.vocabularyserver.repositories.FieldInstanceRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,11 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                 this::checkRegularExpressionMatchesValue,
                 this::checkValueIsOneOfSelectableValues,
                 this::checkForbiddenBlankValue,
-                this::checkValueUniqueness
+                this::checkValueUniqueness,
+                this::checkUntranslatableValueIsNotTranslated,
+                this::checkTranslatableValueContainsNoNonTranslatedValues,
+                this::checkTranslatableValueHasNoUnspecifiedTranslations,
+                this::checkTranslatableValueAllRequiredTranslationsProvided
         ));
         this.fieldInstanceRepository = fieldInstanceRepository;
     }
@@ -38,7 +43,8 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                     if (wrongValues == null) {
                         wrongValues = new LinkedList<>();
                     }
-                    wrongValues.add("[" + translation.getLanguage().getName() + "] :: " + translation.getValue());
+                    String lang = translation.getLanguage() != null ? "[" + translation.getLanguage().getName() + "] :: " : "";
+                    wrongValues.add(lang + translation.getValue());
                 }
             }
         }
@@ -90,6 +96,64 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                 throw new FieldValueValidationException("Unique value(s) \"" + String.join("\", \"", duplicateUniqueValues)
                         + "\" for field \"" + fieldValue.getFieldInstance().getDefinition().getName() + "\" ["
                         + fieldValue.getFieldInstance().getDefinition().getId() + "] is already present in vocabulary");
+            }
+        }
+    }
+
+    private void checkUntranslatableValueIsNotTranslated(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (Boolean.TRUE.equals(fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().isEmpty())) {
+            Set<String> nonDefinedTranslations = fieldValue.getTranslations().stream()
+                    .filter(td -> td.getLanguage() != null)
+                    .map(td -> td.getLanguage().getAbbreviation())
+                    .collect(Collectors.toSet());
+            if (!nonDefinedTranslations.isEmpty()) {
+                throw new FieldValueValidationException("Non-translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
+                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] contains non-specified translations for the following languages: " + String.join(", ", nonDefinedTranslations));
+            }
+        }
+    }
+
+    private void checkTranslatableValueContainsNoNonTranslatedValues(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (Boolean.FALSE.equals(fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().isEmpty())) {
+            if (fieldValue.getTranslations().stream()
+                    .anyMatch(t -> t.getLanguage() == null)) {
+                throw new FieldValueValidationException("Translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
+                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] cannot contain non-translated values");
+            }
+        }
+    }
+
+    private void checkTranslatableValueHasNoUnspecifiedTranslations(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (Boolean.FALSE.equals(fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().isEmpty())) {
+            Set<String> specifiedLanguages = fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().stream()
+                    .map(td -> td.getLanguage().getAbbreviation())
+                    .collect(Collectors.toSet());
+            Set<String> translationsGiven = fieldValue.getTranslations().stream()
+                    .filter(t -> t.getLanguage() != null)
+                    .map(t -> t.getLanguage().getAbbreviation())
+                    .collect(Collectors.toSet());
+            translationsGiven.removeAll(specifiedLanguages);
+            if (!translationsGiven.isEmpty()) {
+                throw new FieldValueValidationException("Translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
+                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] contains non-specified translations for the following languages: " + String.join(", ", translationsGiven));
+            }
+        }
+    }
+
+    private void checkTranslatableValueAllRequiredTranslationsProvided(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (Boolean.FALSE.equals(fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().isEmpty())) {
+            Set<String> specifiedRequiredLanguages = fieldValue.getFieldInstance().getDefinition().getTranslationDefinitions().stream()
+                    .filter(TranslationDefinitionEntity::isRequired)
+                    .map(td -> td.getLanguage().getAbbreviation())
+                    .collect(Collectors.toSet());
+            Set<String> translationsGiven = fieldValue.getTranslations().stream()
+                    .filter(t -> t.getLanguage() != null)
+                    .map(t -> t.getLanguage().getAbbreviation())
+                    .collect(Collectors.toSet());
+            specifiedRequiredLanguages.removeAll(translationsGiven);
+            if (!specifiedRequiredLanguages.isEmpty()) {
+                throw new FieldValueValidationException("Translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
+                        + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] is missing translations for the following required languages: " + String.join(", ", specifiedRequiredLanguages));
             }
         }
     }

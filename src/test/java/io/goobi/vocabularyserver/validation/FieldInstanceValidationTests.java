@@ -8,6 +8,7 @@ import io.goobi.vocabularyserver.model.FieldTypeEntity;
 import io.goobi.vocabularyserver.model.FieldValueEntity;
 import io.goobi.vocabularyserver.model.LanguageEntity;
 import io.goobi.vocabularyserver.model.SelectableValueEntity;
+import io.goobi.vocabularyserver.model.TranslationDefinitionEntity;
 import io.goobi.vocabularyserver.model.VocabularyEntity;
 import io.goobi.vocabularyserver.model.VocabularyRecordEntity;
 import io.goobi.vocabularyserver.model.VocabularySchemaEntity;
@@ -35,13 +36,13 @@ class FieldInstanceValidationTests {
     private FieldInstanceRepository fieldInstanceRepository;
     @InjectMocks
     private FieldInstanceValidatorImpl validator;
-
+    private Map<String, LanguageEntity> languages;
     private VocabularySchemaEntity schema;
     private VocabularyRecordEntity record;
 
-
     @BeforeEach
     public void setUp() {
+        languages = new HashMap<>();
         schema = new VocabularySchemaEntity();
         VocabularyEntity vocabulary = new VocabularyEntity();
         vocabulary.setSchema(schema);
@@ -50,7 +51,7 @@ class FieldInstanceValidationTests {
         record.setVocabulary(vocabulary);
     }
 
-    private FieldDefinitionEntity setupFieldDefinition(String name, String validation, List<String> selectableValues, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
+    private FieldDefinitionEntity setupFieldDefinition(String name, String validation, List<String> selectableValues, Set<TranslationDefinitionEntity> translationDefinitions, boolean mainEntry, boolean titleField, boolean unique, boolean required, boolean multiValued) {
         FieldTypeEntity type = new FieldTypeEntity();
         type.setValidation(validation);
         if (selectableValues != null) {
@@ -69,6 +70,9 @@ class FieldInstanceValidationTests {
         definition.setUnique(unique);
         definition.setRequired(required);
         definition.setMultiValued(multiValued);
+        if (translationDefinitions != null) {
+            definition.setTranslationDefinitions(translationDefinitions);
+        }
         schema.setDefinitions(List.of(definition));
         return definition;
     }
@@ -90,7 +94,7 @@ class FieldInstanceValidationTests {
             }
             valuesPerLanguage.get(p.getFirst()).add(p.getSecond());
         }
-        return valuesPerLanguage.entrySet().stream()
+        List<FieldValueEntity> result = valuesPerLanguage.entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> createLanguage(e.getKey()),
                         Map.Entry::getValue))
@@ -98,12 +102,21 @@ class FieldInstanceValidationTests {
                 .flatMap(e -> e.getValue().stream()
                         .map(v -> createFieldValue(field, e.getKey(), v)))
                 .collect(Collectors.toList());
+        result.stream()
+                .flatMap(e -> e.getTranslations().stream())
+                .filter(t -> t.getLanguage().getAbbreviation().isEmpty())
+                .forEach(t -> t.setLanguage(null));
+        return result;
     }
 
     private LanguageEntity createLanguage(String abbreviation) {
-        LanguageEntity language = new LanguageEntity();
-        language.setAbbreviation(abbreviation);
-        return language;
+        if (!languages.containsKey(abbreviation)) {
+            LanguageEntity language = new LanguageEntity();
+            language.setId(idCounter++);
+            language.setAbbreviation(abbreviation);
+            languages.put(abbreviation, language);
+        }
+        return languages.get(abbreviation);
     }
 
     private FieldValueEntity createFieldValue(FieldInstanceEntity field, LanguageEntity language, String value) {
@@ -121,11 +134,21 @@ class FieldInstanceValidationTests {
         return translation;
     }
 
+    private static long idCounter = 1L;
+    private TranslationDefinitionEntity createTranslationDefinition(String language, boolean fallback, boolean required) {
+        TranslationDefinitionEntity translationDefinition = new TranslationDefinitionEntity();
+        translationDefinition.setId(idCounter++);
+        translationDefinition.setLanguage(createLanguage(language));
+        translationDefinition.setFallback(fallback);
+        translationDefinition.setRequired(required);
+        return translationDefinition;
+    }
+
     @Test
     void textFieldValueNotMatchingValidation_fails() {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("name", "\\w+", null, true, true, true, true, false),
-                Pair.of("none", "Thomas Lastname"));
+                setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false),
+                Pair.of("", "Thomas Lastname"));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -133,8 +156,8 @@ class FieldInstanceValidationTests {
     @Test
     void textFieldValueMatchingValidation_success() throws ValidationException {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("name", "\\w+", null, true, true, true, true, false),
-                Pair.of("none", "Thomas"));
+                setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false),
+                Pair.of("", "Thomas"));
 
         validator.validate(field);
     }
@@ -142,8 +165,8 @@ class FieldInstanceValidationTests {
     @Test
     void numberFieldValueNotMatchingValidation_fails() {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("age", "\\d+", null, true, true, true, true, false),
-                Pair.of("none", "Thomas"));
+                setupFieldDefinition("age", "\\d+", null, null,true, true, true, true, false),
+                Pair.of("", "Thomas"));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -151,8 +174,8 @@ class FieldInstanceValidationTests {
     @Test
     void numberFieldValueMatchingValidation_fails() throws ValidationException {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("age", "\\d+", null, true, true, true, true, false),
-                Pair.of("none", "32"));
+                setupFieldDefinition("age", "\\d+", null, null,true, true, true, true, false),
+                Pair.of("", "32"));
 
         validator.validate(field);
     }
@@ -160,8 +183,8 @@ class FieldInstanceValidationTests {
     @Test
     void valueIsOneOfTheSelectableValues_success() throws ValidationException {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false, false),
-                Pair.of("none", "Linux"));
+                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), null,false, false, false, false, false),
+                Pair.of("", "Linux"));
 
         validator.validate(field);
     }
@@ -169,8 +192,8 @@ class FieldInstanceValidationTests {
     @Test
     void valueIsNotOneOfTheSelectableValues_success() {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), false, false, false, false, false),
-                Pair.of("none", "MacOS"));
+                setupFieldDefinition("OS", null, List.of("Linux", "Windows"), null,false, false, false, false, false),
+                Pair.of("", "MacOS"));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -178,8 +201,8 @@ class FieldInstanceValidationTests {
     @Test
     void emptyFieldValue_fails() {
         FieldInstanceEntity field = setupFieldInstance(
-                setupFieldDefinition("hobbies", null, null, true, true, true, true, false),
-                Pair.of("none", ""));
+                setupFieldDefinition("hobbies", null, null, null,true, true, true, true, false),
+                Pair.of("", ""));
 
         assertThrows(ValidationException.class, () -> validator.validate(field));
     }
@@ -190,13 +213,13 @@ class FieldInstanceValidationTests {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 12L, "Bob")).thenReturn(false);
 
         FieldInstanceEntity fieldFriend = setupFieldInstance(
-                setupFieldDefinition("Best Friend", null, null, false, true, false, true, false),
-                Pair.of("none", "Thomas"));
+                setupFieldDefinition("Best Friend", null, null, null,false, true, false, true, false),
+                Pair.of("", "Thomas"));
         fieldFriend.getDefinition().setId(1L);
         fieldFriend.setId(11L);
         FieldInstanceEntity fieldName = setupFieldInstance(
-                setupFieldDefinition("Name", null, null, true, true, true, true, false),
-                Pair.of("none", "Bob"));
+                setupFieldDefinition("Name", null, null, null,true, true, true, true, false),
+                Pair.of("", "Bob"));
         fieldName.getDefinition().setId(2L);
         fieldName.setId(12L);
 
@@ -209,8 +232,8 @@ class FieldInstanceValidationTests {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 10L, "Bob")).thenReturn(true);
 
         FieldInstanceEntity fieldName = setupFieldInstance(
-                setupFieldDefinition("Name", null, null, true, true, true, true, false),
-                Pair.of("none", "Bob"));
+                setupFieldDefinition("Name", null, null, null,true, true, true, true, false),
+                Pair.of("", "Bob"));
         fieldName.getDefinition().setId(2L);
         fieldName.setId(10L);
 
@@ -220,8 +243,8 @@ class FieldInstanceValidationTests {
     @Test
     void multipleFieldValuesIfMultiValuedIsDisabled_fails() {
         FieldInstanceEntity multiValuedInstance = setupFieldInstance(
-                setupFieldDefinition("Fruit", null, null, false, true, false, true, false),
-                Pair.of("none", "Apple"), Pair.of("none", "Banana"));
+                setupFieldDefinition("Fruit", null, null, null,false, true, false, true, false),
+                Pair.of("", "Apple"), Pair.of("", "Banana"));
 
         assertThrows(ValidationException.class, () -> validator.validate(multiValuedInstance));
     }
@@ -229,9 +252,176 @@ class FieldInstanceValidationTests {
     @Test
     void multipleFieldValuesIfMultiValuedIsEnabled_success() throws ValidationException {
         FieldInstanceEntity multiValuedInstance = setupFieldInstance(
-                setupFieldDefinition("Fruit", null, null, false, true, false, true, true),
-                Pair.of("none", "Apple"), Pair.of("none", "Banana"));
+                setupFieldDefinition("Fruit", null, null, null,false, true, false, true, true),
+                Pair.of("", "Apple"), Pair.of("", "Banana"));
 
         validator.validate(multiValuedInstance);
+    }
+
+    @Test
+    void noTranslationDefinitionGiven_success() throws ValidationException {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, null,false, false, false, true, false),
+                Pair.of("", "Apple"));
+
+        validator.validate(translationInstance);
+    }
+
+    @Test
+    void noTranslationDefinitionGivenButTranslationProvided_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, null,false, false, false, true, false),
+                Pair.of("eng", "Apple"));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void translationDefinitionGivenAndCorrectTranslationGiven_success() throws ValidationException {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false),
+                Pair.of("eng", "Apple"));
+
+        validator.validate(translationInstance);
+    }
+
+    @Test
+    void translationDefinitionGivenAndNonTranslatedValueGiven_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false),
+                Pair.of("", "Apple"));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void translationDefinitionGivenAndBothTranslatedAndNonTranslatedValueGiven_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false),
+                Pair.of("eng", "Apple"), Pair.of("ger", "Apfel"));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void translationDefinitionGivenAndIncorrectTranslationGiven_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false),
+                Pair.of("ger", "Apfel"));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void twoTranslationDefinitionsGivenAndBothTranslationsGiven_success() throws ValidationException {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true),
+                        createTranslationDefinition("ger", false, true)
+                ),false, false, false, true, false));
+
+        FieldValueEntity description = new FieldValueEntity();
+        description.setId(idCounter++);
+        description.setFieldInstance(translationInstance);
+        FieldTranslationEntity eng = new FieldTranslationEntity();
+        eng.setId(idCounter++);
+        eng.setLanguage(createLanguage("eng"));
+        eng.setFieldValue(description);
+        eng.setValue("Apple");
+        FieldTranslationEntity ger = new FieldTranslationEntity();
+        ger.setId(idCounter++);
+        ger.setLanguage(createLanguage("ger"));
+        ger.setFieldValue(description);
+        ger.setValue("Apfel");
+        description.setTranslations(
+                List.of(eng, ger)
+        );
+        translationInstance.setFieldValues(List.of(description));
+
+        validator.validate(translationInstance);
+    }
+
+    @Test
+    void oneTranslationDefinitionsGivenAndBothOneCorrectAndOneIncorrectTranslationsGiven_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false));
+
+        FieldValueEntity description = new FieldValueEntity();
+        description.setId(idCounter++);
+        description.setFieldInstance(translationInstance);
+        FieldTranslationEntity eng = new FieldTranslationEntity();
+        eng.setId(idCounter++);
+        eng.setLanguage(createLanguage("eng"));
+        eng.setFieldValue(description);
+        eng.setValue("Apple");
+        FieldTranslationEntity ger = new FieldTranslationEntity();
+        ger.setId(idCounter++);
+        ger.setLanguage(createLanguage("ger"));
+        ger.setFieldValue(description);
+        ger.setValue("Apfel");
+        description.setTranslations(
+                List.of(eng, ger)
+        );
+        translationInstance.setFieldValues(List.of(description));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void twoRequiredTranslationDefinitionsGivenAndOneTranslationMissing_fails() {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true),
+                        createTranslationDefinition("ger", false, true)
+                ),false, false, false, true, false));
+
+        FieldValueEntity description = new FieldValueEntity();
+        description.setId(idCounter++);
+        description.setFieldInstance(translationInstance);
+        FieldTranslationEntity eng = new FieldTranslationEntity();
+        eng.setId(idCounter++);
+        eng.setLanguage(createLanguage("eng"));
+        eng.setFieldValue(description);
+        eng.setValue("Apple");
+        description.setTranslations(
+                List.of(eng)
+        );
+        translationInstance.setFieldValues(List.of(description));
+
+        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
+    void twoTranslationDefinitionsWithOnlyOneRequiredGivenAndOnlyRequiredTranslationGiven_success() throws ValidationException {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, Set.of(
+                        createTranslationDefinition("eng", true, true),
+                        createTranslationDefinition("ger", false, false)
+                ),false, false, false, true, false));
+
+        FieldValueEntity description = new FieldValueEntity();
+        description.setId(idCounter++);
+        description.setFieldInstance(translationInstance);
+        FieldTranslationEntity eng = new FieldTranslationEntity();
+        eng.setId(idCounter++);
+        eng.setLanguage(createLanguage("eng"));
+        eng.setFieldValue(description);
+        eng.setValue("Apple");
+        description.setTranslations(
+                List.of(eng)
+        );
+        translationInstance.setFieldValues(List.of(description));
+
+        validator.validate(translationInstance);
     }
 }
