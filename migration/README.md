@@ -3,7 +3,7 @@
 ```bash
 python -m venv vmenv
 . vmenv/bin/activate
-pip install requests mysql-connector-python
+pip install requests mysql-connector-python progressbar2
 ```
 
 ## Run
