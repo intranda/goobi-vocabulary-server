@@ -15,3 +15,4 @@ class DB:
         c = self.db.cursor()
         c.execute(q)
         return c.fetchall()
+        

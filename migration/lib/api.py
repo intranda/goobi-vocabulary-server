@@ -1,4 +1,6 @@
 import logging
+import requests
+import json
 
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
 VOCABULARY_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies'
@@ -20,14 +22,37 @@ class API:
         for u in self.urls:
             self.urls[u] = self.urls[u].replace('{{HOST}}', host).replace('{{PORT}}', port)
 
-    def insert_vocabulary(self, vocabulary):
-        payload = json.dumps(vocabulary)
-        #print(payload)
-        response = requests.request("POST", url=self.urls[VOCABULARY_INSERTION], headers=HEADERS, data=payload)
-        #print(response.text)
+    def query(self, url, obj, method='POST'):
+        payload = json.dumps(obj)
+        response = requests.request(method, url=url, headers=HEADERS, data=payload)
         try:
-            inserted = response.json()
-            return inserted['id']
-        except:
-            print(response.text)
-            raise Exception('Error')
+            # Check for success
+            if response.status_code // 100 != 2:
+                error_msg = f'API call was not successful, reason:\n{response.text}'
+                logging.error(error_msg)
+                raise Exception(error_msg)
+            return response.json()
+        except Exception as e:
+            pretty_payload = json.dumps(obj, indent=2)
+            logging.debug(f'''API request led to error
+    route: {url}
+    method: {method}
+    headers: {HEADERS}
+    payload:\n{pretty_payload}
+    response: {response.text}''')
+            raise e
+
+    def insert_vocabulary(self, vocabulary):
+        result = self.query(self.urls[VOCABULARY_INSERTION], vocabulary)
+        return result['id']
+    
+    def insert_schema(self, schema):
+        result = self.query(self.urls[SCHEMA_INSERTION], schema)
+        schema_id = result['id']
+        definition_ids = {}
+        for d in schema['definitions']:
+            new_definition_ids = [nd['id'] for nd in result['definitions'] if nd['name'] == d['name']]
+            if len(new_definition_ids) != 1:
+                raise Exception(f'Error finding new id for definition {d.__str__()}')
+            definition_ids[d['name']] = new_definition_ids[0]
+        return schema_id, definition_ids
