@@ -9,6 +9,9 @@ class Vocabulary(dict):
         if len(description) > 0:
             self['description'] = description
     
+    def is_migrated(self):
+        return self.new_id != None
+
     def get_new_id(self):
         if self.new_id == None:
             raise Exception(f'Vocabulary [{self.id}] not migrated yet')

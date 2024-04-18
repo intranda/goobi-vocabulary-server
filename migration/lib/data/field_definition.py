@@ -2,7 +2,8 @@ from lib.data.translation_definition import TranslationDefinition
 
 class FieldDefinition(dict):
     def __init__(self, id, name, language, itype, validation, required, mainEntry, unique, selection, titleField):
-        self.id = id
+        self.id = []
+        self.id.append(id)
         self.new_id = None
         self['name'] = name
         self.language = language
@@ -15,6 +16,9 @@ class FieldDefinition(dict):
         self['titleField'] = True if titleField == 1 else False
         self.process_translation()
     
+    def matches_id(self, id):
+        return id in self.id
+
     def process_translation(self):
         if len(self.language) > 0:
             self['translationDefinitions'] = [
@@ -52,4 +56,5 @@ class FieldDefinition(dict):
         translations = ''
         if 'translationDefinitions' in self:
             translations = ' ' + ' '.join([f"@{td['language']}" for td in self['translationDefinitions']])
-        return f'Definition [{self.id} -> {self.new_id}] (' + self['name'] + translations + ')'
+        id_str = ','.join([str(i) for i in self.id])
+        return f'Definition [{id_str} -> {self.new_id}] (' + self['name'] + translations + ')'

@@ -56,3 +56,7 @@ class API:
                 raise Exception(f'Error finding new id for definition {d.__str__()}')
             definition_ids[d['name']] = new_definition_ids[0]
         return schema_id, definition_ids
+
+    def insert_record(self, record):
+        result = self.query(self.urls[RECORD_INSERTION].replace('{{VOCABULARY_ID}}', str(record.vocabulary.new_id)), record)
+        return result['id']

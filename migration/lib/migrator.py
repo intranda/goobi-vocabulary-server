@@ -2,6 +2,13 @@ import logging
 from lib.data.schema import Schema
 from lib.data.field_definition import FieldDefinition
 from lib.data.vocabulary import Vocabulary
+from lib.data.record import Record
+from lib.data.field_instance import FieldInstance
+from lib.data.field_value import FieldValue
+from alive_progress import alive_bar
+
+import time
+import random
 
 class Migrator:
     def __init__(self, ctx):
@@ -23,8 +30,10 @@ class Migrator:
     def migrate_data_without_records(self):
         self.migrate_schemas()
         self.migrate_vocabularies()
+        self.migrate_records()
     
     def migrate_schemas(self):
+        logging.info(f'Migrating {len(self.schemas)} schemas')
         successful = 0
         for s in self.schemas.values():
             try:
@@ -36,12 +45,14 @@ class Migrator:
                     logging.error(e)
                 else:
                     raise e
-        logging.info(f'{successful} of {len(self.schemas)} schemas successful migrated')
+        logging.info(f'{successful} of {len(self.schemas)} schemas successfully migrated')
 
     def migrate_vocabularies(self):
+        logging.info(f'Migrating {len(self.vocabularies)} vocabularies')
         successful = 0
         for v in self.vocabularies:
             try:
+                #v['name'] += str(random.randint(0, 9999999999)) # TODO: REMOVE THIS
                 v.insert(self.ctx)
                 logging.debug(f'Vocabulary migrated\n{v}')
                 successful += 1
@@ -50,19 +61,18 @@ class Migrator:
                     logging.error(e)
                 else:
                     raise e
-        logging.info(f'{successful} of {len(self.vocabularies)} vocabularies successful migrated')
+        logging.info(f'{successful} of {len(self.vocabularies)} vocabularies successfully migrated')
 
     def migrate_records(self):
-        #for v in vocabularies:
-        #    raw_records = db.query(f'SELECT * FROM vocabulary_record WHERE vocabulary_id = {v.id}')
-            #records = parse_records(raw_records, v, db)
-        #    parse_records(raw_records, v, db)
-            #for r in records:
-            #    v.add_record(r)
-
-        #for v in vocabularies:
-        #    v.insert_records()
-        pass
+        vocabularies_to_process = [v for v in self.vocabularies if v.is_migrated()]
+        logging.info(f'Migrating records for {len(vocabularies_to_process)} vocabularies')
+        for v in vocabularies_to_process:
+            raw_records = self.ctx.db.query(f'SELECT * FROM vocabulary_record WHERE vocabulary_id = {v.id}')
+            num = len(raw_records)
+            with alive_bar(num) as bar:
+                for r in raw_records:
+                    migrate_record(r, v, self.ctx)
+                    bar()
     
     def load_schemas(self):
         temp_schemas = parse_schemas(self.ctx.db.query('SELECT * FROM vocabulary_structure'))
@@ -118,6 +128,7 @@ def merge_translation_definitions(schema):
             unique_definitions[name] = definition
         else:
             unique_definitions[name]['translationDefinitions'].append(definition['translationDefinitions'][0])
+            unique_definitions[name].id.append(definition.id[0])
             if definition['mainEntry']:
                 unique_definitions[name]['mainEntry'] = True
             if definition['required']:
@@ -139,27 +150,49 @@ def parse_vocabularies(raw_vocabularies, schemas):
             errors += 1
     return vocabularies, errors
 
-def parse_records(raw_records, vocabulary, db):
-    records = []
-    for line in raw_records:
-        r = Record(vocabulary)
-        raw_fields = query(db, f'SELECT * FROM vocabulary_record_data WHERE record_id = {line[0]}')
-        fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
-        for f in fields:
-            r.add_field(f)
-        r.insert()
-        records.append(r)
-    return records
+def migrate_record(record, vocabulary, ctx):
+    r = Record(vocabulary)
+    raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record[0]}')
+    fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
+    for f in fields:
+        r.add_field(f)
+    try:
+        r.insert(ctx)
+    except Exception as e:
+        ctx.log_non_migrated_record(r, record, raw_fields, e)
+        if ctx.continue_on_error:
+            logging.warning(f'Error migrating record')
+        else:
+            raise e
 
 def parse_fields(raw_fields, definitions):
-    fields = []
+    fields = {} # definitionId -> field
     for line in raw_fields:
-        matching_definitions = [d for d in definitions if d.id == line[3]]
+        old_definition_id = int(line[3])
+        matching_definitions = [d for d in definitions if d.matches_id(old_definition_id)]
         if len(matching_definitions) != 1:
             raise Exception('No unique definition found')
-        value = line[6]
-        if len(value) > 0:
-            f = FieldValue(matching_definitions[0], value)
-            fields.append(f)
-        #print(f)
-    return fields
+        new_definition_id = matching_definitions[0].get_new_id()
+
+        if new_definition_id not in fields:
+            fields[new_definition_id] = FieldInstance(matching_definitions[0])
+
+        parsed_values = parse_values(language=line[5], raw_value=line[6])
+        # TODO: Think about correct strategy to find merging
+        for v in parsed_values:
+            if len(fields[new_definition_id]['values']) == 0:
+                fields[new_definition_id].add_value(v)
+            else:
+                # This is only one entry
+                for k, e in v['translations'].items():
+                    fields[new_definition_id]['values'][0].add_translation(k, e)
+
+    return list(fields.values())
+
+def parse_values(language, raw_value):
+    if raw_value == None or len(raw_value.strip()) == 0:
+        return []
+    # TODO: Correct splitting
+    result = FieldValue()
+    result.add_translation(language, raw_value)
+    return [result]
