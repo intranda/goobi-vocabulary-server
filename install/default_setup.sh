@@ -31,6 +31,7 @@ create_type() {
 
 create_language "eng" "English"
 create_language "ger" "Deutsch"
+create_language "fre" "Français"
 create_type "Anything"
 create_type "Boolean" "" "\"true\",\"false\""
 create_type "Number" "\\\\d+"
