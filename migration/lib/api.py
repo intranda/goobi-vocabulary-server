@@ -29,7 +29,7 @@ class API:
             # Check for success
             if response.status_code // 100 != 2:
                 error_msg = f'API call was not successful, reason:\n{response.text}'
-                logging.error(error_msg)
+                logging.warning(error_msg)
                 raise Exception(error_msg)
             return response.json()
         except Exception as e:
