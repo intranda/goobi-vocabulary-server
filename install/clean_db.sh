@@ -50,4 +50,5 @@ clean_table vocabulary_schema
 clean_table field_type
 clean_table language
 clean_tables
+clean_tables
 reset_sequences
