@@ -190,7 +190,7 @@ def parse_fields(raw_fields, definitions):
     return list(fields.values())
 
 def parse_values(language, raw_value):
-    if raw_value == None or len(raw_value.strip()) == 0:
+    if raw_value == None or len(raw_value.strip()) == 0 or raw_value.strip() == 'null':
         return []
     # TODO: Correct splitting
     result = FieldValue()
