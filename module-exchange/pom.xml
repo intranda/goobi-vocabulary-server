@@ -10,7 +10,5 @@
     <artifactId>exchange</artifactId>
     <name>Vocabulary Exchange</name>
     <description>Vocabulary data exchange classes</description>
-    <properties>
-        <java.version>11</java.version>
-    </properties>
+    <packaging>jar</packaging>
 </project>
