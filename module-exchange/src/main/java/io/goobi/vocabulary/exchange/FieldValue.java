@@ -1,0 +1,13 @@
+package io.goobi.vocabulary.exchange;
+
+import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Data
+public class FieldValue {
+    private Long id;
+    private Long fieldId;
+    private Map<String, String> translations = new HashMap<>();
+}

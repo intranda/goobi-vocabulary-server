@@ -8,14 +8,19 @@
         <version>3.2.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>io.goobi</groupId>
-    <artifactId>vocabulary-server</artifactId>
+    <groupId>io.goobi.vocabulary</groupId>
+    <artifactId>all</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Vocabulary-Server</name>
-    <description>RESTful web service for vocabularies</description>
+    <packaging>pom</packaging>
+    <description>RESTful webservice for vocabulary management</description>
     <properties>
         <java.version>11</java.version>
     </properties>
+    <modules>
+        <module>module-core</module>
+        <module>module-exchange</module>
+    </modules>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -87,22 +92,4 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
