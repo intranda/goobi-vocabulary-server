@@ -21,6 +21,9 @@ class API:
         self.urls[RECORD_INSERTION] = RECORD_INSERTION_URL
         for u in self.urls:
             self.urls[u] = self.urls[u].replace('{{HOST}}', host).replace('{{PORT}}', port)
+    
+    def set_context(self, ctx):
+        self.ctx = ctx
 
     def query(self, url, obj, method='POST'):
         payload = json.dumps(obj)
@@ -58,5 +61,9 @@ class API:
         return schema_id, definition_ids
 
     def insert_record(self, record):
-        result = self.query(self.urls[RECORD_INSERTION].replace('{{VOCABULARY_ID}}', str(record.vocabulary.new_id)), record)
+        url = self.urls[RECORD_INSERTION].replace('{{VOCABULARY_ID}}', str(record.vocabulary.new_id))
+        if self.ctx.dry != None:
+            ctx.log_api_call(url, 'POST', HEADERS, json.dumps(record))
+            return
+        result = self.query(url, record)
         return result['id']
