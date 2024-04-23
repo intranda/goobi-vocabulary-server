@@ -7,9 +7,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -24,9 +21,9 @@ public class RecordAssembler implements RepresentationModelAssembler<VocabularyR
                 linkTo(methodOn(VocabularyRecordController.class).delete(entity.getId())).withRel("delete")
         );
         result.addIf(entity.getParentId() != null, () -> linkTo(methodOn(VocabularyRecordController.class).one(entity.getParentId())).withRel("parent_record"));
-        if (entity.getChildren() != null) {
-            entity.setChildren(entity.getChildren().stream().map(c -> toModel(Objects.requireNonNull(c.getContent()))).collect(Collectors.toSet()));
-        }
+//        if (entity.getChildren() != null) {
+//            entity.setChildren(entity.getChildren().stream().map(c -> toModel(Objects.requireNonNull(c.getContent()))).collect(Collectors.toSet()));
+//        }
         return result;
     }
 }

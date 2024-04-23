@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.hateoas.EntityModel;
 
 import java.util.Set;
 
@@ -17,5 +16,5 @@ public class VocabularyRecord extends BaseObject {
     private Long parentId;
     private Long vocabularyId;
     private Set<FieldInstance> fields;
-    private Set<EntityModel<VocabularyRecord>> children;
+    private Set<Long> children;
 }

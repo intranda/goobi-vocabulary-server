@@ -368,7 +368,9 @@ public class DTOMapperImpl implements DTOMapper {
                 .collect(Collectors.toList()));
         result.getFields().forEach(f -> f.setVocabularyRecord(result));
         if (dto.getChildren() != null) {
-            result.setChildren(dto.getChildren().stream().map(c -> toEntity(Objects.requireNonNull(c.getContent()))).collect(Collectors.toList()));
+            result.setChildren(dto.getChildren().stream()
+                    .map(this::lookUpRecord)
+                    .collect(Collectors.toList()));
         }
         result.getChildren().forEach(c -> c.setParentRecord(result));
         return result;
@@ -383,8 +385,9 @@ public class DTOMapperImpl implements DTOMapper {
         }
         result.setVocabularyId(entity.getVocabulary().getId());
         result.setFields(entity.getFields().stream().map(this::toDTO).collect(Collectors.toSet()));
-        result.setChildren(entity.getChildren().stream().map(c -> recordAssembler.toModel(toDTO(c))).collect(Collectors.toSet()));
-        result.getChildren().forEach(c -> Objects.requireNonNull(c.getContent()).setParentId(result.getId()));
+        result.setChildren(entity.getChildren().stream()
+                .map(VocabularyRecordEntity::getId)
+                .collect(Collectors.toSet()));
         if (result.getChildren().isEmpty()) {
             result.setChildren(null);
         }

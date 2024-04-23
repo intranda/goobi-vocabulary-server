@@ -190,51 +190,7 @@ class VocabularyRecordMapperTest {
                 () -> assertEquals(1, result.getChildren().size()),
                 () -> assertEquals(927394672364L, Objects.requireNonNull(result.getChildren().stream()
                                 .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getId()),
-                () -> assertEquals(VOCABULARY_ID, Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getVocabularyId()),
-                () -> assertEquals(RECORD_ID, Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getParentId()),
-                () -> assertNull(Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getChildren()),
-                () -> assertEquals(641565L, Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getFields()
-                        .stream()
-                        .findAny()
-                        .orElseThrow()
-                        .getId()),
-                () -> assertEquals(FIELD_DEFINITION_1_ID, Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getFields()
-                        .stream()
-                        .findAny()
-                        .orElseThrow()
-                        .getDefinitionId()),
-                () -> assertEquals(927394672364L, Objects.requireNonNull(result.getChildren().stream()
-                                .findAny()
-                                .orElseThrow()
-                                .getContent())
-                        .getFields()
-                        .stream()
-                        .findAny()
-                        .orElseThrow()
-                        .getRecordId())
+                                .orElseThrow()))
         );
     }
 
@@ -286,19 +242,20 @@ class VocabularyRecordMapperTest {
 
     @Test
     void validChildrenRecords_fromDTO() {
-        VocabularyRecord child = new VocabularyRecord();
+        VocabularyRecordEntity child = new VocabularyRecordEntity();
         child.setId(927394672364L);
-        child.setVocabularyId(VOCABULARY_ID);
+        child.setVocabulary(vocabulary);
 
-        FieldInstance fieldInstance = new FieldInstance();
+        FieldInstanceEntity fieldInstance = new FieldInstanceEntity();
         fieldInstance.setId(641565L);
-        fieldInstance.setDefinitionId(FIELD_DEFINITION_1_ID);
-        fieldInstance.setRecordId(927394672364L);
+        fieldInstance.setDefinition(fieldDefinition1);
+        fieldInstance.setVocabularyRecord(child);
 //        fieldInstance1.setValue(FIELD_INSTANCE_1_VALUE);
-        child.setFields(Set.of(fieldInstance));
-        child.setParentId(RECORD_ID);
+        child.setFields(List.of(fieldInstance));
+        child.setParentRecord(vocabularyRecord);
 
-        vocabularyRecordDTO.setChildren(Set.of(recordAssembler.toModel(child)));
+        vocabularyRecordDTO.setChildren(Set.of(927394672364L));
+        when(vocabularyRecordRepository.findById(927394672364L)).thenReturn(Optional.of(child));
 
         VocabularyRecordEntity result = mapper.toEntity(vocabularyRecordDTO);
 
