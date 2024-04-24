@@ -81,18 +81,6 @@ class SchemaValidationTests {
     }
 
     @Test
-    void exactlyOneMainFieldDefinitionThatIsNotUnique_fails() {
-        VocabularySchemaEntity schema = new VocabularySchemaEntity();
-
-        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
-        mainEntryField.setUnique(false);
-
-        schema.setDefinitions(List.of(mainEntryField));
-
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
-    }
-
-    @Test
     void exactlyOneMainFieldDefinitionThatIsNotRequired_fails() {
         VocabularySchemaEntity schema = new VocabularySchemaEntity();
 

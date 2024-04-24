@@ -20,7 +20,6 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
         setValidations(List.of(
                 this::checkFieldDefinitionExistence,
                 this::checkSingleMainFieldDefinition,
-                this::checkMainFieldIsUnique,
                 this::checkMainFieldIsRequired,
                 this::checkTitleFieldsAreRequired,
                 this::perFieldDefinitionChecks
@@ -42,16 +41,6 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
             throw new SchemaValidationException("Exactly one main field required but none was specified");
         } else if (mainFieldDefinitionNames.size() > 1) {
             throw new SchemaValidationException("Exactly one main field required but the following multiple main fields are specified: " + String.join(", ", mainFieldDefinitionNames));
-        }
-    }
-
-    private void checkMainFieldIsUnique(VocabularySchemaEntity schema) throws SchemaValidationException {
-        List<FieldDefinitionEntity> mainEntries = schema.getDefinitions().stream()
-                .filter(d -> Boolean.TRUE.equals(d.getMainEntry())).collect(Collectors.toList());
-        if (!mainEntries.isEmpty() && mainEntries.stream()
-                .filter(d -> Boolean.TRUE.equals(d.isUnique()))
-                .count() != 1) {
-            throw new SchemaValidationException("The main field needs to be set unique");
         }
     }
 
