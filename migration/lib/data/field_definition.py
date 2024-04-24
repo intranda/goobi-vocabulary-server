@@ -42,7 +42,7 @@ class FieldDefinition(dict):
         if self['titleField']:
             self['required'] = True
         if self['mainEntry']:
-            self['unique'] = True
+            self['required'] = True
     
     def get_new_id(self):
         if self.new_id == None:
