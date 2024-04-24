@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-HOST='localhost:8080/api/v1'
+HOST='localhost:8081/api/v1'
 
 curl_call() {
   curl --location "$HOST/$1" --header 'Content-Type: application/json' --data "$2"
