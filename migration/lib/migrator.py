@@ -155,7 +155,8 @@ def migrate_record(record, vocabulary, ctx):
     raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record[0]}')
     fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
     for f in fields:
-        r.add_field(f)
+        if len(f['values']) > 0:
+            r.add_field(f)
     try:
         r.insert(ctx)
     except Exception as e:
