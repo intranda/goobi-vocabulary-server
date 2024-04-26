@@ -19,10 +19,17 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstanceEntit
         super("Field");
         this.fieldValueValidator = new FieldValueValidatorImpl(fieldInstanceRepository);
         setValidations(List.of(
+                this::fieldIsNotEmptyCheck,
                 this::fieldDefinitionBelongsToCorrectSchema,
                 this::perValueChecks,
                 this::multiValueCheck
         ));
+    }
+
+    private void fieldIsNotEmptyCheck(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
+        if (fieldInstance.getFieldValues().isEmpty()) {
+            throw new FieldInstanceValidationException("The field is empty");
+        }
     }
 
     private void fieldDefinitionBelongsToCorrectSchema(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {

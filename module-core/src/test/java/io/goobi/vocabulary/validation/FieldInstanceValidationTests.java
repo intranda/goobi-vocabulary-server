@@ -145,6 +145,14 @@ class FieldInstanceValidationTests {
     }
 
     @Test
+    void emptyFieldInstance_fails() {
+        FieldInstanceEntity field = setupFieldInstance(
+                setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false));
+
+        assertThrows(ValidationException.class, () -> validator.validate(field));
+    }
+
+    @Test
     void textFieldValueNotMatchingValidation_fails() {
         FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false),
