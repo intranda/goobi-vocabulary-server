@@ -5,8 +5,10 @@ import io.goobi.vocabulary.api.assemblers.VocabularyAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
+import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.manager.Manager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
+import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,11 +34,16 @@ public class VocabularyController {
     private final Manager<Vocabulary> manager;
     private final VocabularyExportManager exportManager;
     private final VocabularyAssembler assembler;
+    private final RDFMapper rdfMapper;
+    // TODO: Refactor VocabularyEntityManager for this
+    private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(Manager<Vocabulary> manager, VocabularyExportManager exportManager, VocabularyAssembler assembler) {
+    public VocabularyController(Manager<Vocabulary> manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.exportManager = exportManager;
         this.assembler = assembler;
+        this.rdfMapper = rdfMapper;
+        this.vocabularyRepository = vocabularyRepository;
     }
 
     @GetMapping("/vocabularies")
@@ -57,6 +65,17 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
                 .body(IOUtils.toByteArray(exportManager.export(id)));
+    }
+
+    @GetMapping(
+            value = "/vocabularies/{id}/export/rdfxml",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public @ResponseBody ResponseEntity<?> exportAsRdfXml(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".rdf\"")
+                .body(IOUtils.toByteArray(rdfMapper.toRDFXML(vocabularyRepository.findById(id).orElseThrow())));
     }
 
     @PostMapping("/vocabularies")
