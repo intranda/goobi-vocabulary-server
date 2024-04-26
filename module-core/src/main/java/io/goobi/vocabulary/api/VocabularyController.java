@@ -6,11 +6,14 @@ import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.service.manager.Manager;
+import io.goobi.vocabulary.service.manager.VocabularyExportManager;
+import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class VocabularyController {
     private final Manager<Vocabulary> manager;
+    private final VocabularyExportManager exportManager;
     private final VocabularyAssembler assembler;
 
-    public VocabularyController(Manager<Vocabulary> manager, VocabularyAssembler assembler) {
+    public VocabularyController(Manager<Vocabulary> manager, VocabularyExportManager exportManager, VocabularyAssembler assembler) {
         this.manager = manager;
+        this.exportManager = exportManager;
         this.assembler = assembler;
     }
 
@@ -41,6 +46,17 @@ public class VocabularyController {
     @GetMapping("/vocabularies/{id}")
     public EntityModel<Vocabulary> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
+    }
+
+    @GetMapping(
+            value = "/vocabularies/{id}/export/json",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public ResponseEntity<?> exportAsJson(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
+                .body(IOUtils.toByteArray(exportManager.export(id)));
     }
 
     @PostMapping("/vocabularies")
