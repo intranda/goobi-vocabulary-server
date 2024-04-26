@@ -4,7 +4,7 @@ import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.RecordValidationException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.validation.Validator;

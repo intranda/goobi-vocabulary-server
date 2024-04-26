@@ -2,8 +2,8 @@ package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.FieldInstanceValidationException;
 import io.goobi.vocabulary.exception.ValidationException;
-import io.goobi.vocabulary.model.FieldInstanceEntity;
-import io.goobi.vocabulary.model.FieldValueEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldValueEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
 import org.springframework.stereotype.Service;
 

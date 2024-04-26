@@ -1,9 +1,9 @@
 package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.Vocabulary;
-import io.goobi.vocabulary.model.VocabularyEntity;
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
-import io.goobi.vocabulary.model.VocabularySchemaEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

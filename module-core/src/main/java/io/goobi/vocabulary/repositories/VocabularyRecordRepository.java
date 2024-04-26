@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.repositories;
 
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;

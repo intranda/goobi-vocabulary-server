@@ -2,9 +2,9 @@ package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.RecordValidationException;
 import io.goobi.vocabulary.exception.ValidationException;
-import io.goobi.vocabulary.model.FieldDefinitionEntity;
-import io.goobi.vocabulary.model.FieldInstanceEntity;
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

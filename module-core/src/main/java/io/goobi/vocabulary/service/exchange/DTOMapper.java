@@ -9,15 +9,15 @@ import io.goobi.vocabulary.exchange.TranslationDefinition;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.exchange.VocabularySchema;
-import io.goobi.vocabulary.model.FieldDefinitionEntity;
-import io.goobi.vocabulary.model.FieldInstanceEntity;
-import io.goobi.vocabulary.model.FieldTypeEntity;
-import io.goobi.vocabulary.model.FieldValueEntity;
-import io.goobi.vocabulary.model.LanguageEntity;
-import io.goobi.vocabulary.model.TranslationDefinitionEntity;
-import io.goobi.vocabulary.model.VocabularyEntity;
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
-import io.goobi.vocabulary.model.VocabularySchemaEntity;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
+import io.goobi.vocabulary.model.jpa.FieldValueEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 
 public interface DTOMapper {
     default FieldDefinitionEntity toEntity(FieldDefinition dto) {

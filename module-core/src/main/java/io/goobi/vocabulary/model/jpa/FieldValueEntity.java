@@ -1,39 +1,38 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Entity
-@Table(name = "field_translation")
+@Table(name = "field_value")
 @Getter
 @Setter
-public class FieldTranslationEntity {
+public class FieldValueEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "field_value_id", nullable = false)
-    private FieldValueEntity fieldValue;
+    @JoinColumn(name = "field_instance_id", nullable = false)
+    private FieldInstanceEntity fieldInstance;
 
-    @ManyToOne
-    @JoinColumn(name = "language_id")
-    private LanguageEntity language;
-
-    @Lob
-    @Column(name = "content")
-    private String value;
+    @OneToMany(mappedBy = "fieldValue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FieldTranslationEntity> translations = new LinkedList<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -48,7 +47,7 @@ public class FieldTranslationEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        FieldTranslationEntity that = (FieldTranslationEntity) o;
+        FieldValueEntity that = (FieldValueEntity) o;
         return id == that.id;
     }
 

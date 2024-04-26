@@ -2,11 +2,11 @@ package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.FieldDefinition;
 import io.goobi.vocabulary.exchange.TranslationDefinition;
-import io.goobi.vocabulary.model.FieldDefinitionEntity;
-import io.goobi.vocabulary.model.FieldTypeEntity;
-import io.goobi.vocabulary.model.LanguageEntity;
-import io.goobi.vocabulary.model.TranslationDefinitionEntity;
-import io.goobi.vocabulary.model.VocabularySchemaEntity;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.FieldTypeRepository;
 import io.goobi.vocabulary.repositories.LanguageRepository;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;

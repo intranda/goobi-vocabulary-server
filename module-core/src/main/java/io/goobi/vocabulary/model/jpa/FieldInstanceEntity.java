@@ -1,5 +1,6 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,28 +8,37 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Entity
-@Table(name = "selectable_value")
+@Table(name = "field_instance")
 @Getter
 @Setter
-public class SelectableValueEntity {
+public class FieldInstanceEntity {
+    private static final int MAX_LANGUAGE_LENGTH = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "field_type_id", nullable = false)
-    private FieldTypeEntity fieldType;
+    @JoinColumn(name = "field_definition_id", nullable = false)
+    private FieldDefinitionEntity definition;
 
-    // `value` is a reserved Mysql keyword
-    @Column(name = "selection_value", nullable = false)
-    private String value;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "record_id", nullable = false)
+    private VocabularyRecordEntity vocabularyRecord;
+
+    @OneToMany(mappedBy = "fieldInstance", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FieldValueEntity> fieldValues = new LinkedList<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -43,7 +53,7 @@ public class SelectableValueEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        SelectableValueEntity that = (SelectableValueEntity) o;
+        FieldInstanceEntity that = (FieldInstanceEntity) o;
         return id == that.id;
     }
 

@@ -1,44 +1,39 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 @Entity
-@Table(name = "field_instance")
+@Table(name = "field_translation")
 @Getter
 @Setter
-public class FieldInstanceEntity {
-    private static final int MAX_LANGUAGE_LENGTH = 3;
-
+public class FieldTranslationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "field_definition_id", nullable = false)
-    private FieldDefinitionEntity definition;
+    @ManyToOne
+    @JoinColumn(name = "field_value_id", nullable = false)
+    private FieldValueEntity fieldValue;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "record_id", nullable = false)
-    private VocabularyRecordEntity vocabularyRecord;
+    @ManyToOne
+    @JoinColumn(name = "language_id")
+    private LanguageEntity language;
 
-    @OneToMany(mappedBy = "fieldInstance", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FieldValueEntity> fieldValues = new LinkedList<>();
+    @Lob
+    @Column(name = "content")
+    private String value;
 
     @Override
     public final boolean equals(Object o) {
@@ -53,7 +48,7 @@ public class FieldInstanceEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        FieldInstanceEntity that = (FieldInstanceEntity) o;
+        FieldTranslationEntity that = (FieldTranslationEntity) o;
         return id == that.id;
     }
 

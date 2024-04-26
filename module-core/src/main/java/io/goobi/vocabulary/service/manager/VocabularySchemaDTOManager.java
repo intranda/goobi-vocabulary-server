@@ -5,7 +5,7 @@ import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularySchema;
-import io.goobi.vocabulary.model.VocabularySchemaEntity;
+import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.validation.Validator;

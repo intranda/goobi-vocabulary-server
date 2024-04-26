@@ -1,46 +1,42 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 @Entity
-@Table(name = "vocabulary_record")
+@Table(name = "language")
 @Getter
 @Setter
-// Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
-public class VocabularyRecordEntity {
+public class LanguageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "vocabulary_id", nullable = false)
-    private VocabularyEntity vocabulary;
+    @Column(name = "abbreviation", nullable = false, unique = true)
+    private String abbreviation;
 
-    @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FieldInstanceEntity> fields = new LinkedList<>();
+    // `name` is a reserved Mysql keyword
+    @Column(name = "full_name")
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_record_id")
-    private VocabularyRecordEntity parentRecord;
+    @Column(name = "is_default", unique = true)
+    private Boolean isDefault;
 
-    @OneToMany(mappedBy = "parentRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VocabularyRecordEntity> children = new LinkedList<>();
+    public void setIsDefault(final Boolean newValue) {
+        if (Boolean.TRUE.equals(newValue)) {
+            this.isDefault = true;
+        } else {
+            this.isDefault = null;
+        }
+    }
 
     @Override
     public final boolean equals(Object o) {
@@ -55,8 +51,8 @@ public class VocabularyRecordEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        VocabularyRecordEntity vocabularyRecord = (VocabularyRecordEntity) o;
-        return id == vocabularyRecord.id;
+        LanguageEntity that = (LanguageEntity) o;
+        return id == that.id;
     }
 
     @Override

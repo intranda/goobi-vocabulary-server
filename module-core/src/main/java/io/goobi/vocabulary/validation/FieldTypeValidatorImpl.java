@@ -1,8 +1,8 @@
 package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.FieldTypeValidationException;
-import io.goobi.vocabulary.model.FieldTypeEntity;
-import io.goobi.vocabulary.model.SelectableValueEntity;
+import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
+import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

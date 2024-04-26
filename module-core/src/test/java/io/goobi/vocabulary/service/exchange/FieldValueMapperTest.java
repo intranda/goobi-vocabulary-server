@@ -1,10 +1,10 @@
 package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.FieldValue;
-import io.goobi.vocabulary.model.FieldInstanceEntity;
-import io.goobi.vocabulary.model.FieldTranslationEntity;
-import io.goobi.vocabulary.model.FieldValueEntity;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
+import io.goobi.vocabulary.model.jpa.FieldValueEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
 import io.goobi.vocabulary.repositories.LanguageRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.repositories;
 
-import io.goobi.vocabulary.model.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 

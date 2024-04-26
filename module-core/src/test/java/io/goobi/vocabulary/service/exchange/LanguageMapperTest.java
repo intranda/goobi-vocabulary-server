@@ -1,7 +1,7 @@
 package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.Language;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

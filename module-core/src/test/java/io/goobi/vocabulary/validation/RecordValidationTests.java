@@ -1,12 +1,12 @@
 package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.ValidationException;
-import io.goobi.vocabulary.model.FieldDefinitionEntity;
-import io.goobi.vocabulary.model.FieldInstanceEntity;
-import io.goobi.vocabulary.model.FieldTypeEntity;
-import io.goobi.vocabulary.model.VocabularyEntity;
-import io.goobi.vocabulary.model.VocabularyRecordEntity;
-import io.goobi.vocabulary.model.VocabularySchemaEntity;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

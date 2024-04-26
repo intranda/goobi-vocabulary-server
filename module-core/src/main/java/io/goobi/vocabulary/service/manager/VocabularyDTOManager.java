@@ -4,7 +4,7 @@ import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exchange.Vocabulary;
-import io.goobi.vocabulary.model.VocabularyEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import org.springframework.data.domain.Page;

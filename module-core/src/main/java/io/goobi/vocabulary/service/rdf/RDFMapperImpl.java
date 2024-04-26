@@ -2,7 +2,7 @@ package io.goobi.vocabulary.service.rdf;
 
 import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.exception.MappingException;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.service.rdf.vocabulary.LANGUAGE;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;

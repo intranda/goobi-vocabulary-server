@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

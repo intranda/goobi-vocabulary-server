@@ -4,7 +4,7 @@ import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.repositories.LanguageRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

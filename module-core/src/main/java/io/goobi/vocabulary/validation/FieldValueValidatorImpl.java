@@ -1,10 +1,10 @@
 package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.FieldValueValidationException;
-import io.goobi.vocabulary.model.FieldTranslationEntity;
-import io.goobi.vocabulary.model.FieldValueEntity;
-import io.goobi.vocabulary.model.SelectableValueEntity;
-import io.goobi.vocabulary.model.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
+import io.goobi.vocabulary.model.jpa.FieldValueEntity;
+import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
+import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
 import org.springframework.stereotype.Service;
 

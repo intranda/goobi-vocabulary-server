@@ -5,7 +5,7 @@ import io.goobi.vocabulary.api.assemblers.LanguageAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Language;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.service.manager.Manager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;

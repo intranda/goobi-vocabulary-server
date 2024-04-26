@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.model;
+package io.goobi.vocabulary.model.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,45 +8,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "translation_definition",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"field_definition_id", "fallback"})
-        })
+@Table(name = "selectable_value")
 @Getter
 @Setter
-public class TranslationDefinitionEntity {
+public class SelectableValueEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "language_id", nullable = false)
-    private LanguageEntity language;
+    @JoinColumn(name = "field_type_id", nullable = false)
+    private FieldTypeEntity fieldType;
 
-    @Column(name = "fallback")
-    private Boolean fallback;
-
-    @ManyToOne
-    @JoinColumn(name = "field_definition_id")
-    private FieldDefinitionEntity fieldDefinition;
-
-    public void setFallback(final Boolean newValue) {
-        if (Boolean.TRUE.equals(newValue)) {
-            this.fallback = true;
-        } else {
-            this.fallback = null;
-        }
-    }
-
-    @Column(name = "required", nullable = false)
-    private boolean required;
+    // `value` is a reserved Mysql keyword
+    @Column(name = "selection_value", nullable = false)
+    private String value;
 
     @Override
     public final boolean equals(Object o) {
@@ -61,7 +43,7 @@ public class TranslationDefinitionEntity {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        TranslationDefinitionEntity that = (TranslationDefinitionEntity) o;
+        SelectableValueEntity that = (SelectableValueEntity) o;
         return id == that.id;
     }
 

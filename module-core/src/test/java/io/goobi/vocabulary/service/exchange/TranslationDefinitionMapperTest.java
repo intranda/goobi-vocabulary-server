@@ -1,9 +1,9 @@
 package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.TranslationDefinition;
-import io.goobi.vocabulary.model.FieldDefinitionEntity;
-import io.goobi.vocabulary.model.LanguageEntity;
-import io.goobi.vocabulary.model.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
 import io.goobi.vocabulary.repositories.FieldDefinitionRepository;
 import io.goobi.vocabulary.repositories.LanguageRepository;
 import org.junit.jupiter.api.BeforeEach;

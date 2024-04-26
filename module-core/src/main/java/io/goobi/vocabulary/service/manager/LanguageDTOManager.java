@@ -2,7 +2,7 @@ package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Language;
-import io.goobi.vocabulary.model.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
