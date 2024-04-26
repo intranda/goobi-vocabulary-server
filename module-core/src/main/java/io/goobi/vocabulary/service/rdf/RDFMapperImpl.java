@@ -12,13 +12,18 @@ import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 
 @Service
 public class RDFMapperImpl implements RDFMapper {
     @Value("${vocabulary-server.base-url}")
-    private String baseUrl;
+    private String host;
+
+    @Value("${server.port}")
+    private int port;
 
     public static final RDFFormat RDF_XML_SYNTAX = RDFFormat.RDFXML;
     public static final RDFFormat RDF_TURTLE_SYNTAX = RDFFormat.TURTLE_BLOCKS;
@@ -53,12 +58,24 @@ public class RDFMapperImpl implements RDFMapper {
 
     private String generateLanguageURIForId(long id) {
         try {
-            String[] values = LanguageController.class.getMethod("one", long.class).getAnnotation(GetMapping.class).value();
-            assert (values.length == 1);
-            String endpoint = values[0].replace("{id}", Long.toString(id));
-            return baseUrl + endpoint;
+            String classRoute = extractClassEndpoint(LanguageController.class);
+            String methodRoute = extractMethodEndpoint(LanguageController.class.getMethod("one", long.class));
+            String endpoint = classRoute + methodRoute.replace("{id}", Long.toString(id));
+            return host + ':' + port + endpoint;
         } catch (NoSuchMethodException e) {
             throw new MappingException(LanguageEntity.class, String.class, e);
         }
+    }
+
+    private static String extractClassEndpoint(Class<?> clazz) throws NoSuchMethodException {
+        String[] values = clazz.getAnnotation(RequestMapping.class).value();
+        assert (values.length == 1);
+        return values[0];
+    }
+
+    private static String extractMethodEndpoint(Method method) throws NoSuchMethodException {
+        String[] values = method.getAnnotation(GetMapping.class).value();
+        assert (values.length == 1);
+        return values[0];
     }
 }
