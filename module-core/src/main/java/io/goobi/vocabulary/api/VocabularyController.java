@@ -78,6 +78,17 @@ public class VocabularyController {
                 .body(IOUtils.toByteArray(rdfMapper.toRDFXML(vocabularyRepository.findById(id).orElseThrow())));
     }
 
+    @GetMapping(
+            value = "/vocabularies/{id}/export/turtle",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public @ResponseBody ResponseEntity<?> exportAsRdfTurtle(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".ttl\"")
+                .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(vocabularyRepository.findById(id).orElseThrow())));
+    }
+
     @PostMapping("/vocabularies")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws ValidationException {

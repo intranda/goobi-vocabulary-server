@@ -7,4 +7,5 @@ public interface RDFMapper {
     String toRDFXML(LanguageEntity entity);
     String toRDFXML(VocabularyEntity entity);
     String toRDFTurtle(LanguageEntity entity);
+    String toRDFTurtle(VocabularyEntity entity);
 }

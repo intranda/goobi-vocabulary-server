@@ -36,14 +36,14 @@ public class VocabularyRecordController {
         return pagedResourcesAssembler.toModel(manager.listAll(vocabularyId, pageRequest), assembler);
     }
 
-    @GetMapping("/records/{recordId}")
-    public EntityModel<VocabularyRecord> one(@PathVariable long recordId) {
-        return assembler.toModel(manager.get(recordId));
+    @GetMapping("/records/{id}")
+    public EntityModel<VocabularyRecord> one(@PathVariable long id) {
+        return assembler.toModel(manager.get(id));
     }
 
-    @GetMapping(value = "/records/{recordId}", produces = {"application/xml"})
-    public VocabularyRecord oneAsXml(@PathVariable long recordId) {
-        return manager.get(recordId);
+    @GetMapping(value = "/records/{id}", produces = {"application/xml"})
+    public VocabularyRecord oneAsXml(@PathVariable long id) {
+        return manager.get(id);
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
