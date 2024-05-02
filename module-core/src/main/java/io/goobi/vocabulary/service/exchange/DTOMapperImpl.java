@@ -250,7 +250,7 @@ public class DTOMapperImpl implements DTOMapper {
         FieldTranslationEntity result = new FieldTranslationEntity();
         // ID is not present but will be auto-generated anyway
         // Special case, "" for non-translatable values
-        if ("".equals(translationInstance.getLanguage())) {
+        if (translationInstance.getLanguage() == null || translationInstance.getLanguage().isEmpty()) {
             result.setLanguage(null);
         } else {
             result.setLanguage(lookUpLanguage(translationInstance.getLanguage()));
@@ -269,7 +269,9 @@ public class DTOMapperImpl implements DTOMapper {
         result.setTranslations(entity.getTranslations().stream()
                         .map(t -> {
                             TranslationInstance translationInstance = new TranslationInstance();
-                            translationInstance.setLanguage(t.getLanguage() != null ? t.getLanguage().getAbbreviation() : "");
+                            if (t.getLanguage() != null) {
+                                translationInstance.setLanguage(t.getLanguage().getAbbreviation());
+                            }
                             translationInstance.setValue(t.getValue());
                             return translationInstance;
                         })
