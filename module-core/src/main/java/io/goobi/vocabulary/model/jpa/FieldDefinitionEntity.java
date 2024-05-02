@@ -44,6 +44,11 @@ public class FieldDefinitionEntity {
     @JoinColumn(name = "type_id", nullable = false)
     private FieldTypeEntity type;
 
+    // TODO: Maybe find a cleaner solution for this
+    @ManyToOne
+    @JoinColumn(name = "reference_vocabulary_id")
+    private VocabularyEntity referenceVocabulary;
+
     @OneToMany(mappedBy = "fieldDefinition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TranslationDefinitionEntity> translationDefinitions = new LinkedList<>();
 

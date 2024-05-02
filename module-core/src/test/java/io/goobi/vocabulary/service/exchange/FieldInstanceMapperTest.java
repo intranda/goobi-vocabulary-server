@@ -2,6 +2,7 @@ package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.FieldInstance;
 import io.goobi.vocabulary.exchange.FieldValue;
+import io.goobi.vocabulary.exchange.TranslationInstance;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
@@ -103,12 +104,18 @@ class FieldInstanceMapperTest {
         fieldValue1DTO = new FieldValue();
         fieldValue1DTO.setId(1L);
         fieldValue1DTO.setFieldId(FIELD_INSTANCE_ID);
-        fieldValue1DTO.setTranslations(Map.of("eng", FIELD_INSTANCE_VALUE1));
+        TranslationInstance translationInstance1 = new TranslationInstance();
+        translationInstance1.setLanguage("eng");
+        translationInstance1.setValue(FIELD_INSTANCE_VALUE1);
+        fieldValue1DTO.setTranslations(List.of(translationInstance1));
 
         fieldValue2DTO = new FieldValue();
         fieldValue2DTO.setId(2L);
         fieldValue2DTO.setFieldId(FIELD_INSTANCE_ID);
-        fieldValue2DTO.setTranslations(Map.of("eng", FIELD_INSTANCE_VALUE2));
+        TranslationInstance translationInstance2 = new TranslationInstance();
+        translationInstance2.setLanguage("eng");
+        translationInstance2.setValue(FIELD_INSTANCE_VALUE2);
+        fieldValue2DTO.setTranslations(List.of(translationInstance2));
 
         fieldInstance = new FieldInstanceEntity();
         fieldInstance.setId(FIELD_INSTANCE_ID);
@@ -192,7 +199,8 @@ class FieldInstanceMapperTest {
     private void assertDTOTranslations(Set<FieldValue> fieldValues, String... values) {
         Set<String> expectedValues = Set.of(values);
         Set<String> providedValues = fieldValues.stream()
-                .flatMap(fv -> fv.getTranslations().values().stream())
+                .flatMap(fv -> fv.getTranslations().stream())
+                .map(TranslationInstance::getValue)
                 .collect(Collectors.toSet());
 
         assertEquals(expectedValues, providedValues);

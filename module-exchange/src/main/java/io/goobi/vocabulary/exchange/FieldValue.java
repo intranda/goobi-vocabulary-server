@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -13,5 +15,5 @@ import java.util.Map;
 public class FieldValue extends BaseObject {
     private Long id;
     private Long fieldId;
-    private Map<String, String> translations = new HashMap<>();
+    private List<TranslationInstance> translations = new LinkedList<>();
 }

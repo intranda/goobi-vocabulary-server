@@ -31,6 +31,9 @@ public class FieldTypeEntity {
     @Column(name = "validation")
     private String validation;
 
+    @Column(name = "large")
+    private boolean large;
+
     @OneToMany(mappedBy = "fieldType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SelectableValueEntity> selectableValues = new LinkedList<>();
 }

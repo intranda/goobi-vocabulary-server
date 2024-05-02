@@ -9,6 +9,7 @@ import io.goobi.vocabulary.exchange.FieldType;
 import io.goobi.vocabulary.exchange.FieldValue;
 import io.goobi.vocabulary.exchange.Language;
 import io.goobi.vocabulary.exchange.TranslationDefinition;
+import io.goobi.vocabulary.exchange.TranslationInstance;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.exchange.VocabularySchema;
@@ -238,24 +239,24 @@ public class DTOMapperImpl implements DTOMapper {
             result.setFieldInstance(lookupFieldInstance(dto.getFieldId()));
         }
         // TODO: Maybe issue with same IDs
-        result.setTranslations(dto.getTranslations().entrySet().stream()
+        result.setTranslations(dto.getTranslations().stream()
                 .map(e -> toEntity(e, result))
                 .collect(Collectors.toList())
         );
         return result;
     }
 
-    private FieldTranslationEntity toEntity(Map.Entry<String, String> entry, FieldValueEntity fieldValue) {
+    private FieldTranslationEntity toEntity(TranslationInstance translationInstance, FieldValueEntity fieldValue) {
         FieldTranslationEntity result = new FieldTranslationEntity();
         // ID is not present but will be auto-generated anyway
         // Special case, "" for non-translatable values
-        if ("".equals(entry.getKey())) {
+        if ("".equals(translationInstance.getLanguage())) {
             result.setLanguage(null);
         } else {
-            result.setLanguage(lookUpLanguage(entry.getKey()));
+            result.setLanguage(lookUpLanguage(translationInstance.getLanguage()));
         }
         result.setFieldValue(fieldValue);
-        result.setValue(entry.getValue());
+        result.setValue(translationInstance.getValue());
         return result;
     }
 
@@ -266,7 +267,13 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setFieldId(entity.getFieldInstance().getId());
         result.setTranslations(entity.getTranslations().stream()
-                .collect(Collectors.toMap(t -> t.getLanguage() != null ? t.getLanguage().getAbbreviation() : "", FieldTranslationEntity::getValue))
+                        .map(t -> {
+                            TranslationInstance translationInstance = new TranslationInstance();
+                            translationInstance.setLanguage(t.getLanguage() != null ? t.getLanguage().getAbbreviation() : "");
+                            translationInstance.setValue(t.getValue());
+                            return translationInstance;
+                        })
+                .collect(Collectors.toList())
         );
         return result;
     }

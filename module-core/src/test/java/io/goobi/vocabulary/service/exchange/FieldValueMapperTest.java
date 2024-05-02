@@ -1,6 +1,7 @@
 package io.goobi.vocabulary.service.exchange;
 
 import io.goobi.vocabulary.exchange.FieldValue;
+import io.goobi.vocabulary.exchange.TranslationInstance;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
@@ -126,8 +127,12 @@ class FieldValueMapperTest {
         Arrays.stream(translations).forEach(t -> t.setFieldValue(fieldValue));
     }
 
-    private void setUpFieldValueDTOTranslations(Map.Entry<String, String>... translations) {
-        Arrays.stream(translations).forEach(t -> fieldValueDTO.getTranslations().put(t.getKey(), t.getValue()));
+    private void setUpFieldValueDTOTranslations(Map.Entry<String, String>... translations) {Arrays.stream(translations).forEach(t -> {
+        TranslationInstance translationInstance = new TranslationInstance();
+        translationInstance.setLanguage(t.getKey());
+        translationInstance.setValue(t.getValue());
+        fieldValueDTO.getTranslations().add(translationInstance);
+    });
     }
 
     @Test
@@ -150,12 +155,12 @@ class FieldValueMapperTest {
 
         FieldValue result = mapper.toDTO(fieldValue);
 
-        Map<String, String> resultTranslations = result.getTranslations();
+        List<TranslationInstance> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(1, resultTranslations.size()),
-                () -> assertTrue(resultTranslations.containsKey(ENGLISH_ABBREVIATION)),
-                () -> assertEquals(ENGLISH_VALUE_TRANSLATION_VALUE, resultTranslations.get(ENGLISH_ABBREVIATION))
+                () -> assertTrue(resultTranslations.stream().anyMatch(t-> ENGLISH_ABBREVIATION.equals(t.getLanguage()))),
+                () -> assertEquals(ENGLISH_VALUE_TRANSLATION_VALUE, resultTranslations.stream().filter(t-> ENGLISH_ABBREVIATION.equals(t.getLanguage())).findFirst().orElseThrow().getValue())
         );
     }
 
@@ -165,14 +170,14 @@ class FieldValueMapperTest {
 
         FieldValue result = mapper.toDTO(fieldValue);
 
-        Map<String, String> resultTranslations = result.getTranslations();
+        List<TranslationInstance> resultTranslations = result.getTranslations();
         assertAll(
                 "Assert correct translations",
                 () -> assertEquals(2, resultTranslations.size()),
-                () -> assertTrue(resultTranslations.containsKey(ENGLISH_ABBREVIATION)),
-                () -> assertTrue(resultTranslations.containsKey(GERMAN_ABBREVIATION)),
-                () -> assertEquals(ENGLISH_VALUE_TRANSLATION_VALUE, resultTranslations.get(ENGLISH_ABBREVIATION)),
-                () -> assertEquals(GERMAN_VALUE_TRANSLATION_VALUE, resultTranslations.get(GERMAN_ABBREVIATION))
+                () -> assertTrue(resultTranslations.stream().anyMatch(t-> ENGLISH_ABBREVIATION.equals(t.getLanguage()))),
+                () -> assertTrue(resultTranslations.stream().anyMatch(t-> GERMAN_ABBREVIATION.equals(t.getLanguage()))),
+                () -> assertEquals(ENGLISH_VALUE_TRANSLATION_VALUE, resultTranslations.stream().filter(t-> ENGLISH_ABBREVIATION.equals(t.getLanguage())).findFirst().orElseThrow().getValue()),
+                () -> assertEquals(GERMAN_VALUE_TRANSLATION_VALUE, resultTranslations.stream().filter(t-> GERMAN_ABBREVIATION.equals(t.getLanguage())).findFirst().orElseThrow().getValue())
         );
     }
 
