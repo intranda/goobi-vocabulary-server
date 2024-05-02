@@ -185,8 +185,8 @@ def parse_fields(raw_fields, definitions):
                 fields[new_definition_id].add_value(v)
             else:
                 # This is only one entry
-                for k, e in v['translations'].items():
-                    fields[new_definition_id]['values'][0].add_translation(k, e)
+                for t in v['translations']:
+                    fields[new_definition_id]['values'][0].add_translation(t['language'], t['value'])
 
     return list(fields.values())
 
