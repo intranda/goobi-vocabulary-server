@@ -1,7 +1,9 @@
 package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
+import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.RecordValidationException;
+import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
@@ -78,6 +80,28 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         if (!errors.isEmpty()) {
             throw new RecordValidationException(errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n")));
         }
+    }
+
+    @Override
+    public VocabularyRecord replace(VocabularyRecord newRecord) throws ValidationException {
+        VocabularyRecordEntity jpaRecord = vocabularyRecordRepository
+                .findById(newRecord.getId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newRecord.getClass(), newRecord.getId()));
+
+        List<Runnable> replacements = new LinkedList<>();
+        if (!newRecord.getFields().isEmpty()) {
+            replacements.add(() -> jpaRecord.getFields().clear());
+            newRecord.getFields().stream()
+                    .map(modelMapper::toEntity)
+                    .forEach(f -> replacements.add(() -> jpaRecord.getFields().add(f)));
+        }
+        // TODO: Plan children replacement
+        if (replacements.isEmpty()) {
+            throw new MissingValuesException(newRecord.getClass(), List.of("fields", "children"));
+        }
+        replacements.forEach(Runnable::run);
+        validator.validate(jpaRecord);
+        return modelMapper.toDTO(vocabularyRecordRepository.save(jpaRecord));
     }
 
     @Override
