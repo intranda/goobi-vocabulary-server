@@ -288,6 +288,7 @@ public class DTOMapperImpl implements DTOMapper {
         }
         result.setName(dto.getName());
         result.setValidation(dto.getValidation());
+        result.setLarge(Boolean.TRUE.equals(dto.getLarge()));
         if (dto.getSelectableValues() != null) {
             result.setSelectableValues(dto.getSelectableValues().stream()
                     .map(s -> {
@@ -307,6 +308,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setName(entity.getName());
         result.setValidation(entity.getValidation());
+        result.setLarge(entity.isLarge());
         if (entity.getSelectableValues() != null) {
             result.setSelectableValues(entity.getSelectableValues().stream().map(SelectableValueEntity::getValue).collect(Collectors.toSet()));
         }

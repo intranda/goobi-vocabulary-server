@@ -13,5 +13,6 @@ public class FieldType extends BaseObject {
     private Long id;
     private String name;
     private String validation;
+    private Boolean large;
     private Set<String> selectableValues;
 }
