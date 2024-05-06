@@ -6,7 +6,7 @@ import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
-import io.goobi.vocabulary.service.manager.Manager;
+import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
@@ -31,14 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyController {
-    private final Manager<Vocabulary> manager;
+    private final VocabularyDTOManager manager;
     private final VocabularyExportManager exportManager;
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(Manager<Vocabulary> manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.exportManager = exportManager;
         this.assembler = assembler;
@@ -54,6 +54,11 @@ public class VocabularyController {
     @GetMapping("/vocabularies/{id}")
     public EntityModel<Vocabulary> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
+    }
+
+    @GetMapping("/vocabularies/find/{name}")
+    public EntityModel<Vocabulary> findByName(@PathVariable String name) {
+        return assembler.toModel(manager.find(name));
     }
 
     @GetMapping(

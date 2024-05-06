@@ -38,6 +38,13 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
         );
     }
 
+    public Vocabulary find(String name) {
+        return modelMapper.toDTO(
+                vocabularyRepository.findByName(name)
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, name))
+        );
+    }
+
     @Override
     public Vocabulary create(Vocabulary newVocabularyDTO) {
         VocabularyEntity jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
