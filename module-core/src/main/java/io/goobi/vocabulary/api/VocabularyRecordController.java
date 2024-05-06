@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,8 +49,8 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
-    public PagedModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestBody String searchTerm, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.search(vocabularyId, searchTerm, pageRequest), assembler);
+    public PagedModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestParam String query, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.search(vocabularyId, query, pageRequest), assembler);
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")

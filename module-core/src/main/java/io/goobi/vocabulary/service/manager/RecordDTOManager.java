@@ -114,7 +114,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     }
 
     public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
-        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, searchTerm, pageRequest)
+        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, "%" + searchTerm + "%", pageRequest)
                 .map(modelMapper::toDTO);
     }
 }
