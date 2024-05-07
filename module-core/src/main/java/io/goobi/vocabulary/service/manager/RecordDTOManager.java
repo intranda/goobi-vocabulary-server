@@ -116,12 +116,14 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
 
     public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
         if (!searchTerm.contains(SEARCH_QUERY_DELIMITER)) {
-            throw new IllegalArgumentException("Field delimiter not found");
+            return vocabularyRecordRepository.findRecordsInVocabulary(id, "%" + searchTerm + "%", pageRequest)
+                    .map(modelMapper::toDTO);
+        } else {
+            String[] parts = searchTerm.split(SEARCH_QUERY_DELIMITER);
+            long fieldId = Long.parseLong(parts[0]);
+            String fieldValue = parts[1];
+            return vocabularyRecordRepository.findRecordsInVocabularyByField(id, fieldId, "%" + fieldValue + "%", pageRequest)
+                    .map(modelMapper::toDTO);
         }
-        String[] parts = searchTerm.split(SEARCH_QUERY_DELIMITER);
-        long fieldId = Long.parseLong(parts[0]);
-        String fieldValue = parts[1];
-       return vocabularyRecordRepository.findRecordsInVocabularyByField(id, fieldId,"%" + fieldValue + "%", pageRequest)
-               .map(modelMapper::toDTO);
     }
 }
