@@ -6,6 +6,7 @@ import io.goobi.vocabulary.exception.RecordValidationException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
@@ -14,12 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class RecordDTOManager implements Manager<VocabularyRecord> {
+    public static final String SEARCH_QUERY_DELIMITER = ":";
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
@@ -113,8 +116,31 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         return null;
     }
 
-    public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
-        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, "%" + searchTerm + "%", pageRequest)
-                .map(modelMapper::toDTO);
+    public List<VocabularyRecord> search(long id, String searchTerm) {
+        if (!searchTerm.contains(SEARCH_QUERY_DELIMITER)) {
+            return Collections.emptyList();
+        }
+        String[] parts = searchTerm.split(SEARCH_QUERY_DELIMITER);
+        String fieldName = parts[0];
+        String fieldValue = parts[1];
+        return vocabularyRecordRepository.findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(id, "%" + fieldValue + "%")
+                .stream()
+                .filter(r -> correctFieldContainsValue(r, fieldName, fieldValue))
+                .map(modelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    private boolean correctFieldContainsValue(VocabularyRecordEntity record, String fieldName, String fieldValue) {
+        for (FieldInstanceEntity field : record.getFields()) {
+            if (!field.getDefinition().getName().equals(fieldName)) {
+                continue;
+            }
+            if (field.getFieldValues().stream()
+                    .flatMap(v -> v.getTranslations().stream())
+                    .anyMatch(t -> t.getValue().toLowerCase().contains(fieldValue.toLowerCase()))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -7,6 +7,7 @@ import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.service.manager.RecordDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -49,8 +50,8 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records/search")
-    public PagedModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestParam String query, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.search(vocabularyId, query, pageRequest), assembler);
+    public CollectionModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestParam String query) {
+        return assembler.toCollectionModel(manager.search(vocabularyId, query));
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")

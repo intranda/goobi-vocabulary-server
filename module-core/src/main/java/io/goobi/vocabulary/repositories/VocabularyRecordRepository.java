@@ -6,13 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VocabularyRecordRepository extends CrudRepository<VocabularyRecordEntity, Long> {
     @Override
     Optional<VocabularyRecordEntity> findById(Long aLong);
 
-    Page<VocabularyRecordEntity> findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(@NonNull Long id, @NonNull String value, Pageable pageable);
+    List<VocabularyRecordEntity> findByVocabulary_IdAndFields_FieldValues_Translations_ValueLike(@NonNull Long id, @NonNull String value);
 
     Page<VocabularyRecordEntity> findByVocabulary_IdAndParentRecordNull(@NonNull Long id, Pageable pageable);
 }
