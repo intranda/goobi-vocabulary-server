@@ -4,8 +4,11 @@ import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
 import io.goobi.vocabulary.exception.MappingException;
+import io.goobi.vocabulary.exchange.Vocabulary;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
+import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
@@ -67,6 +70,19 @@ public class RDFMapperImpl implements RDFMapper {
         String[] values = method.getAnnotation(GetMapping.class).value();
         assert (values.length == 1);
         return values[0];
+    }
+
+    @Override
+    public boolean isRDFCompatible(VocabularyEntity entity) {
+        try {
+            entity.getSchema().getDefinitions().stream()
+                    .map(FieldDefinitionEntity::getType)
+                    .map(FieldTypeEntity::getName)
+                    .forEach(this::findSkosProperty);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @Override
