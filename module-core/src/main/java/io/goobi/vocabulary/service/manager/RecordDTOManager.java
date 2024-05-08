@@ -11,7 +11,9 @@ import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.validation.Validator;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -32,8 +34,20 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     }
 
     public Page<VocabularyRecord> listAll(long id, Pageable pageRequest) {
-        return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
-                .map(modelMapper::toDTO);
+        if (pageRequest.getSort().isUnsorted()) {
+            return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
+                    .map(modelMapper::toDTO);
+        } else {
+            Sort.Order order = pageRequest.getSort().stream().toList().get(0);
+            PageRequest cleanedUp = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+            if (order.isAscending()) {
+                return vocabularyRecordRepository.findByVocabulary_sortedByFieldDefinitionASC(id, Long.parseLong(order.getProperty()), cleanedUp)
+                        .map(modelMapper::toDTO);
+            } else {
+                return vocabularyRecordRepository.findByVocabulary_sortedByFieldDefinitionDESC(id, Long.parseLong(order.getProperty()), cleanedUp)
+                        .map(modelMapper::toDTO);
+            }
+        }
     }
 
     @Override
