@@ -13,6 +13,15 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
     @Override
     Optional<VocabularyRecordEntity> findById(Long aLong);
 
+//    @Query(value = "SELECT r1.id,r1.parent_record_id,r1.vocabulary_id FROM (" +
+//            "SELECT DISTINCT r.id FROM vocabulary_record r " +
+//            "LEFT JOIN field_instance f ON r.id=f.record_id " +
+//            "LEFT JOIN field_value v ON f.id=v.field_instance_id " +
+//            "LEFT JOIN field_translation t ON v.id=t.field_value_id " +
+//            "WHERE r.vocabulary_id=?1 AND f.field_definition_id=49952 and r.parent_record_id IS NULL " +
+//            "ORDER BY t.content " +
+//            ") AS sorted_records " +
+//            "LEFT JOIN vocabulary_record r1 ON sorted_records.id=r1.id", nativeQuery = true)
     Page<VocabularyRecordEntity> findByVocabulary_IdAndParentRecordNull(@NonNull Long id, Pageable pageable);
 
     @Query(value = "SELECT vre1_0.id,vre1_0.parent_record_id,vre1_0.vocabulary_id FROM vocabulary_record vre1_0 " +
