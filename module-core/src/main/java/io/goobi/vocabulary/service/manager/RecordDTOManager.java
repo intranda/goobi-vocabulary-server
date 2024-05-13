@@ -130,8 +130,20 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
 
     public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
         if (!searchTerm.contains(SEARCH_QUERY_DELIMITER)) {
-            return vocabularyRecordRepository.findRecordsInVocabulary(id, "%" + searchTerm + "%", pageRequest)
-                    .map(modelMapper::toDTO);
+            if (pageRequest.getSort().isUnsorted()) {
+                return vocabularyRecordRepository.findRecordsInVocabulary(id, "%" + searchTerm + "%", pageRequest)
+                        .map(modelMapper::toDTO);
+            } else {
+                Sort.Order order = pageRequest.getSort().stream().toList().get(0);
+                PageRequest cleanedUp = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+                if (order.isAscending()) {
+                    return vocabularyRecordRepository.findRecordsInVocabularySortedASC(id, "%" + searchTerm + "%", Long.parseLong(order.getProperty()), cleanedUp)
+                            .map(modelMapper::toDTO);
+                } else {
+                    return vocabularyRecordRepository.findRecordsInVocabularySortedDESC(id, "%" + searchTerm + "%", Long.parseLong(order.getProperty()), cleanedUp)
+                            .map(modelMapper::toDTO);
+                }
+            }
         } else {
             String[] parts = searchTerm.split(SEARCH_QUERY_DELIMITER);
             long fieldId = Long.parseLong(parts[0]);
