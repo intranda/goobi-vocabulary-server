@@ -38,6 +38,7 @@ class Migrator:
         for s in self.schemas.values():
             try:
                 s.insert(self.ctx)
+                self.ctx.log_processed(s)
                 logging.debug(f'Schema migrated\n{s}')
                 successful += 1
             except Exception as e:
@@ -54,6 +55,7 @@ class Migrator:
             try:
                 #v['name'] += str(random.randint(0, 9999999999)) # TODO: REMOVE THIS
                 v.insert(self.ctx)
+                self.ctx.log_processed(v)
                 logging.debug(f'Vocabulary migrated\n{v}')
                 successful += 1
             except Exception as e:
@@ -151,7 +153,7 @@ def parse_vocabularies(raw_vocabularies, schemas):
     return vocabularies, errors
 
 def migrate_record(record, vocabulary, ctx):
-    r = Record(vocabulary)
+    r = Record(vocabulary, record[0])
     raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record[0]}')
     fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
     for f in fields:
@@ -159,6 +161,7 @@ def migrate_record(record, vocabulary, ctx):
             r.add_field(f)
     try:
         r.insert(ctx)
+        ctx.log_processed(r)
     except Exception as e:
         ctx.log_non_migrated_record(r, record, raw_fields, e)
         if ctx.continue_on_error:

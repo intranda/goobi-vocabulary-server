@@ -5,6 +5,10 @@ class Context:
         self.dry = dry
         self.fallback_language = fallback_language
         self.continue_on_error = continue_on_error
+
+    def log_processed(self, obj):
+        with open('migration.log', 'a') as f:
+            f.write(obj.__str__() + '\n')
     
     def log_api_call(self, url, method, header, data):
         with open(self.dry, 'a') as f:
