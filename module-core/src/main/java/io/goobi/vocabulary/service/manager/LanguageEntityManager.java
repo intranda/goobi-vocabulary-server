@@ -22,7 +22,7 @@ public class LanguageEntityManager implements Manager<LanguageEntity> {
     }
 
     @Override
-    public Page<LanguageEntity> listAll(Pageable pageable) {
+    public Page<LanguageEntity> list(Pageable pageable) {
         return languageRepository.findAll(pageable);
     }
 

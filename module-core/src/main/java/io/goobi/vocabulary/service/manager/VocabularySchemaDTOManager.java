@@ -30,7 +30,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchema> {
     }
 
     @Override
-    public Page<VocabularySchema> listAll(Pageable pageable) {
+    public Page<VocabularySchema> list(Pageable pageable) {
         return vocabularySchemaRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }

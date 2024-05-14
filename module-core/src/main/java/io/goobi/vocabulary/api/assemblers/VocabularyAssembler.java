@@ -6,7 +6,6 @@ import io.goobi.vocabulary.api.VocabularySchemaController;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -29,9 +28,9 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
         EntityModel<Vocabulary> result =
                 EntityModel.of(entity,
                 linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(VocabularyController.class).all(null, null)).withRel("vocabularies"),
+                linkTo(methodOn(VocabularyController.class).list(null, null)).withRel("vocabularies"),
                 linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
-                linkTo(methodOn(VocabularyRecordController.class).allInVocabulary(entity.getId(), null, null)).withRel("records"),
+                linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getId(), null, null)).withRel("records"),
                 linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete")
         );
         if (rdfMapper.isRDFCompatible(dtoMapper.toEntity(entity))) {

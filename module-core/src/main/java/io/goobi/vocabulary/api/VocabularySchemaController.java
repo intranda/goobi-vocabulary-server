@@ -34,7 +34,7 @@ public class VocabularySchemaController {
 
     @GetMapping("/schemas")
     public PagedModel<EntityModel<VocabularySchema>> all(Pageable pageRequest, PagedResourcesAssembler<VocabularySchema> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
+        return pagedResourcesAssembler.toModel(manager.list(pageRequest), assembler);
     }
 
     @GetMapping("/schemas/{id}")

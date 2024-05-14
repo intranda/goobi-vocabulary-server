@@ -31,7 +31,7 @@ public class FieldTypeDTOManager implements Manager<FieldType> {
     }
 
     @Override
-    public Page<FieldType> listAll(Pageable pageable) {
+    public Page<FieldType> list(Pageable pageable) {
         return fieldTypeRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }

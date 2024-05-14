@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VocabularyDTOManager implements Manager<Vocabulary> {
@@ -25,7 +26,14 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
     }
 
     @Override
-    public Page<Vocabulary> listAll(Pageable pageable) {
+    public List<Vocabulary> listAll() {
+        return vocabularyRepository.findAll().stream()
+                .map(modelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Vocabulary> list(Pageable pageable) {
         return vocabularyRepository.findAll(pageable)
                 .map(modelMapper::toDTO);
     }

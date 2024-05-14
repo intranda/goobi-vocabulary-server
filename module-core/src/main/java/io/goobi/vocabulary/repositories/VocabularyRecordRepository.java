@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VocabularyRecordRepository extends CrudRepository<VocabularyRecordEntity, Long> {
@@ -77,4 +78,6 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
             "left join field_translation t1_0 on fv1_0.id=t1_0.field_value_id " +
             "where vre1_0.vocabulary_id=?1 and f1_0.field_definition_id=?2 and t1_0.content like ?3 escape '\\\\'", nativeQuery = true)
     Page<VocabularyRecordEntity> findRecordsInVocabularyByField(@NonNull long vocabularyId, @NonNull long searchFieldId, @NonNull String value,  Pageable pageable);
+
+    List<VocabularyRecordEntity> findByVocabulary_Id(@NonNull long id);
 }

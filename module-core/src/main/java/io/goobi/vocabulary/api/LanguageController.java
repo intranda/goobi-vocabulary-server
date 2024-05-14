@@ -44,7 +44,7 @@ public class LanguageController {
 
     @GetMapping("/languages")
     public PagedModel<EntityModel<Language>> all(Pageable pageRequest, PagedResourcesAssembler<Language> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(DTOmanager.listAll(pageRequest), assembler);
+        return pagedResourcesAssembler.toModel(DTOmanager.list(pageRequest), assembler);
     }
 
     @GetMapping("/languages/{id}")

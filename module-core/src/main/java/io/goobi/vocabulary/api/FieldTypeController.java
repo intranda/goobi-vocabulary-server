@@ -35,7 +35,7 @@ public class FieldTypeController {
 
     @GetMapping("/types")
     public PagedModel<EntityModel<FieldType>> all(Pageable pageRequest, PagedResourcesAssembler<FieldType> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
+        return pagedResourcesAssembler.toModel(manager.list(pageRequest), assembler);
     }
 
     @GetMapping("/types/{id}")

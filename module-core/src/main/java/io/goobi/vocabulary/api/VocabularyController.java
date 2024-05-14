@@ -12,6 +12,7 @@ import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -46,9 +47,14 @@ public class VocabularyController {
         this.vocabularyRepository = vocabularyRepository;
     }
 
+    @GetMapping("/vocabularies/all")
+    public CollectionModel<EntityModel<Vocabulary>> all() {
+        return assembler.toCollectionModel(manager.listAll());
+    }
+
     @GetMapping("/vocabularies")
-    public PagedModel<EntityModel<Vocabulary>> all(Pageable pageRequest, PagedResourcesAssembler<Vocabulary> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.listAll(pageRequest), assembler);
+    public PagedModel<EntityModel<Vocabulary>> list(Pageable pageRequest, PagedResourcesAssembler<Vocabulary> pagedResourcesAssembler) {
+        return pagedResourcesAssembler.toModel(manager.list(pageRequest), assembler);
     }
 
     @GetMapping("/vocabularies/{id}")

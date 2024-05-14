@@ -19,8 +19,8 @@ public class LanguageDTOManager implements Manager<Language> {
     }
 
     @Override
-    public Page<Language> listAll(Pageable pageable) {
-        return languageEntityManager.listAll(pageable)
+    public Page<Language> list(Pageable pageable) {
+        return languageEntityManager.list(pageable)
                 .map(modelMapper::toDTO);
     }
 

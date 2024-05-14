@@ -33,7 +33,13 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         this.validator = validator;
     }
 
-    public Page<VocabularyRecord> listAll(long id, Pageable pageRequest) {
+    public List<VocabularyRecord> all(long id) {
+        return vocabularyRecordRepository.findByVocabulary_Id(id).stream()
+                .map(modelMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Page<VocabularyRecord> list(long id, Pageable pageRequest) {
         if (pageRequest.getSort().isUnsorted()) {
             return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
                     .map(modelMapper::toDTO);
