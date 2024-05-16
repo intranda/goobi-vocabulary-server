@@ -8,7 +8,9 @@
         <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <artifactId>server-core</artifactId>
+    <groupId>io.goobi.vocabulary</groupId>
+    <artifactId>vocabulary-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
