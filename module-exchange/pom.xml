@@ -8,6 +8,17 @@
     <name>Vocabulary Exchange</name>
     <description>Vocabulary data exchange classes</description>
     <packaging>jar</packaging>
+    <!-- RELEASE REPOSITORIES -->
+    <distributionManagement>
+        <repository>
+            <id>intranda-releases</id>
+            <url>https://nexus.intranda.com/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>intranda-snapshots</id>
+            <url>https://nexus.intranda.com/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
