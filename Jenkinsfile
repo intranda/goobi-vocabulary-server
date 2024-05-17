@@ -129,7 +129,7 @@ pipeline {
       )
     }
     success {
-      archiveArtifacts artifacts: 'target/*.war, target/*.jar, install/*', fingerprint: true
+      archiveArtifacts artifacts: 'module-*/target/*.jar, install/*', fingerprint: true
     }
     changed {
       emailext(
