@@ -1,4 +1,6 @@
+import logging
 from lib.data.translation_definition import TranslationDefinition
+from lib.data.field_type import FieldType
 
 class FieldDefinition(dict):
     def __init__(self, id, name, language, itype, validation, required, mainEntry, unique, selection, titleField):
@@ -8,16 +10,31 @@ class FieldDefinition(dict):
         self['name'] = name
         self.language = language
         self.itype = itype
-        self['typeId'] = 1
+        self.type_name = 'Anything'
+        #self['typeId'] = 1
         self.validation = validation
+        if len(validation.strip()) == 0:
+            self.validation = None
+        self.selection = selection
+        if len(selection.strip()) == 0:
+            self.selection = None
         self['required'] = True if required == 1 else False
         self['mainEntry'] = True if mainEntry == 1 else False
         self['unique'] = True if unique == 1 else False
         self['titleField'] = True if titleField == 1 else False
+        self['multiValued'] = True if itype == 'select' else False
+        if itype == 'textarea':
+            self.type_name = 'Any Text'
         self.process_translation()
     
     def matches_id(self, id):
         return id in self.id
+    
+    def resolve_type(self, ctx):
+        if self.validation != None or self.selection != None:
+            newType = FieldType(validation=self.validation, selection=self.selection.split('|'), large=self.itype == 'textarea')
+            self['typeId'] = ctx.api.insert_type(newType)
+        self['typeId'] = ctx.api.find_type(self.type_name)
 
     def process_translation(self):
         if len(self.language) > 0:
@@ -36,7 +53,7 @@ class FieldDefinition(dict):
                     raise Exception(f'There are optional fields with no fallback language defined, please use the "--fallback-language" parameter to set a fallback language for these cases')
                 fallback_translations = [t for t in self['translationDefinitions'] if t['language'] == fallback_language]
                 if len(fallback_translations) == 0:
-                    raise Exception(f'Fallback language {fallback_language} is not defined for field definition:\n{self.__str__()}')
+                    logging.warning(f'Fallback language {fallback_language} is not defined for field definition:\n{self.__str__()}')
                 fallback_translations[0]['fallback'] = True
                 fallback_translations[0]['required'] = True
         if self['titleField']:

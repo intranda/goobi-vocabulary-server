@@ -22,6 +22,8 @@ class Schema(dict):
         self.new_id = new_id
 
     def insert(self, ctx):
+        for d in self['definitions']:
+            d.resolve_type(ctx)
         identifier, definition_identifiers = ctx.api.insert_schema(self)
         self.set_new_id(identifier)
         for d in self['definitions']:

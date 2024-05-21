@@ -5,6 +5,8 @@ import json
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
 VOCABULARY_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies'
 RECORD_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records'
+TYPE_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types'
+TYPE_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types/find/{{NAME}}'
 HEADERS = {
     'Content-Type': 'application/json'
 }
@@ -12,6 +14,8 @@ HEADERS = {
 SCHEMA_INSERTION = 1
 VOCABULARY_INSERTION = 2
 RECORD_INSERTION = 3
+TYPE_INSERTION = 4
+TYPE_SEARCH = 5
 
 class API:
     def __init__(self, host, port):
@@ -19,14 +23,20 @@ class API:
         self.urls[SCHEMA_INSERTION] = SCHEMA_INSERTION_URL
         self.urls[VOCABULARY_INSERTION] = VOCABULARY_INSERTION_URL
         self.urls[RECORD_INSERTION] = RECORD_INSERTION_URL
+        self.urls[TYPE_INSERTION] = TYPE_INSERTION_URL
+        self.urls[TYPE_SEARCH] = TYPE_FIND_URL
+        self.type_id_map = {}
+        self.type_counter = 1
         for u in self.urls:
             self.urls[u] = self.urls[u].replace('{{HOST}}', host).replace('{{PORT}}', port)
     
     def set_context(self, ctx):
         self.ctx = ctx
 
-    def query(self, url, obj, method='POST'):
-        payload = json.dumps(obj)
+    def query(self, url, obj=None, method='POST'):
+        payload = None
+        if obj != None:
+            payload = json.dumps(obj)
         response = requests.request(method, url=url, headers=HEADERS, data=payload)
         try:
             # Check for success
@@ -48,6 +58,18 @@ class API:
     def insert_vocabulary(self, vocabulary):
         result = self.query(self.urls[VOCABULARY_INSERTION], vocabulary)
         return result['id']
+
+    def insert_type(self, typ):
+        name = f'_generated_{self.type_counter}'
+        self.type_counter += 1
+        typ['name'] = name
+        result = self.query(self.urls[TYPE_INSERTION], typ)
+        return result['id']
+    
+    def find_type(self, type_name):
+        if not type_name in self.type_id_map:
+            self.type_id_map[type_name] = self.query(self.urls[TYPE_SEARCH].replace('{{NAME}}', type_name), method='GET')['id']
+        return self.type_id_map[type_name]
     
     def insert_schema(self, schema):
         result = self.query(self.urls[SCHEMA_INSERTION], schema)
