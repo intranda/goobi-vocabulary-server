@@ -6,6 +6,7 @@ import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
+import io.goobi.vocabulary.service.csv.CSVMapper;
 import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
@@ -36,14 +37,16 @@ public class VocabularyController {
     private final VocabularyExportManager exportManager;
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
+    private final CSVMapper csvMapper;
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(VocabularyDTOManager manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.exportManager = exportManager;
         this.assembler = assembler;
         this.rdfMapper = rdfMapper;
+        this.csvMapper = csvMapper;
         this.vocabularyRepository = vocabularyRepository;
     }
 
@@ -76,6 +79,17 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
                 .body(IOUtils.toByteArray(exportManager.export(id)));
+    }
+
+    @GetMapping(
+            value = "/vocabularies/{id}/export/csv",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public ResponseEntity<?> exportAsCsv(@PathVariable long id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".csv\"")
+                .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow())));
     }
 
     @GetMapping(
