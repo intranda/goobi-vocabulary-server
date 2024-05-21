@@ -2,6 +2,7 @@ package io.goobi.vocabulary.api;
 
 
 import io.goobi.vocabulary.api.assemblers.VocabularyAssembler;
+import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
@@ -89,7 +90,7 @@ public class VocabularyController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".csv\"")
-                .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow())));
+                .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @GetMapping(
@@ -100,7 +101,7 @@ public class VocabularyController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".rdf\"")
-                .body(IOUtils.toByteArray(rdfMapper.toRDFXML(vocabularyRepository.findById(id).orElseThrow())));
+                .body(IOUtils.toByteArray(rdfMapper.toRDFXML(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @GetMapping(
@@ -111,7 +112,7 @@ public class VocabularyController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".ttl\"")
-                .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(vocabularyRepository.findById(id).orElseThrow())));
+                .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @PostMapping("/vocabularies")
