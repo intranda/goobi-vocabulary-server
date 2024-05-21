@@ -5,7 +5,7 @@ import io.goobi.vocabulary.api.assemblers.FieldTypeAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.FieldType;
-import io.goobi.vocabulary.service.manager.Manager;
+import io.goobi.vocabulary.service.manager.FieldTypeDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -25,10 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class FieldTypeController {
-    private final Manager<FieldType> manager;
+    private final FieldTypeDTOManager manager;
     private final FieldTypeAssembler assembler;
 
-    public FieldTypeController(Manager<FieldType> manager, FieldTypeAssembler assembler) {
+    public FieldTypeController(FieldTypeDTOManager manager, FieldTypeAssembler assembler) {
         this.manager = manager;
         this.assembler = assembler;
     }
@@ -41,6 +41,11 @@ public class FieldTypeController {
     @GetMapping("/types/{id}")
     public EntityModel<FieldType> one(@PathVariable long id) {
         return assembler.toModel(manager.get(id));
+    }
+
+    @GetMapping("/types/find/{name}")
+    public EntityModel<FieldType> findByName(@PathVariable String name) {
+        return assembler.toModel(manager.find(name));
     }
 
     @PostMapping("/types")

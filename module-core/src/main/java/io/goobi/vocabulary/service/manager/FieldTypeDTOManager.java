@@ -44,6 +44,13 @@ public class FieldTypeDTOManager implements Manager<FieldType> {
         );
     }
 
+    public FieldType find(String name) {
+        return modelMapper.toDTO(
+                fieldTypeRepository.findByName(name)
+                        .orElseThrow(() -> new EntityNotFoundException(FieldTypeEntity.class, name))
+        );
+    }
+
     @Override
     public FieldType create(FieldType newFieldTypeDTO) throws ValidationException {
         FieldTypeEntity jpaType = modelMapper.toEntity(newFieldTypeDTO);
