@@ -116,14 +116,15 @@ public class CSVMapperImpl implements CSVMapper {
         Map<String, List<String>> languageValues = new HashMap<>();
         for (FieldValueEntity v : f.getFieldValues()) {
             for (FieldTranslationEntity t : v.getTranslations()) {
-                if (!languageValues.containsKey(t.getLanguage().getAbbreviation())) {
-                    languageValues.put(t.getLanguage().getAbbreviation(), new LinkedList<>());
+                String abbreviation = "";
+                if (t.getLanguage() != null) {
+                    abbreviation = t.getLanguage().getAbbreviation();
                 }
-                languageValues.get(t.getLanguage().getAbbreviation()).add(t.getValue());
+                languageValues.computeIfAbsent(abbreviation, abb -> new LinkedList<>()).add(t.getValue());
             }
         }
         return languageValues.entrySet().stream()
-                .map(e -> new Field(f.getDefinition().getName(), e.getKey(), String.join("|", e.getValue())))
+                .map(e -> new Field(f.getDefinition().getName(), e.getKey().isBlank() ? null : e.getKey(), String.join("|", e.getValue())))
                 .collect(Collectors.toSet());
     }
 }
