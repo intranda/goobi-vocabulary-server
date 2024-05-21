@@ -1,36 +1,129 @@
 package io.goobi.vocabulary.service.csv;
 
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
+import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
+import io.goobi.vocabulary.model.jpa.FieldValueEntity;
+import io.goobi.vocabulary.model.jpa.LanguageEntity;
+import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
-import org.apache.jena.rdf.model.Model;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CSVMapperImpl implements CSVMapper {
-    @Override
-    public String toCSV(VocabularyEntity entity) {
-//        return transform(entity, this::generateVocabularyModel, RDF_TURTLE_SYNTAX);
-        return "CSV";
+    @Data
+    @AllArgsConstructor
+    class FieldDefinition {
+        private String name;
+        private String language;
+
+        @Override
+        public String toString() {
+            if (language == null) {
+                return name;
+            }
+            return name + " (" + language + ")";
+        }
     }
 
-    private Model generateVocabularyModel(VocabularyEntity entity) {
-//        String uri = generateURIForId(VocabularyController.class, entity.getId());
-//
-//        Model model = ModelFactory.createDefaultModel();
-//        Map<Long, Resource> recordMap = new HashMap<>();
-//
-//        Resource vocabulary = model.createResource(uri)
-//                .addProperty(RDF.type, SKOS.Concept);
-//
-//        for (VocabularyRecordEntity r : entity.getRecords()) {
-//            generateRecordResource(model, recordMap, r);
-//        }
-//
-//        // Create between record references
-//        entity.getRecords().forEach(r -> generateBetweenRecordReferences(r, recordMap));
-//
-//        model.setNsPrefix("skos", SKOS.uri);
-//
-//        return model;
-        return null;
+    @Data
+    @AllArgsConstructor
+    class Field {
+        private String name;
+        private String language;
+        private String value;
+    }
+
+    @Data
+    class Row {
+        private Set<Field> fields = new HashSet<>();
+
+        public void addField(Field field) {
+            fields.add(field);
+        }
+
+        public String getField(String name, String language) {
+            return fields.stream()
+                    .filter(f -> f.getName().equals(name))
+                    .filter(f -> {
+                        if (language != null) {
+                            return language.equals(f.getLanguage());
+                        } else {
+                            return true;
+                        }
+                    })
+                    .map(Field::getValue)
+                    .findFirst()
+                    .orElse("");
+        }
+    }
+
+    @Override
+    public String toCSV(VocabularyEntity entity) {
+        StringBuilder sb = new StringBuilder();
+        List<FieldDefinition> fieldDefinitions = createHeader(sb, entity);
+        entity.getRecords().forEach(r -> dumpRecord(sb, fieldDefinitions, r));
+        return sb.toString();
+    }
+
+    private List<FieldDefinition> createHeader(StringBuilder sb, VocabularyEntity vocabulary) {
+        List<FieldDefinition> fieldDefinitions = vocabulary.getSchema().getDefinitions().stream()
+                .sorted(Comparator.comparingLong(FieldDefinitionEntity::getId))
+                .map(d -> {
+                    if (d.getTranslationDefinitions() == null || d.getTranslationDefinitions().isEmpty()) {
+                        return List.of(new FieldDefinition(d.getName(), null));
+                    } else {
+                        return d.getTranslationDefinitions().stream()
+                                .map(TranslationDefinitionEntity::getLanguage)
+                                .sorted(Comparator.comparingLong(LanguageEntity::getId))
+                                .map(l -> new FieldDefinition(d.getName(), l.getAbbreviation()))
+                                .collect(Collectors.toList());
+                    }
+                })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        sb.append(fieldDefinitions.stream()
+                .map(FieldDefinition::toString)
+                .collect(Collectors.joining(",")) + '\n');
+        return fieldDefinitions;
+    }
+
+    private void dumpRecord(StringBuilder sb, List<FieldDefinition> fieldDefinitions, VocabularyRecordEntity r) {
+        Row row = new Row();
+        r.getFields().stream()
+                .map(this::extractField)
+                .flatMap(Collection::stream)
+                .forEach(row::addField);
+        sb.append(fieldDefinitions.stream()
+                .map(fd -> row.getField(fd.name, fd.language))
+                .collect(Collectors.joining(",")) + '\n');
+    }
+
+    private Set<Field> extractField(FieldInstanceEntity f) {
+        Map<String, List<String>> languageValues = new HashMap<>();
+        for (FieldValueEntity v : f.getFieldValues()) {
+            for (FieldTranslationEntity t : v.getTranslations()) {
+                if (!languageValues.containsKey(t.getLanguage().getAbbreviation())) {
+                    languageValues.put(t.getLanguage().getAbbreviation(), new LinkedList<>());
+                }
+                languageValues.get(t.getLanguage().getAbbreviation()).add(t.getValue());
+            }
+        }
+        return languageValues.entrySet().stream()
+                .map(e -> new Field(f.getDefinition().getName(), e.getKey(), String.join("|", e.getValue())))
+                .collect(Collectors.toSet());
     }
 }
