@@ -155,6 +155,9 @@ def parse_vocabularies(raw_vocabularies, schemas):
 def migrate_record(record, vocabulary, ctx):
     r = Record(vocabulary, record[0])
     raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record[0]}')
+    if len(raw_fields) == 0:
+        logging.warning(f'Skipping empty record [{record[0]}]')
+        return
     fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
     for f in fields:
         if len(f['values']) > 0:
@@ -190,13 +193,31 @@ def parse_fields(raw_fields, definitions):
                 # This is only one entry
                 for t in v['translations']:
                     fields[new_definition_id]['values'][0].add_translation(t['language'], t['value'])
+        
+        # Fill translations that are required and missing with duplicates
+        if 'translationDefinitions' in matching_definitions[0]:
+            translation_definitions = matching_definitions[0]['translationDefinitions']
+            if len(translation_definitions) > 0:
+                required_languages = [td['language'] for td in translation_definitions if td['required']]
+                for v in fields[new_definition_id]['values']:
+                    found = [t['language'] for t in v['translations']]
+                    for missing_language in [l for l in required_languages if l not in found]:
+                        if len(v['translations']) > 0:
+                            v.add_translation(missing_language, v['translations'][0]['value'])
 
     return list(fields.values())
 
 def parse_values(language, raw_value):
-    if raw_value == None or len(raw_value.strip()) == 0 or raw_value.strip() == 'null':
+    if raw_value == None:
         return []
-    # TODO: Correct splitting
-    result = FieldValue()
-    result.add_translation(language, raw_value)
-    return [result]
+    raw_value = raw_value.strip()
+    if len(raw_value) == 0 or raw_value == 'null':
+        return []
+    # TODO: Test this
+    raw_values = raw_value.split('|')
+    results = []
+    for rv in raw_values:
+        result = FieldValue()
+        result.add_translation(language, rv)
+        results.append(result)
+    return results
