@@ -32,7 +32,7 @@ Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
         - Navigate to the extracted vocabulary migration tool directory.
         - Run `python -m venv vmenv` to create a virtual python environment named `vmenv`.
         - Activate the python environment with `. vmenv/bin/activate`.
-        - Install the python dependencies with `pip install requests mysql-connector-python progressbar2`.
+        - Install the python dependencies with `pip install requests mysql-connector-python alive_progress`.
     - In the activated virtual python environment, run:
 ```bash
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
