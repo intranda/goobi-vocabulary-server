@@ -11,7 +11,6 @@ class FieldDefinition(dict):
         self.language = language
         self.itype = itype
         self.type_name = 'Anything'
-        #self['typeId'] = 1
         self.validation = validation
         if len(validation.strip()) == 0:
             self.validation = None
@@ -34,7 +33,8 @@ class FieldDefinition(dict):
         if self.validation != None or self.selection != None:
             newType = FieldType(validation=self.validation, selection=self.selection, large=self.itype == 'textarea')
             self['typeId'] = ctx.api.insert_type(newType)
-        self['typeId'] = ctx.api.find_type(self.type_name)
+        else:
+            self['typeId'] = ctx.api.find_type(self.type_name)
 
     def process_translation(self):
         if len(self.language) > 0:

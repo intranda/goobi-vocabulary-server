@@ -3,7 +3,6 @@ class FieldType(dict):
         self['validation'] = validation
         self['selectableValues'] = None
         if selection != None:
-            print(selection)
-            self['selectableValues'] = selection
+            self['selectableValues'] = selection.split('|')
         self['large'] = large
     
