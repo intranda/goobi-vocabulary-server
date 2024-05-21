@@ -32,7 +32,7 @@ class FieldDefinition(dict):
     
     def resolve_type(self, ctx):
         if self.validation != None or self.selection != None:
-            newType = FieldType(validation=self.validation, selection=self.selection.split('|'), large=self.itype == 'textarea')
+            newType = FieldType(validation=self.validation, selection=self.selection, large=self.itype == 'textarea')
             self['typeId'] = ctx.api.insert_type(newType)
         self['typeId'] = ctx.api.find_type(self.type_name)
 
