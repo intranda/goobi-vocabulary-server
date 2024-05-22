@@ -69,13 +69,13 @@ class Migrator:
         vocabularies_to_process = [v for v in self.vocabularies if v.is_migrated()]
         logging.info(f'Migrating records for {len(vocabularies_to_process)} vocabularies')
         for v in vocabularies_to_process:
-            raw_records = self.ctx.db.query(f'SELECT * FROM vocabulary_record WHERE vocabulary_id = {v.id}')
-            num = len(raw_records)
+            raw_ids = self.ctx.db.query(f'SELECT id FROM vocabulary_record WHERE vocabulary_id = {v.id}')
+            ids = [i[0] for i in raw_ids]
+            num = len(ids)
             with alive_bar(num) as bar:
-                for r in raw_records:
-                    migrate_record(r, v, self.ctx)
-                    bar()
-    
+                for chunk in list(split_into_chunks(ids, 100)):
+                    migrate_record_chunk(chunk, v, self.ctx, bar)
+
     def load_schemas(self):
         temp_schemas = parse_schemas(self.ctx.db.query('SELECT * FROM vocabulary_structure'))
         schemas = {}
@@ -96,6 +96,10 @@ class Migrator:
         vocabularies, errors = parse_vocabularies(self.ctx.db.query('SELECT * FROM vocabulary'), self.schemas)
         logging.info(f'{len(vocabularies)} of {len(vocabularies) + errors} vocabularies successfully loaded')
         return vocabularies
+
+def split_into_chunks(l, n):
+    for i in range(0, len(l), n):  
+        yield l[i:i + n]
 
 def parse_schemas(raw_schema):
     schema_definitions = {}
@@ -152,13 +156,25 @@ def parse_vocabularies(raw_vocabularies, schemas):
             errors += 1
     return vocabularies, errors
 
-def migrate_record(record, vocabulary, ctx):
-    r = Record(vocabulary, record[0])
-    raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record[0]}')
-    if len(raw_fields) == 0:
-        logging.warning(f'Skipping empty record [{record[0]}]')
+def migrate_record_chunk(ids, vocabulary, ctx, bar):
+    id_string = ','.join([str(i) for i in ids])
+    raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id in ({id_string})')
+    record_field_map = {}
+    for i in ids:
+        record_field_map[i] = []
+    for f in raw_fields:
+        record_field_map[f[1]].append(f)
+    for i in ids:
+        migrate_record(i, record_field_map[i], vocabulary, ctx)
+        bar()
+
+def migrate_record(record_id, data, vocabulary, ctx):
+    r = Record(vocabulary, record_id)
+    #raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record_id}')
+    if len(data) == 0:
+        logging.warning(f'Skipping empty record [{record_id}')
         return
-    fields = parse_fields(raw_fields, vocabulary.schema['definitions'])
+    fields = parse_fields(data, vocabulary.schema['definitions'])
     for f in fields:
         if len(f['values']) > 0:
             r.add_field(f)
@@ -166,7 +182,7 @@ def migrate_record(record, vocabulary, ctx):
         r.insert(ctx)
         ctx.log_processed(r)
     except Exception as e:
-        ctx.log_non_migrated_record(r, record, raw_fields, e)
+        ctx.log_non_migrated_record(r, record_id, data, e)
         if ctx.continue_on_error:
             logging.warning(f'Error migrating record')
         else:
