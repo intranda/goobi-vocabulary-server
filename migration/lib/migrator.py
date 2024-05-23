@@ -73,7 +73,7 @@ class Migrator:
             ids = [i[0] for i in raw_ids]
             num = len(ids)
             with alive_bar(num) as bar:
-                for chunk in list(split_into_chunks(ids, 100)):
+                for chunk in list(split_into_chunks(ids, 10000)):
                     migrate_record_chunk(chunk, v, self.ctx, bar)
 
     def load_schemas(self):
