@@ -13,6 +13,7 @@ import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
+import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,8 @@ import static org.mockito.Mockito.when;
 class FieldInstanceValidationTests {
     @Mock
     private FieldInstanceRepository fieldInstanceRepository;
+    @Mock
+    private VocabularyRecordRepository vocabularyRecordRepository;
     @InjectMocks
     private FieldInstanceValidatorImpl validator;
     private Map<String, LanguageEntity> languages;
@@ -431,5 +435,59 @@ class FieldInstanceValidationTests {
         translationInstance.setFieldValues(List.of(description));
 
         validator.validate(translationInstance);
+    }
+
+    @Test
+    void vocabularyRecordReferenceGiven_isPresent_success() throws ValidationException {
+        VocabularyEntity colors = new VocabularyEntity();
+        VocabularyRecordEntity red = new VocabularyRecordEntity();
+        red.setId(1337);
+        FieldTranslationEntity redTranslation = new FieldTranslationEntity();
+        redTranslation.setLanguage(null);
+        redTranslation.setValue("red");
+        FieldValueEntity redValue = new FieldValueEntity();
+        redValue.setTranslations(List.of(redTranslation));
+        FieldInstanceEntity redField = new FieldInstanceEntity();
+        redField.setFieldValues(List.of(redValue));
+        red.setFields(List.of(redField));
+        red.setVocabulary(colors);
+        colors.setRecords(List.of(red));
+        when(vocabularyRecordRepository.findById(1337L)).thenReturn(Optional.of(red));
+
+        FieldDefinitionEntity definition = new FieldDefinitionEntity();
+        definition.setSchema(schema);
+        definition.setName("Color");
+        definition.setReferenceVocabulary(colors);
+        definition.setMainEntry(true);
+        definition.setTitleField(true);
+        definition.setUnique(false);
+        definition.setRequired(true);
+        definition.setMultiValued(false);
+        schema.setDefinitions(List.of(definition));
+
+        FieldInstanceEntity instanceToTest = setupFieldInstance(definition, Pair.of("", "1337"));
+
+        validator.validate(instanceToTest);
+    }
+
+    @Test
+    void vocabularyRecordReferenceGiven_isNotPresent_fails() {
+        VocabularyEntity colors = new VocabularyEntity();
+        when(vocabularyRecordRepository.findById(1337L)).thenReturn(Optional.empty());
+
+        FieldDefinitionEntity definition = new FieldDefinitionEntity();
+        definition.setSchema(schema);
+        definition.setName("Color");
+        definition.setReferenceVocabulary(colors);
+        definition.setMainEntry(true);
+        definition.setTitleField(true);
+        definition.setUnique(false);
+        definition.setRequired(true);
+        definition.setMultiValued(false);
+        schema.setDefinitions(List.of(definition));
+
+        FieldInstanceEntity instanceToTest = setupFieldInstance(definition, Pair.of("", "1337"));
+
+        assertThrows(ValidationException.class, () -> validator.validate(instanceToTest));
     }
 }

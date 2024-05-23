@@ -5,11 +5,15 @@ import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
 import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
 import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
+import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,9 +22,12 @@ import java.util.stream.Collectors;
 public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
 
     private final FieldInstanceRepository fieldInstanceRepository;
+    private final VocabularyRecordRepository recordRepository;
 
-    public FieldValueValidatorImpl(FieldInstanceRepository fieldInstanceRepository) {
+    public FieldValueValidatorImpl(FieldInstanceRepository fieldInstanceRepository, VocabularyRecordRepository recordRepository) {
         super("Value");
+        this.fieldInstanceRepository = fieldInstanceRepository;
+        this.recordRepository = recordRepository;
         setValidations(List.of(
                 this::checkRegularExpressionMatchesValue,
                 this::checkValueIsOneOfSelectableValues,
@@ -29,12 +36,15 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                 this::checkUntranslatableValueIsNotTranslated,
                 this::checkTranslatableValueContainsNoNonTranslatedValues,
                 this::checkTranslatableValueHasNoUnspecifiedTranslations,
-                this::checkTranslatableValueAllRequiredTranslationsProvided
+                this::checkTranslatableValueAllRequiredTranslationsProvided,
+                this::checkReferencedVocabularyRecordIsExistingInCorrectVocabulary
         ));
-        this.fieldInstanceRepository = fieldInstanceRepository;
     }
 
     private void checkRegularExpressionMatchesValue(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (fieldValue.getFieldInstance().getDefinition().getType() == null) {
+            return;
+        }
         String regex = fieldValue.getFieldInstance().getDefinition().getType().getValidation();
         List<String> wrongValues = null;
         if (regex != null) {
@@ -57,6 +67,9 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
     }
 
     private void checkValueIsOneOfSelectableValues(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (fieldValue.getFieldInstance().getDefinition().getType() == null) {
+            return;
+        }
         List<SelectableValueEntity> selectableValues = fieldValue.getFieldInstance().getDefinition().getType().getSelectableValues();
         if (selectableValues != null && !selectableValues.isEmpty()) {
             Set<String> selectableStringValues = selectableValues.stream()
@@ -154,6 +167,28 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
             if (!specifiedRequiredLanguages.isEmpty()) {
                 throw new FieldValueValidationException("Translatable field \"" + fieldValue.getFieldInstance().getDefinition().getName()
                         + "\" [" + fieldValue.getFieldInstance().getDefinition().getId() + "] is missing translations for the following required languages: " + String.join(", ", specifiedRequiredLanguages));
+            }
+        }
+    }
+
+    private void checkReferencedVocabularyRecordIsExistingInCorrectVocabulary(FieldValueEntity fieldValue) throws FieldValueValidationException {
+        if (fieldValue.getFieldInstance().getDefinition().getReferenceVocabulary() != null) {
+            long referenceVocabularyId = fieldValue.getFieldInstance().getDefinition().getReferenceVocabulary().getId();
+            Set<Long> ids = fieldValue.getTranslations().stream()
+                    .map(FieldTranslationEntity::getValue)
+                    .map((Long::parseLong))
+                    .collect(Collectors.toSet());
+            List<String> errors = new ArrayList<>(ids.size());
+            ids.forEach(id -> {
+                Optional<VocabularyRecordEntity> rec = recordRepository.findById(id);
+                if (rec.isEmpty()) {
+                    errors.add("record [" + id + "] does not exist");
+                } else if (referenceVocabularyId != rec.get().getVocabulary().getId()) {
+                    errors.add("record [" + id + "] belongs to vocabulary [" + rec.get().getVocabulary().getId() + "] instead of [" + referenceVocabularyId + "]");
+                }
+            });
+            if (!errors.isEmpty()) {
+                throw new FieldValueValidationException("Vocabulary record reference error(s): " + String.join(", " + errors));
             }
         }
     }

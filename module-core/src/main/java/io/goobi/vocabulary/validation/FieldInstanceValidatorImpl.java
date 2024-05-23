@@ -5,6 +5,7 @@ import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
+import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -15,9 +16,9 @@ import java.util.stream.Collectors;
 public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstanceEntity> {
     private final Validator<FieldValueEntity> fieldValueValidator;
 
-    public FieldInstanceValidatorImpl(FieldInstanceRepository fieldInstanceRepository) {
+    public FieldInstanceValidatorImpl(FieldInstanceRepository fieldInstanceRepository, VocabularyRecordRepository vocabularyRecordRepository) {
         super("Field");
-        this.fieldValueValidator = new FieldValueValidatorImpl(fieldInstanceRepository);
+        this.fieldValueValidator = new FieldValueValidatorImpl(fieldInstanceRepository, vocabularyRecordRepository);
         setValidations(List.of(
                 this::fieldIsNotEmptyCheck,
                 this::fieldDefinitionBelongsToCorrectSchema,
