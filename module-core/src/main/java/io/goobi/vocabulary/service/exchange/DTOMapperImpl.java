@@ -115,10 +115,12 @@ public class DTOMapperImpl implements DTOMapper {
             }
             result.setSchema(lookUpSchema(dto.getSchemaId()));
         }
-        if (dto.getTypeId() == null) {
+        if (dto.getReferenceVocabularyId() == null && dto.getTypeId() == null) {
             throw new MissingAttributeException(FieldInstanceEntity.class, "typeId");
         }
-        result.setType(lookUpFieldType(dto.getTypeId()));
+        if (dto.getTypeId() != null) {
+            result.setType(lookUpFieldType(dto.getTypeId()));
+        }
         if (dto.getReferenceVocabularyId() != null) {
             result.setReferenceVocabulary(lookUpVocabulary(dto.getReferenceVocabularyId()));
         }
@@ -144,7 +146,9 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setSchemaId(entity.getSchema().getId());
         result.setName(entity.getName());
-        result.setTypeId(entity.getType().getId());
+        if (entity.getType() != null) {
+            result.setTypeId(entity.getType().getId());
+        }
         if (entity.getReferenceVocabulary() != null) {
             result.setReferenceVocabularyId(entity.getReferenceVocabulary().getId());
         }

@@ -4,7 +4,6 @@ import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
 import io.goobi.vocabulary.exception.MappingException;
-import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
@@ -31,6 +30,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class RDFMapperImpl implements RDFMapper {
@@ -75,8 +75,10 @@ public class RDFMapperImpl implements RDFMapper {
     @Override
     public boolean isRDFCompatible(VocabularyEntity entity) {
         try {
+            // TODO: Think about how to export / resolve referenced entries
             entity.getSchema().getDefinitions().stream()
                     .map(FieldDefinitionEntity::getType)
+                    .filter(Objects::nonNull)
                     .map(FieldTypeEntity::getName)
                     .forEach(this::findSkosProperty);
             return true;

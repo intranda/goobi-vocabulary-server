@@ -188,7 +188,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                 }
             });
             if (!errors.isEmpty()) {
-                throw new FieldValueValidationException("Vocabulary record reference error(s): " + String.join(", " + errors));
+                throw new FieldValueValidationException("Vocabulary record reference error(s): " + String.join(", ", errors));
             }
         }
     }

@@ -40,8 +40,8 @@ public class FieldDefinitionEntity {
     @Column(name = "label", nullable = false)
     private String name;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "type_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "type_id")
     private FieldTypeEntity type;
 
     // TODO: Maybe find a cleaner solution for this

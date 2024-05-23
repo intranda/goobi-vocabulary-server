@@ -49,8 +49,7 @@ public class FieldDefinitionValidatorImpl extends BaseValidator<FieldDefinitionE
                 }
                 throw new FieldDefinitionValidationException("You specified a reference vocabulary, therefore: " + String.join(", ", errors));
             }
-        }
-        if (fieldDefinitionEntity.getType() == null) {
+        } else if (fieldDefinitionEntity.getType() == null) {
             throw new FieldDefinitionValidationException("You did not specify a type");
         }
     }
