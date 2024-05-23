@@ -30,7 +30,6 @@ class Migrator:
     def migrate_data_without_records(self):
         self.migrate_schemas()
         self.migrate_vocabularies()
-        self.migrate_records()
     
     def migrate_schemas(self):
         logging.info(f'Migrating {len(self.schemas)} schemas')
@@ -53,7 +52,6 @@ class Migrator:
         successful = 0
         for v in self.vocabularies:
             try:
-                #v['name'] += str(random.randint(0, 9999999999)) # TODO: REMOVE THIS
                 v.insert(self.ctx)
                 self.ctx.log_processed(v)
                 logging.debug(f'Vocabulary migrated\n{v}')
