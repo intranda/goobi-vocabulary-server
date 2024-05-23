@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -96,6 +97,24 @@ class FieldTypeMapperTest {
     }
 
     @Test
+    void largeFalse_toDTO() {
+        fieldType.setLarge(false);
+
+        FieldType result = mapper.toDTO(fieldType);
+
+        assertEquals(Boolean.FALSE, result.getLarge());
+    }
+
+    @Test
+    void largeTrue_toDTO() {
+        fieldType.setLarge(true);
+
+        FieldType result = mapper.toDTO(fieldType);
+
+        assertEquals(Boolean.TRUE, result.getLarge());
+    }
+
+    @Test
     void validId_fromDTO() {
         FieldTypeEntity result = mapper.toEntity(fieldTypeDTO);
 
@@ -150,5 +169,23 @@ class FieldTypeMapperTest {
         FieldTypeEntity result = mapper.toEntity(fieldTypeDTO);
 
         assertTrue(result.getSelectableValues().isEmpty());
+    }
+
+    @Test
+    void largeFalse_fromDTO() {
+        fieldTypeDTO.setLarge(false);
+
+        FieldTypeEntity result = mapper.toEntity(fieldTypeDTO);
+
+        assertFalse(result.isLarge());
+    }
+
+    @Test
+    void largeTrue_fromDTO() {
+        fieldTypeDTO.setLarge(true);
+
+        FieldTypeEntity result = mapper.toEntity(fieldTypeDTO);
+
+        assertTrue(result.isLarge());
     }
 }
