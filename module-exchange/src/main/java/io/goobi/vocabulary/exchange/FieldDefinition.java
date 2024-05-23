@@ -14,6 +14,7 @@ public class FieldDefinition extends BaseObject {
     private Long schemaId;
     private String name;
     private Long typeId;
+    private Long referenceVocabularyId;
     private Boolean required;
     private Boolean unique;
     private Boolean mainEntry;

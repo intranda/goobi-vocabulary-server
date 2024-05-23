@@ -6,9 +6,11 @@ import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.FieldTypeRepository;
 import io.goobi.vocabulary.repositories.LanguageRepository;
+import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,9 +43,12 @@ class FieldDefinitionMapperTest {
     private static final Long FIELD_DEFINITION_ID = 6234824L;
     private static final String FIELD_DEFINITION_NAME = "SOME_NAME";
     private static final Long FIELD_TYPE_ID = 203763L;
+    private static final Long REFERENCE_VOCABULARY_ID = 168435432L;
 
     @Mock
     private FieldTypeRepository fieldTypeRepository;
+    @Mock
+    private VocabularyRepository vocabularyRepository;
     @Mock
     private VocabularySchemaRepository vocabularySchemaRepository;
     @Mock
@@ -52,6 +57,7 @@ class FieldDefinitionMapperTest {
     @InjectMocks
     private DTOMapperImpl mapper;
 
+    private VocabularyEntity referenceVocabulary;
     private VocabularySchemaEntity schema;
     private FieldTypeEntity fieldType;
     private LanguageEntity english;
@@ -65,6 +71,10 @@ class FieldDefinitionMapperTest {
 
     @BeforeEach
     void setUp() {
+        referenceVocabulary = new VocabularyEntity();
+        referenceVocabulary.setId(REFERENCE_VOCABULARY_ID);
+        when(vocabularyRepository.findById(REFERENCE_VOCABULARY_ID)).thenReturn(Optional.ofNullable(referenceVocabulary));
+
         schema = new VocabularySchemaEntity();
         schema.setId(SCHEMA_ID);
 
@@ -111,6 +121,7 @@ class FieldDefinitionMapperTest {
         fieldDefinition.setSchema(schema);
         fieldDefinition.setName(FIELD_DEFINITION_NAME);
         fieldDefinition.setType(fieldType);
+        fieldDefinition.setReferenceVocabulary(referenceVocabulary);
         fieldDefinition.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
         englishTranslationDefinition.setFieldDefinition(fieldDefinition);
         germanTranslationDefinition.setFieldDefinition(fieldDefinition);
@@ -119,6 +130,7 @@ class FieldDefinitionMapperTest {
         fieldDefinitionDTO.setSchemaId(SCHEMA_ID);
         fieldDefinitionDTO.setName(FIELD_DEFINITION_NAME);
         fieldDefinitionDTO.setTypeId(FIELD_TYPE_ID);
+        fieldDefinitionDTO.setReferenceVocabularyId(REFERENCE_VOCABULARY_ID);
         fieldDefinitionDTO.setTranslationDefinitions(Set.of(englishTranslationDefinitionDTO, germanTranslationDefinitionDTO));
 
         when(fieldTypeRepository.findById(FIELD_TYPE_ID)).thenReturn(Optional.of(fieldType));
@@ -151,6 +163,13 @@ class FieldDefinitionMapperTest {
         FieldDefinition result = mapper.toDTO(fieldDefinition);
 
         assertEquals(FIELD_TYPE_ID, result.getTypeId());
+    }
+
+    @Test
+    void validReferenceVocabulary_toDTO() {
+        FieldDefinition result = mapper.toDTO(fieldDefinition);
+
+        assertEquals(REFERENCE_VOCABULARY_ID, result.getReferenceVocabularyId());
     }
 
     @Test
@@ -310,6 +329,13 @@ class FieldDefinitionMapperTest {
         FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
 
         assertEquals(fieldType, result.getType());
+    }
+
+    @Test
+    void validReferenceVocabulary_fromDTO() {
+        FieldDefinitionEntity result = mapper.toEntity(fieldDefinitionDTO);
+
+        assertEquals(referenceVocabulary, result.getReferenceVocabulary());
     }
 
     @Test

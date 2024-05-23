@@ -33,7 +33,6 @@ import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -120,6 +119,9 @@ public class DTOMapperImpl implements DTOMapper {
             throw new MissingAttributeException(FieldInstanceEntity.class, "typeId");
         }
         result.setType(lookUpFieldType(dto.getTypeId()));
+        if (dto.getReferenceVocabularyId() != null) {
+            result.setReferenceVocabulary(lookUpVocabulary(dto.getReferenceVocabularyId()));
+        }
         result.setName(dto.getName());
         result.setRequired(Boolean.TRUE.equals(dto.getRequired()));
         result.setUnique(Boolean.TRUE.equals(dto.getUnique()));
@@ -143,6 +145,9 @@ public class DTOMapperImpl implements DTOMapper {
         result.setSchemaId(entity.getSchema().getId());
         result.setName(entity.getName());
         result.setTypeId(entity.getType().getId());
+        if (entity.getReferenceVocabulary() != null) {
+            result.setReferenceVocabularyId(entity.getReferenceVocabulary().getId());
+        }
         result.setRequired(entity.isRequired());
         result.setUnique(entity.isUnique());
         result.setMainEntry(Boolean.TRUE.equals(entity.getMainEntry()));
