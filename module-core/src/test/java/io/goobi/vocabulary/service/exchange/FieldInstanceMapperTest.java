@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -137,7 +136,7 @@ class FieldInstanceMapperTest {
     }
 
     private void setUpFieldDTOValues(FieldValue... values) {
-        fieldInstanceDTO.setValues(Set.of(values));
+        fieldInstanceDTO.setValues(List.of(values));
         Arrays.stream(values).forEach(v -> v.setFieldId(FIELD_INSTANCE_ID));
     }
 
@@ -196,7 +195,7 @@ class FieldInstanceMapperTest {
         );
     }
 
-    private void assertDTOTranslations(Set<FieldValue> fieldValues, String... values) {
+    private void assertDTOTranslations(List<FieldValue> fieldValues, String... values) {
         Set<String> expectedValues = Set.of(values);
         Set<String> providedValues = fieldValues.stream()
                 .flatMap(fv -> fv.getTranslations().stream())

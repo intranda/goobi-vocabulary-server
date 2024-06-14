@@ -228,7 +228,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setDefinitionId(entity.getDefinition().getId());
         result.setValues(entity.getFieldValues().stream()
                 .map(this::toDTO)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toList())
         );
         return result;
     }
