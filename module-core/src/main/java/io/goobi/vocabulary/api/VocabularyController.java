@@ -10,6 +10,7 @@ import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.csv.CSVMapper;
 import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
+import io.goobi.vocabulary.service.manager.VocabularyImportManager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class VocabularyController {
     private final VocabularyDTOManager manager;
+    private final VocabularyImportManager importManager;
     private final VocabularyExportManager exportManager;
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
@@ -42,8 +44,9 @@ public class VocabularyController {
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(VocabularyDTOManager manager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
+        this.importManager = importManager;
         this.exportManager = exportManager;
         this.assembler = assembler;
         this.rdfMapper = rdfMapper;
@@ -80,6 +83,12 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
                 .body(IOUtils.toByteArray(exportManager.export(id)));
+    }
+
+    @PutMapping( "/vocabularies/{id}/import/csv")
+    public ResponseEntity<?> importCsv(@PathVariable long id, @RequestBody String body) {
+        importManager.importCsv(id, body);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(
