@@ -70,7 +70,9 @@ public class VocabularyExportManager {
         Definition result = new Definition();
         result.setId(original.getId());
         result.setLabel(original.getName());
-        result.setType(transform(original.getType()));
+        if (original.getType() != null) {
+            result.setType(transform(original.getType()));
+        }
         if (original.getTranslationDefinitions() != null && !original.getTranslationDefinitions().isEmpty()) {
             result.setLanguageSpecifications(original.getTranslationDefinitions().stream()
                     .map(this::transform)
