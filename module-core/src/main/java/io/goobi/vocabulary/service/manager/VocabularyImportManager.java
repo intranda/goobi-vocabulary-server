@@ -148,8 +148,8 @@ public class VocabularyImportManager {
         Map<String, FieldInstance> fieldMap = new HashMap<>();
         for (int i = 0; i < fields.size(); i++) {
             FieldInformation info = fields.get(i);
-            String value = values[i];
-            if (value.isBlank()) {
+            String multiValue = values[i];
+            if (multiValue.isBlank()) {
                 continue;
             }
             FieldInstance field = fieldMap.computeIfAbsent(info.name, k -> {
@@ -161,18 +161,21 @@ public class VocabularyImportManager {
                         .orElseThrow());
                 return result;
             });
-            FieldValue fieldValue;
-            if (field.getValues().isEmpty()) {
-                fieldValue = new FieldValue();
-                field.getValues().add(fieldValue);
-            } else {
-                // TODO: Handle multi values
-                fieldValue = field.getValues().get(0);
+            // TODO: Test this with translatable multi-values
+            String[] multiValues = multiValue.split("\\|");
+            for (int j = 0; j < multiValues.length; j++) {
+                FieldValue fieldValue;
+                if (field.getValues().size() <= j) {
+                    fieldValue = new FieldValue();
+                    field.getValues().add(fieldValue);
+                } else {
+                    fieldValue = field.getValues().get(j);
+                }
+                TranslationInstance translation = new TranslationInstance();
+                translation.setLanguage(info.getLanguage());
+                translation.setValue(multiValues[j]);
+                fieldValue.getTranslations().add(translation);
             }
-            TranslationInstance translation = new TranslationInstance();
-            translation.setLanguage(info.getLanguage());
-            translation.setValue(value);
-            fieldValue.getTranslations().add(translation);
         }
 
         VocabularyRecord result = new VocabularyRecord();
