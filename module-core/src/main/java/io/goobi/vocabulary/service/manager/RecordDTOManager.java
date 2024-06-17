@@ -70,6 +70,10 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         );
     }
 
+    public boolean exists(long id) {
+        return vocabularyRecordRepository.existsById(id);
+    }
+
     @Override
     public VocabularyRecord create(VocabularyRecord newRecord) throws ValidationException {
         VocabularyRecordEntity jpaVocabularyRecord = modelMapper.toEntity(newRecord);

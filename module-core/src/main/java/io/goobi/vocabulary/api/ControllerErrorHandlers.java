@@ -78,6 +78,13 @@ public class ControllerErrorHandlers {
     }
 
     @ResponseBody
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String illegalArgumentHandler(IllegalArgumentException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
     @ExceptionHandler(UnsupportedEntityReplacementException.class)
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     String unsupportedResourcesReplaceMethod(UnsupportedEntityReplacementException e) {

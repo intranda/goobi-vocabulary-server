@@ -72,10 +72,54 @@ public class VocabularyImportManager {
         fields.forEach(System.err::println);
         validateHeader();
         List<Throwable> importErrors = new LinkedList<>();
+
+        // parse all records and create a queue
+        List<VocabularyRecord> insertionQueue = new LinkedList<>();
         for (int i = 1; i < lines.size(); i++) {
-            // TODO: Transactional insert
             try {
-                manager.create(parseRecord(lines.get(i)));
+                insertionQueue.add(parseRecord(lines.get(i)));
+            } catch (IllegalArgumentException e) {
+                importErrors.add(e);
+            }
+        }
+
+        // insert all records in this queue, if the parent has been already inserted, otherwise enqueue last
+        Map<Long, Long> idMapping = new HashMap<>();
+        // TODO: Might lead to infinite loop on ID or import errors
+        while (!insertionQueue.isEmpty()) {
+            try {
+                VocabularyRecord newRecord = insertionQueue.get(0);
+                insertionQueue.remove(0);
+                Long oldId = newRecord.getId();
+                Long parentId = newRecord.getParentId();
+
+                // if parent is not yet processed, enqueue last
+                if (parentId != null && !idMapping.containsKey(parentId)) {
+                    throw new ValidationException("Undefined parent \"" + parentId + "\"");
+                }
+
+                if (parentId != null) {
+                    newRecord.setParentId(idMapping.get(parentId));
+                    if (oldId != null && manager.exists(oldId)) {
+                        newRecord = replaceExistingRecordsValues(newRecord, oldId);
+                        newRecord = manager.replace(newRecord);
+                    } else {
+                        newRecord.setId(null);
+                        newRecord = manager.createSubRecord(newRecord);
+                    }
+                } else {
+                    if (oldId != null && manager.exists(oldId)) {
+                        newRecord = replaceExistingRecordsValues(newRecord, oldId);
+                        newRecord = manager.replace(newRecord);
+                    } else {
+                        newRecord.setId(null);
+                        newRecord = manager.create(newRecord);
+                    }
+                }
+                long newId = newRecord.getId();
+                if (oldId != null) {
+                    idMapping.put(oldId, newId);
+                }
             } catch (ValidationException e) {
                 importErrors.add(e);
             }
@@ -84,6 +128,14 @@ public class VocabularyImportManager {
             throw new IllegalArgumentException("Error(s) during csv import:\n\t"
                     + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
         }
+    }
+
+    private VocabularyRecord replaceExistingRecordsValues(VocabularyRecord newRecord, long oldId) {
+        VocabularyRecord existingRecord = manager.get(oldId);
+        existingRecord.setParentId(newRecord.getParentId());
+        existingRecord.setFields(newRecord.getFields());
+        existingRecord.getFields().forEach(f -> f.setRecordId(oldId));
+        return existingRecord;
     }
 
     private void parseHeader(String header) {
@@ -106,7 +158,12 @@ public class VocabularyImportManager {
     }
 
     private void validateHeader() {
-        Set<FieldInformation> definedFields = vocabulary.getSchema().getDefinitions().stream()
+        Set<FieldInformation> definedFields = new HashSet<>();
+        definedFields.add(new FieldInformation("ID", null));
+        if (vocabulary.getSchema().isHierarchicalRecords()) {
+            definedFields.add(new FieldInformation("Parent-ID", null));
+        }
+        definedFields.addAll(vocabulary.getSchema().getDefinitions().stream()
                 .flatMap(d -> {
                     String name = d.getName();
                     List<String> languages = d.getTranslationDefinitions().stream()
@@ -119,7 +176,7 @@ public class VocabularyImportManager {
                     return languages.stream()
                             .map(l -> new FieldInformation(name, l));
                 })
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()));
         Set<FieldInformation> presentFields = fields.stream().collect(Collectors.toSet());
         if (!definedFields.equals(presentFields)) {
             Set<FieldInformation> undefined = presentFields.stream()
@@ -140,6 +197,8 @@ public class VocabularyImportManager {
     }
 
     private VocabularyRecord parseRecord(String rec) {
+        VocabularyRecord resultRecord = new VocabularyRecord();
+
         String[] values = rec.split(CSV_DELIMITER, -1);
         if (values.length != fields.size()) {
             throw new IllegalArgumentException("Malformed CSV, number of fields does not match header");
@@ -152,37 +211,43 @@ public class VocabularyImportManager {
             if (multiValue.isBlank()) {
                 continue;
             }
-            FieldInstance field = fieldMap.computeIfAbsent(info.name, k -> {
-                FieldInstance result = new FieldInstance();
-                result.setDefinitionId(vocabulary.getSchema().getDefinitions().stream()
-                        .filter(d -> d.getName().equals(k))
-                        .map(FieldDefinitionEntity::getId)
-                        .findFirst()
-                        .orElseThrow());
-                return result;
-            });
-            // TODO: Test this with translatable multi-values
-            String[] multiValues = multiValue.split("\\|");
-            for (int j = 0; j < multiValues.length; j++) {
-                FieldValue fieldValue;
-                if (field.getValues().size() <= j) {
-                    fieldValue = new FieldValue();
-                    field.getValues().add(fieldValue);
-                } else {
-                    fieldValue = field.getValues().get(j);
+            // Special treatment for ID's
+            if ("ID".equals(info.name)) {
+                resultRecord.setId(Long.parseLong(multiValue));
+            } else if ("Parent-ID".equals(info.name)) {
+                resultRecord.setParentId(Long.parseLong(multiValue));
+            } else {
+                FieldInstance field = fieldMap.computeIfAbsent(info.name, k -> {
+                    FieldInstance result = new FieldInstance();
+                    result.setDefinitionId(vocabulary.getSchema().getDefinitions().stream()
+                            .filter(d -> d.getName().equals(k))
+                            .map(FieldDefinitionEntity::getId)
+                            .findFirst()
+                            .orElseThrow());
+                    return result;
+                });
+                // TODO: Test this with translatable multi-values
+                String[] multiValues = multiValue.split("\\|");
+                for (int j = 0; j < multiValues.length; j++) {
+                    FieldValue fieldValue;
+                    if (field.getValues().size() <= j) {
+                        fieldValue = new FieldValue();
+                        field.getValues().add(fieldValue);
+                    } else {
+                        fieldValue = field.getValues().get(j);
+                    }
+                    TranslationInstance translation = new TranslationInstance();
+                    translation.setLanguage(info.getLanguage());
+                    translation.setValue(multiValues[j]);
+                    fieldValue.getTranslations().add(translation);
                 }
-                TranslationInstance translation = new TranslationInstance();
-                translation.setLanguage(info.getLanguage());
-                translation.setValue(multiValues[j]);
-                fieldValue.getTranslations().add(translation);
             }
         }
 
-        VocabularyRecord result = new VocabularyRecord();
-        result.setVocabularyId(vocabularyId);
-        result.setFields(new HashSet<>(fieldMap.values()));
+        resultRecord.setVocabularyId(vocabularyId);
+        resultRecord.setFields(new HashSet<>(fieldMap.values()));
 
-        return result;
+        return resultRecord;
     }
 
     private List<String> extractLines(String csv) {
