@@ -75,12 +75,17 @@ public class CSVMapperImpl implements CSVMapper {
     public String toCSV(VocabularyEntity entity) {
         StringBuilder sb = new StringBuilder();
         List<FieldDefinition> fieldDefinitions = createHeader(sb, entity);
-        entity.getRecords().forEach(r -> dumpRecord(sb, fieldDefinitions, r));
+        entity.getRecords().forEach(r -> dumpRecord(sb, fieldDefinitions, entity, r));
         return sb.toString();
     }
 
     private List<FieldDefinition> createHeader(StringBuilder sb, VocabularyEntity vocabulary) {
-        List<FieldDefinition> fieldDefinitions = vocabulary.getSchema().getDefinitions().stream()
+        List<FieldDefinition> fieldDefinitions = new LinkedList<>();
+        fieldDefinitions.add(new FieldDefinition("ID", null));
+        if (vocabulary.getSchema().isHierarchicalRecords()) {
+            fieldDefinitions.add(new FieldDefinition("Parent-ID", null));
+        }
+        fieldDefinitions.addAll(vocabulary.getSchema().getDefinitions().stream()
                 .sorted(Comparator.comparingLong(FieldDefinitionEntity::getId))
                 .map(d -> {
                     if (d.getTranslationDefinitions() == null || d.getTranslationDefinitions().isEmpty()) {
@@ -94,15 +99,19 @@ public class CSVMapperImpl implements CSVMapper {
                     }
                 })
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         sb.append(fieldDefinitions.stream()
                 .map(FieldDefinition::toString)
                 .collect(Collectors.joining(",")) + '\n');
         return fieldDefinitions;
     }
 
-    private void dumpRecord(StringBuilder sb, List<FieldDefinition> fieldDefinitions, VocabularyRecordEntity r) {
+    private void dumpRecord(StringBuilder sb, List<FieldDefinition> fieldDefinitions, VocabularyEntity vocabulary, VocabularyRecordEntity r) {
         Row row = new Row();
+        row.addField(new Field("ID", null, String.valueOf(r.getId())));
+        if (vocabulary.getSchema().isHierarchicalRecords()) {
+            row.addField(new Field("Parent-ID", null, r.getParentRecord() == null ? "" : String.valueOf(r.getParentRecord().getId())));
+        }
         r.getFields().stream()
                 .map(this::extractField)
                 .flatMap(Collection::stream)
