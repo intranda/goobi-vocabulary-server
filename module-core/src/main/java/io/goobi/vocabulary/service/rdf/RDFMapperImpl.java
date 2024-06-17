@@ -76,6 +76,11 @@ public class RDFMapperImpl implements RDFMapper {
     public boolean isRDFCompatible(VocabularyEntity entity) {
         try {
             // TODO: Think about how to export / resolve referenced entries
+            if (entity.getSchema().getDefinitions().stream()
+                    .map(FieldDefinitionEntity::getType)
+                    .anyMatch(Objects::isNull)) {
+                return false;
+            }
             entity.getSchema().getDefinitions().stream()
                     .map(FieldDefinitionEntity::getType)
                     .filter(Objects::nonNull)
