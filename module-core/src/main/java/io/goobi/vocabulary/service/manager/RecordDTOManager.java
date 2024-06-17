@@ -6,8 +6,10 @@ import io.goobi.vocabulary.exception.RecordValidationException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
+import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
+import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.validation.Validator;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,11 +30,13 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     private final VocabularyRecordRepository vocabularyRecordRepository;
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
+    private final VocabularyRepository vocabularyRepository;
 
-    public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator) {
+    public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator, VocabularyRepository vocabularyRepository) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
+        this.vocabularyRepository = vocabularyRepository;
     }
 
     public List<VocabularyRecord> all(long id) {
@@ -132,6 +138,14 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         }
         vocabularyRecordRepository.deleteById(id);
         return null;
+    }
+
+    public Collection<VocabularyRecord> deleteAllRecords(long vocabularyId) {
+        VocabularyEntity vocabulary = vocabularyRepository.findById(vocabularyId)
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
+        vocabulary.getRecords().clear();
+        vocabularyRepository.save(vocabulary);
+        return Collections.emptyList();
     }
 
     public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {

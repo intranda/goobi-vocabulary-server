@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
+
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyRecordController {
@@ -99,5 +101,11 @@ public class VocabularyRecordController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<VocabularyRecord> delete(@PathVariable long recordId) {
         return ResponseEntity.ok(manager.delete(recordId));
+    }
+
+    @DeleteMapping("/vocabularies/{vocabularyId}/records")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Collection<VocabularyRecord>> deleteAllRecords(@PathVariable long vocabularyId) {
+        return ResponseEntity.ok(manager.deleteAllRecords(vocabularyId));
     }
 }
