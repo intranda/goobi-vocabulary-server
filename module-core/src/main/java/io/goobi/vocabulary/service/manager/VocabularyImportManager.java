@@ -69,7 +69,6 @@ public class VocabularyImportManager {
         List<String> lines = extractLines(csv);
         String header = lines.get(0);
         parseHeader(header);
-        fields.forEach(System.err::println);
         validateHeader();
         List<Throwable> importErrors = new LinkedList<>();
 
