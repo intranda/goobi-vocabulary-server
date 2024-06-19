@@ -98,11 +98,11 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
         if (Boolean.TRUE.equals(fieldValue.getFieldInstance().getDefinition().isUnique())) {
             Set<String> duplicateUniqueValues = fieldValue.getTranslations().stream()
                     .map(FieldTranslationEntity::getValue)
-                    .filter(v -> fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(
-                                fieldValue.getFieldInstance().getVocabularyRecord().getVocabulary().getId(),
-                                fieldValue.getFieldInstance().getDefinition().getId(),
-                                fieldValue.getFieldInstance().getId(),
-                                v
+                    .filter(v -> fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(
+                            fieldValue.getFieldInstance().getVocabularyRecord().getVocabulary().getId(),
+                            fieldValue.getFieldInstance().getDefinition().getId(),
+                            fieldValue.getFieldInstance().getVocabularyRecord().getId(),
+                            v
                     ))
                     .collect(Collectors.toSet());
             if (!duplicateUniqueValues.isEmpty()) {

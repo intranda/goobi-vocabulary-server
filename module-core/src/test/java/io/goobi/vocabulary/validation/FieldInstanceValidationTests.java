@@ -221,8 +221,8 @@ class FieldInstanceValidationTests {
 
     @Test
     void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws ValidationException {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, 11L, "Bob")).thenReturn(true);
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 12L, "Bob")).thenReturn(false);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, record.getId(), "Bob")).thenReturn(true);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, record.getId(), "Bob")).thenReturn(false);
 
         FieldInstanceEntity fieldFriend = setupFieldInstance(
                 setupFieldDefinition("Best Friend", null, null, null,false, true, false, true, false),
@@ -241,13 +241,12 @@ class FieldInstanceValidationTests {
 
     @Test
     void duplicateUniqueFieldValueForTheSameFieldDefinition_fails() {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndIdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, 10L, "Bob")).thenReturn(true);
+        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, record.getId(), "Bob")).thenReturn(true);
 
         FieldInstanceEntity fieldName = setupFieldInstance(
                 setupFieldDefinition("Name", null, null, null,true, true, true, true, false),
                 Pair.of("", "Bob"));
         fieldName.getDefinition().setId(2L);
-        fieldName.setId(10L);
 
         assertThrows(ValidationException.class, () -> validator.validate(fieldName));
     }
