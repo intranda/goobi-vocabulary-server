@@ -43,7 +43,7 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
             "LEFT JOIN vocabulary_record r1 ON sorted_records.id=r1.id", nativeQuery = true)
     Page<VocabularyRecordEntity> findByVocabulary_sortedByFieldDefinitionDESC(@NonNull Long vocabularyId, @NonNull Long definitionId, Pageable pageable);
 
-    @Query(value = "SELECT vre1_0.id,vre1_0.parent_record_id,vre1_0.vocabulary_id FROM vocabulary_record vre1_0 " +
+    @Query(value = "SELECT DISTINCT vre1_0.id,vre1_0.parent_record_id,vre1_0.vocabulary_id FROM vocabulary_record vre1_0 " +
             "left join field_instance f1_0 on vre1_0.id=f1_0.record_id " +
             "left join field_value fv1_0 on f1_0.id=fv1_0.field_instance_id " +
             "left join field_translation t1_0 on fv1_0.id=t1_0.field_value_id " +
