@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class ExcelMapperImpl implements ExcelMapper {
+    public static final int MAX_CELL_LENGTH = 32767;
     private final TabularRecordExporter tabularRecordExporter;
 
     public ExcelMapperImpl(TabularRecordExporter tabularRecordExporter) {
@@ -30,6 +31,9 @@ public class ExcelMapperImpl implements ExcelMapper {
                 Row excelRow = sheet.createRow(rowIndex++);
                 int columnIndex = 0;
                 for (String column : row) {
+                    if (column.length() > MAX_CELL_LENGTH) {
+                        column = column.substring(0, MAX_CELL_LENGTH);
+                    }
                     excelRow.createCell(columnIndex++).setCellValue(column);
                 }
             }
