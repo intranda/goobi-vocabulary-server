@@ -14,6 +14,9 @@
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
+    <properties>
+        <poi.version>5.2.5</poi.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>io.goobi.vocabulary</groupId>
@@ -47,6 +50,38 @@
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
             <version>5.0.0</version>
+        </dependency>
+        <!-- Excel import and export -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-full</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-excelant</artifactId>
+            <version>${poi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>

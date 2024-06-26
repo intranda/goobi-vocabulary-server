@@ -33,7 +33,8 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
                 linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getId(), null, null)).withRel("records"),
                 linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete"),
                 linkTo(methodOn(VocabularyController.class).exportAsJson(entity.getId())).withRel("export_json"),
-                linkTo(methodOn(VocabularyController.class).exportAsCsv(entity.getId())).withRel("export_csv")
+                linkTo(methodOn(VocabularyController.class).exportAsCsv(entity.getId())).withRel("export_csv"),
+                linkTo(methodOn(VocabularyController.class).exportAsExcel(entity.getId())).withRel("export_excel")
         );
         if (rdfMapper.isRDFCompatible(dtoMapper.toEntity(entity))) {
             result.add(linkTo(methodOn(VocabularyController.class).exportAsRdfXml(entity.getId())).withRel("export_rdf_xml"));

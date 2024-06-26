@@ -7,8 +7,8 @@ import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
-import io.goobi.vocabulary.service.csv.CSVMapper;
 import io.goobi.vocabulary.service.io.csv.CSVMapper;
+import io.goobi.vocabulary.service.io.excel.ExcelMapper;
 import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
 import io.goobi.vocabulary.service.manager.VocabularyImportManager;
@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -42,16 +43,18 @@ public class VocabularyController {
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
     private final CSVMapper csvMapper;
+    private final ExcelMapper excelMapper;
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, ExcelMapper excelMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.importManager = importManager;
         this.exportManager = exportManager;
         this.assembler = assembler;
         this.rdfMapper = rdfMapper;
         this.csvMapper = csvMapper;
+        this.excelMapper = excelMapper;
         this.vocabularyRepository = vocabularyRepository;
     }
 
@@ -101,6 +104,20 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".csv\"")
                 .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
+    }
+
+    @GetMapping(
+            value = "/vocabularies/{id}/export/excel",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public ResponseEntity<StreamingResponseBody> exportAsExcel(@PathVariable long id) {
+        StreamingResponseBody responseBody = outputStream -> {
+            excelMapper.toExcel(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)), outputStream);
+        };
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".xlsx\"")
+                .body(responseBody);
     }
 
     @GetMapping(
