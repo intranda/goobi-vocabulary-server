@@ -8,6 +8,7 @@ import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.csv.CSVMapper;
+import io.goobi.vocabulary.service.io.csv.CSVMapper;
 import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyExportManager;
 import io.goobi.vocabulary.service.manager.VocabularyImportManager;

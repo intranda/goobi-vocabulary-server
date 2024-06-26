@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.service.csv;
+package io.goobi.vocabulary.service.io.csv;
 
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 

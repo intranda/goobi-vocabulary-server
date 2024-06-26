@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.service.csv;
+package io.goobi.vocabulary.service.io;
 
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class CSVMapperImpl implements CSVMapper {
+public class TabularRecordExporter {
     @Data
     @AllArgsConstructor
     class FieldDefinition {
@@ -71,15 +71,17 @@ public class CSVMapperImpl implements CSVMapper {
         }
     }
 
-    @Override
-    public String toCSV(VocabularyEntity entity) {
-        StringBuilder sb = new StringBuilder();
-        List<FieldDefinition> fieldDefinitions = createHeader(sb, entity);
-        entity.getRecords().forEach(r -> dumpRecord(sb, fieldDefinitions, entity, r));
-        return sb.toString();
+    public List<List<String>> toTabularData(VocabularyEntity entity) {
+        List<List<String>> result = new LinkedList<>();
+        List<FieldDefinition> fieldDefinitions = createHeader(entity);
+        result.add(fieldDefinitions.stream()
+                .map(FieldDefinition::toString)
+                .collect(Collectors.toList()));
+        entity.getRecords().forEach(r -> result.add(dumpRecord(fieldDefinitions, entity, r)));
+        return result;
     }
 
-    private List<FieldDefinition> createHeader(StringBuilder sb, VocabularyEntity vocabulary) {
+    private List<FieldDefinition> createHeader(VocabularyEntity vocabulary) {
         List<FieldDefinition> fieldDefinitions = new LinkedList<>();
         fieldDefinitions.add(new FieldDefinition("ID", null));
         if (vocabulary.getSchema().isHierarchicalRecords()) {
@@ -100,13 +102,10 @@ public class CSVMapperImpl implements CSVMapper {
                 })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
-        sb.append(fieldDefinitions.stream()
-                .map(FieldDefinition::toString)
-                .collect(Collectors.joining(",")) + '\n');
         return fieldDefinitions;
     }
 
-    private void dumpRecord(StringBuilder sb, List<FieldDefinition> fieldDefinitions, VocabularyEntity vocabulary, VocabularyRecordEntity r) {
+    private List<String> dumpRecord(List<FieldDefinition> fieldDefinitions, VocabularyEntity vocabulary, VocabularyRecordEntity r) {
         Row row = new Row();
         row.addField(new Field("ID", null, String.valueOf(r.getId())));
         if (vocabulary.getSchema().isHierarchicalRecords()) {
@@ -116,9 +115,9 @@ public class CSVMapperImpl implements CSVMapper {
                 .map(this::extractField)
                 .flatMap(Collection::stream)
                 .forEach(row::addField);
-        sb.append(fieldDefinitions.stream()
+        return fieldDefinitions.stream()
                 .map(fd -> row.getField(fd.name, fd.language))
-                .collect(Collectors.joining(",")) + '\n');
+                .collect(Collectors.toList());
     }
 
     private Set<Field> extractField(FieldInstanceEntity f) {
