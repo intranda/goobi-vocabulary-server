@@ -1,7 +1,6 @@
-package io.goobi.vocabulary.service.manager;
+package io.goobi.vocabulary.service.io.json;
 
 import com.google.gson.Gson;
-import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.model.flat.Definition;
 import io.goobi.vocabulary.model.flat.Field;
 import io.goobi.vocabulary.model.flat.LanguageSpecification;
@@ -20,7 +19,6 @@ import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
-import io.goobi.vocabulary.repositories.VocabularyRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -28,18 +26,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class VocabularyExportManager {
-    private final VocabularyRepository vocabularyRepository;
-    private final Gson gson;
+public class JsonMapperImpl implements JsonMapper {
+    private final Gson gson = new Gson();
 
-    public VocabularyExportManager(VocabularyRepository vocabularyRepository) {
-        this.vocabularyRepository = vocabularyRepository;
-        this.gson = new Gson();
-    }
-
-    public String export(long vocabularyId) {
-        return gson.toJson(transform(vocabularyRepository.findById(vocabularyId)
-                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId))));
+    @Override
+    public String toJson(VocabularyEntity vocabulary) {
+        return gson.toJson(transform(vocabulary));
     }
 
     private Vocabulary transform(VocabularyEntity original) {

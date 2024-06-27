@@ -26,7 +26,8 @@ import java.util.stream.Collectors;
 public class TabularRecordExporter {
     @Data
     @AllArgsConstructor
-    class FieldDefinition {
+    static
+    class FieldInformation {
         private String name;
         private String language;
 
@@ -41,6 +42,7 @@ public class TabularRecordExporter {
 
     @Data
     @AllArgsConstructor
+    static
     class Field {
         private String name;
         private String language;
@@ -48,6 +50,7 @@ public class TabularRecordExporter {
     }
 
     @Data
+    static
     class Row {
         private Set<Field> fields = new HashSet<>();
 
@@ -73,30 +76,30 @@ public class TabularRecordExporter {
 
     public List<List<String>> toTabularData(VocabularyEntity entity) {
         List<List<String>> result = new LinkedList<>();
-        List<FieldDefinition> fieldDefinitions = createHeader(entity);
+        List<FieldInformation> fieldDefinitions = createHeader(entity);
         result.add(fieldDefinitions.stream()
-                .map(FieldDefinition::toString)
+                .map(FieldInformation::toString)
                 .collect(Collectors.toList()));
         entity.getRecords().forEach(r -> result.add(dumpRecord(fieldDefinitions, entity, r)));
         return result;
     }
 
-    private List<FieldDefinition> createHeader(VocabularyEntity vocabulary) {
-        List<FieldDefinition> fieldDefinitions = new LinkedList<>();
-        fieldDefinitions.add(new FieldDefinition("ID", null));
+    private List<FieldInformation> createHeader(VocabularyEntity vocabulary) {
+        List<FieldInformation> fieldDefinitions = new LinkedList<>();
+        fieldDefinitions.add(new FieldInformation("ID", null));
         if (vocabulary.getSchema().isHierarchicalRecords()) {
-            fieldDefinitions.add(new FieldDefinition("Parent-ID", null));
+            fieldDefinitions.add(new FieldInformation("Parent-ID", null));
         }
         fieldDefinitions.addAll(vocabulary.getSchema().getDefinitions().stream()
                 .sorted(Comparator.comparingLong(FieldDefinitionEntity::getId))
                 .map(d -> {
                     if (d.getTranslationDefinitions() == null || d.getTranslationDefinitions().isEmpty()) {
-                        return List.of(new FieldDefinition(d.getName(), null));
+                        return List.of(new FieldInformation(d.getName(), null));
                     } else {
                         return d.getTranslationDefinitions().stream()
                                 .map(TranslationDefinitionEntity::getLanguage)
                                 .sorted(Comparator.comparingLong(LanguageEntity::getId))
-                                .map(l -> new FieldDefinition(d.getName(), l.getAbbreviation()))
+                                .map(l -> new FieldInformation(d.getName(), l.getAbbreviation()))
                                 .collect(Collectors.toList());
                     }
                 })
@@ -105,7 +108,7 @@ public class TabularRecordExporter {
         return fieldDefinitions;
     }
 
-    private List<String> dumpRecord(List<FieldDefinition> fieldDefinitions, VocabularyEntity vocabulary, VocabularyRecordEntity r) {
+    private List<String> dumpRecord(List<FieldInformation> fieldDefinitions, VocabularyEntity vocabulary, VocabularyRecordEntity r) {
         Row row = new Row();
         row.addField(new Field("ID", null, String.valueOf(r.getId())));
         if (vocabulary.getSchema().isHierarchicalRecords()) {

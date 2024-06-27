@@ -10,7 +10,7 @@ import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.io.csv.CSVMapper;
 import io.goobi.vocabulary.service.io.excel.ExcelMapper;
 import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
-import io.goobi.vocabulary.service.manager.VocabularyExportManager;
+import io.goobi.vocabulary.service.io.json.JsonMapperImpl;
 import io.goobi.vocabulary.service.manager.VocabularyImportManager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
@@ -29,17 +29,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
 public class VocabularyController {
     private final VocabularyDTOManager manager;
     private final VocabularyImportManager importManager;
-    private final VocabularyExportManager exportManager;
+    private final JsonMapperImpl exportManager;
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
     private final CSVMapper csvMapper;
@@ -47,7 +51,7 @@ public class VocabularyController {
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, VocabularyExportManager exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, ExcelMapper excelMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, JsonMapperImpl exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, ExcelMapper excelMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.importManager = importManager;
         this.exportManager = exportManager;
@@ -86,7 +90,7 @@ public class VocabularyController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
-                .body(IOUtils.toByteArray(exportManager.export(id)));
+                .body(IOUtils.toByteArray(exportManager.toJson(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @PutMapping( "/vocabularies/{id}/import/csv")
@@ -104,6 +108,14 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".csv\"")
                 .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
+    }
+
+    @PutMapping(
+            value = "/vocabularies/{id}/import/excel"
+    )
+    public ResponseEntity<?> importExcel(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {
+        importManager.importExcel(id, file.getInputStream());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(
