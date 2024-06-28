@@ -1,5 +1,6 @@
 package io.goobi.vocabulary.service.manager;
 
+import io.goobi.vocabulary.exception.DeletionOfReferencedVocabularyException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,10 +85,17 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
 
     @Override
     public Vocabulary delete(long id) {
-        if (!vocabularyRepository.existsById(id)) {
-            throw new EntityNotFoundException(VocabularyEntity.class, id);
-        }
+        VocabularyEntity vocabulary = vocabularyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, id));
+        checkForExistingReferencesToVocabulary(vocabulary);
         vocabularyRepository.deleteById(id);
         return null;
+    }
+
+    private void checkForExistingReferencesToVocabulary(VocabularyEntity vocabulary) {
+        Set<VocabularyEntity> referencingVocabularies = vocabularyRepository.findDistinctBySchema_Definitions_ReferenceVocabulary(vocabulary);
+        if (!referencingVocabularies.isEmpty()) {
+            throw new DeletionOfReferencedVocabularyException(vocabulary, referencingVocabularies);
+        }
     }
 }
