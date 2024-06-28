@@ -1,6 +1,7 @@
 package io.goobi.vocabulary.service.io.json;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.goobi.vocabulary.model.flat.Definition;
 import io.goobi.vocabulary.model.flat.Field;
 import io.goobi.vocabulary.model.flat.LanguageSpecification;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class JsonMapperImpl implements JsonMapper {
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public String toJson(VocabularyEntity vocabulary) {
