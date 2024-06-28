@@ -43,7 +43,7 @@ import java.io.IOException;
 public class VocabularyController {
     private final VocabularyDTOManager manager;
     private final VocabularyImportManager importManager;
-    private final JsonMapperImpl exportManager;
+    private final JsonMapperImpl jsonMapper;
     private final VocabularyAssembler assembler;
     private final RDFMapper rdfMapper;
     private final CSVMapper csvMapper;
@@ -51,10 +51,10 @@ public class VocabularyController {
     // TODO: Refactor VocabularyEntityManager for this
     private final VocabularyRepository vocabularyRepository;
 
-    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, JsonMapperImpl exportManager, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, ExcelMapper excelMapper, VocabularyRepository vocabularyRepository) {
+    public VocabularyController(VocabularyDTOManager manager, VocabularyImportManager importManager, JsonMapperImpl jsonMapper, VocabularyAssembler assembler, RDFMapper rdfMapper, CSVMapper csvMapper, ExcelMapper excelMapper, VocabularyRepository vocabularyRepository) {
         this.manager = manager;
         this.importManager = importManager;
-        this.exportManager = exportManager;
+        this.jsonMapper = jsonMapper;
         this.assembler = assembler;
         this.rdfMapper = rdfMapper;
         this.csvMapper = csvMapper;
@@ -90,7 +90,7 @@ public class VocabularyController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
-                .body(IOUtils.toByteArray(exportManager.toJson(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
+                .body(IOUtils.toByteArray(jsonMapper.toJson(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @PutMapping( "/vocabularies/{id}/import/csv")
