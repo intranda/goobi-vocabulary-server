@@ -16,6 +16,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "vocabulary_record")
@@ -62,5 +63,14 @@ public class VocabularyRecordEntity {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Record [" + getId() + "]: " + getFields().stream()
+                .flatMap(f -> f.getFieldValues().stream())
+                .flatMap(v -> v.getTranslations().stream())
+                .map(FieldTranslationEntity::getValue)
+                .collect(Collectors.joining(", "));
     }
 }

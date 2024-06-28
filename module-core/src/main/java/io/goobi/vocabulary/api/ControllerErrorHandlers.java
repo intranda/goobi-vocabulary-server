@@ -1,5 +1,6 @@
 package io.goobi.vocabulary.api;
 
+import io.goobi.vocabulary.exception.DeletionOfReferencedRecordException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.MissingAttributeException;
@@ -74,6 +75,13 @@ public class ControllerErrorHandlers {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String validationFailsHandler(ValidationException e) {
+        return e.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(DeletionOfReferencedRecordException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String deletionOfRecordNotPossible(DeletionOfReferencedRecordException e) {
         return e.getMessage();
     }
 

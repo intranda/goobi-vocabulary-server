@@ -1,15 +1,19 @@
 package io.goobi.vocabulary.service.manager;
 
+import io.goobi.vocabulary.exception.DeletionOfReferencedRecordException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.RecordValidationException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
 import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
+import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
+import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
+import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
 import io.goobi.vocabulary.validation.Validator;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,12 +36,14 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
     private final VocabularyRepository vocabularyRepository;
+    private final VocabularySchemaRepository vocabularySchemaRepository;
 
-    public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator, VocabularyRepository vocabularyRepository) {
+    public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator, VocabularyRepository vocabularyRepository, VocabularySchemaRepository vocabularySchemaRepository) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
         this.vocabularyRepository = vocabularyRepository;
+        this.vocabularySchemaRepository = vocabularySchemaRepository;
     }
 
     public List<VocabularyRecord> all(long id) {
@@ -137,19 +144,58 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
 
     @Override
     public VocabularyRecord delete(long id) {
-        if (!vocabularyRecordRepository.existsById(id)) {
-            throw new EntityNotFoundException(VocabularyRecordEntity.class, id);
-        }
-        vocabularyRecordRepository.deleteById(id);
+        VocabularyRecordEntity rec =vocabularyRecordRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id));
+        checkForExistingReferencesToRecord(rec);
+        vocabularyRecordRepository.deleteById(rec.getId());
         return null;
     }
 
     public Collection<VocabularyRecord> deleteAllRecords(long vocabularyId) {
         VocabularyEntity vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
+        checkForExistingReferencesToVocabularyRecords(vocabulary);
         vocabulary.getRecords().clear();
         vocabularyRepository.save(vocabulary);
         return Collections.emptyList();
+    }
+
+    private void checkForExistingReferencesToVocabularyRecords(VocabularyEntity vocabulary) {
+        List<DeletionOfReferencedRecordException> errors = new LinkedList<>();
+        for (VocabularyRecordEntity r : vocabulary.getRecords()) {
+            try {
+                checkForExistingReferencesToRecord(r);
+            } catch (DeletionOfReferencedRecordException e) {
+                errors.add(e);
+            }
+        }
+        if (!errors.isEmpty()) {
+            throw new DeletionOfReferencedRecordException(vocabulary, errors);
+        }
+    }
+
+    private void checkForExistingReferencesToRecord(VocabularyRecordEntity r) {
+        VocabularyEntity vocabulary = r.getVocabulary();
+        Set<VocabularyEntity> referencingVocabularies = vocabularyRepository.findDistinctBySchema_Definitions_ReferenceVocabulary(vocabulary);
+        if (referencingVocabularies.isEmpty()) {
+            return;
+        }
+        List<VocabularyRecordEntity> referencingRecords = new LinkedList<>();
+        for (VocabularyEntity vocab : referencingVocabularies) {
+            Set<FieldDefinitionEntity> referencingFields = vocab.getSchema().getDefinitions().stream()
+                    .filter(d -> d.getReferenceVocabulary() != null && vocabulary.getId() == d.getReferenceVocabulary().getId())
+                    .collect(Collectors.toSet());
+            referencingRecords.addAll(vocab.getRecords().stream()
+                    .filter(rec -> rec.getFields().stream()
+                            .filter(f -> referencingFields.contains(f.getDefinition()))
+                            .flatMap(f -> f.getFieldValues().stream())
+                            .flatMap(v -> v.getTranslations().stream())
+                            .map(FieldTranslationEntity::getValue)
+                            .anyMatch(v -> v.equals(String.valueOf(r.getId()))))
+                    .collect(Collectors.toSet()));
+        }
+        if (!referencingRecords.isEmpty()) {
+            throw new DeletionOfReferencedRecordException(r, referencingRecords);
+        }
     }
 
     public Page<VocabularyRecord> search(long id, String searchTerm, Pageable pageRequest) {
