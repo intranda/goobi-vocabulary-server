@@ -144,8 +144,8 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
 
     @Override
     public VocabularyRecord delete(long id) {
-        VocabularyRecordEntity rec =vocabularyRecordRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id));
-        checkForExistingReferencesToRecord(rec);
+        VocabularyRecordEntity rec = vocabularyRecordRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, id));
+        checkForExistingReferencesToSingleVocabularyRecord(rec);
         vocabularyRecordRepository.deleteById(rec.getId());
         return null;
     }
@@ -153,27 +153,51 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     public Collection<VocabularyRecord> deleteAllRecords(long vocabularyId) {
         VocabularyEntity vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
-        checkForExistingReferencesToVocabularyRecords(vocabulary);
+        checkForExistingReferencesInWholeVocabulary(vocabulary);
         vocabulary.getRecords().clear();
         vocabularyRepository.save(vocabulary);
         return Collections.emptyList();
     }
 
-    private void checkForExistingReferencesToVocabularyRecords(VocabularyEntity vocabulary) {
-        List<DeletionOfReferencedRecordException> errors = new LinkedList<>();
-        for (VocabularyRecordEntity r : vocabulary.getRecords()) {
-            try {
-                checkForExistingReferencesToRecord(r);
-            } catch (DeletionOfReferencedRecordException e) {
-                errors.add(e);
-            }
+
+
+    private void checkForExistingReferencesToSingleVocabularyRecord(VocabularyRecordEntity recordEntity) {
+        List<DeletionOfReferencedRecordException> errors = checkForExistingReferencesToRecords(extractAllRecordsToCheckForReferences(recordEntity));
+        if (!errors.isEmpty()) {
+            throw new DeletionOfReferencedRecordException(recordEntity, errors);
         }
+    }
+
+    private void checkForExistingReferencesInWholeVocabulary(VocabularyEntity vocabulary) {
+        List<DeletionOfReferencedRecordException> errors = checkForExistingReferencesToRecords(
+                vocabulary.getRecords().stream()
+                        .flatMap(r -> extractAllRecordsToCheckForReferences(r).stream())
+                        .collect(Collectors.toList()));
         if (!errors.isEmpty()) {
             throw new DeletionOfReferencedRecordException(vocabulary, errors);
         }
     }
 
-    private void checkForExistingReferencesToRecord(VocabularyRecordEntity r) {
+    private List<VocabularyRecordEntity> extractAllRecordsToCheckForReferences(VocabularyRecordEntity rec) {
+        List<VocabularyRecordEntity> result = new LinkedList<>();
+        result.add(rec);
+        rec.getChildren().forEach(c -> result.addAll(extractAllRecordsToCheckForReferences(c)));
+        return result;
+    }
+
+    private List<DeletionOfReferencedRecordException> checkForExistingReferencesToRecords(Collection<VocabularyRecordEntity> records) {
+        List<DeletionOfReferencedRecordException> errors = new LinkedList<>();
+        for (VocabularyRecordEntity r : records) {
+            try {
+                recordReferenceValidation(r);
+            } catch (DeletionOfReferencedRecordException e) {
+                errors.add(e);
+            }
+        }
+        return errors;
+    }
+
+    private void recordReferenceValidation(VocabularyRecordEntity r) {
         VocabularyEntity vocabulary = r.getVocabulary();
         Set<VocabularyEntity> referencingVocabularies = vocabularyRepository.findDistinctBySchema_Definitions_ReferenceVocabulary(vocabulary);
         if (referencingVocabularies.isEmpty()) {
