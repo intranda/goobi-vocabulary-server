@@ -5,6 +5,7 @@ import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -16,16 +17,19 @@ import java.util.stream.Collectors;
 @Service
 public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
     private final Validator<FieldInstanceEntity> fieldValidator;
+    private final VocabularyRecordRepository vocabularyRecordRepository;
 
-    public RecordValidatorImpl(Validator<FieldInstanceEntity> fieldValidator) {
+    public RecordValidatorImpl(Validator<FieldInstanceEntity> fieldValidator, VocabularyRecordRepository vocabularyRecordRepository) {
         super("Record");
         this.fieldValidator = fieldValidator;
         setValidations(List.of(
                 this::checkRequiredFieldsExistence,
                 this::checkOnlyAllowedFieldDefinitionsGiven,
                 this::checkHierarchy,
+                this::checkRootElementRestriction,
                 this::perFieldInstanceChecks
         ));
+        this.vocabularyRecordRepository = vocabularyRecordRepository;
     }
 
     private void checkRequiredFieldsExistence(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
@@ -80,6 +84,14 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
             }
             if (!errors.isEmpty()) {
                 throw new RecordValidationException("Record violates hierarchy validation:\n\t- " + String.join("\n\t- ", errors));
+            }
+        }
+    }
+
+    private void checkRootElementRestriction(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
+        if (vocabularyRecord.getParentRecord() == null && Boolean.TRUE.equals(vocabularyRecord.getVocabulary().getSchema().isSingleRootElement())) {
+            if (vocabularyRecordRepository.existsByVocabulary_IdAndParentRecordNullAndIdNot(vocabularyRecord.getVocabulary().getId(), vocabularyRecord.getId())) {
+                throw new RecordValidationException("Can't insert this root-level record, this vocabulary already contains a root-level record and is restricted to a single root-level record");
             }
         }
     }

@@ -80,4 +80,8 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
     Page<VocabularyRecordEntity> findRecordsInVocabularyByField(@NonNull long vocabularyId, @NonNull long searchFieldId, @NonNull String value,  Pageable pageable);
 
     List<VocabularyRecordEntity> findByVocabulary_Id(@NonNull long id);
+
+    boolean existsByVocabulary_IdAndParentRecordNull(@NonNull long id);
+
+    boolean existsByVocabulary_IdAndParentRecordNullAndIdNot(@NonNull long id, @NonNull long id1);
 }
