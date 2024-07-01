@@ -9,8 +9,8 @@ import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.io.csv.CSVMapper;
 import io.goobi.vocabulary.service.io.excel.ExcelMapper;
-import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.io.json.JsonMapperImpl;
+import io.goobi.vocabulary.service.manager.VocabularyDTOManager;
 import io.goobi.vocabulary.service.manager.VocabularyImportManager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
@@ -93,9 +93,18 @@ public class VocabularyController {
                 .body(IOUtils.toByteArray(jsonMapper.toJson(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
-    @PutMapping( "/vocabularies/{id}/import/csv")
-    public ResponseEntity<?> importCsv(@PathVariable long id, @RequestBody String body) {
-        importManager.importCsv(id, body);
+    @PutMapping(
+            value = "/vocabularies/{id}/import/csv",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?> cleanImportCsv(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {
+        importManager.cleanImportCsv(id, new String(file.getInputStream().readAllBytes()));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping( "/vocabularies/{id}/import/csv")
+    public ResponseEntity<?> importCsv(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {
+        importManager.importCsv(id, new String(file.getInputStream().readAllBytes()));
         return ResponseEntity.ok().build();
     }
 
@@ -111,6 +120,15 @@ public class VocabularyController {
     }
 
     @PutMapping(
+            value = "/vocabularies/{id}/import/excel",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?> cleanImportExcel(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {
+        importManager.cleanImportExcel(id, file.getInputStream());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(
             value = "/vocabularies/{id}/import/excel"
     )
     public ResponseEntity<?> importExcel(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {

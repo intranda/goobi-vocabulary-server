@@ -35,11 +35,33 @@ public class VocabularyImportManager {
     }
 
     @Transactional
+    public void cleanImportCsv(long vocabularyId, String csv) {
+        this.vocabulary = vocabularyRepository.findById(vocabularyId)
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
+
+        manager.deleteAllRecords(vocabularyId);
+        List<VocabularyRecord> insertionQueue = csvMapper.fromCSV(vocabulary, csv);
+
+        performRecordImport(insertionQueue);
+    }
+
+    @Transactional
     public void importCsv(long vocabularyId, String csv) {
         this.vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
 
         List<VocabularyRecord> insertionQueue = csvMapper.fromCSV(vocabulary, csv);
+
+        performRecordImport(insertionQueue);
+    }
+
+    @Transactional
+    public void cleanImportExcel(long vocabularyId, InputStream excel) throws IOException {
+        this.vocabulary = vocabularyRepository.findById(vocabularyId)
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
+
+        manager.deleteAllRecords(vocabularyId);
+        List<VocabularyRecord> insertionQueue = excelMapper.fromExcel(vocabulary, excel);
 
         performRecordImport(insertionQueue);
     }
