@@ -29,4 +29,7 @@ public class VocabularySchemaEntity {
 
     @Column(name = "hierarchical_records")
     private boolean hierarchicalRecords;
+
+    @Column(name = "single_root_element")
+    private boolean singleRootElement;
 }

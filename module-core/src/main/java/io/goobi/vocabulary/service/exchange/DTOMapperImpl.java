@@ -360,6 +360,7 @@ public class DTOMapperImpl implements DTOMapper {
                 ).collect(Collectors.toList()));
         result.getDefinitions().forEach(d -> d.setSchema(result));
         result.setHierarchicalRecords(Boolean.TRUE.equals(dto.getHierarchicalRecords()));
+        result.setSingleRootElement(Boolean.TRUE.equals(dto.getSingleRootElement()));
         return result;
     }
 
@@ -369,6 +370,7 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setDefinitions(entity.getDefinitions().stream().map(this::toDTO).collect(Collectors.toList()));
         result.setHierarchicalRecords(Boolean.TRUE.equals(entity.isHierarchicalRecords()));
+        result.setSingleRootElement(Boolean.TRUE.equals(entity.isSingleRootElement()));
         return result;
     }
 

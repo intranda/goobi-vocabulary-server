@@ -8,5 +8,6 @@ import java.util.List;
 public class Schema {
     private long id;
     private boolean hierarchicalRecordsEnabled;
+    private boolean singleRootElement;
     private List<Definition> definitions;
 }

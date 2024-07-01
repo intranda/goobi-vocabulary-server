@@ -13,4 +13,5 @@ public class VocabularySchema extends BaseObject {
     private Long id;
     private List<FieldDefinition> definitions;
     private Boolean hierarchicalRecords;
+    private Boolean singleRootElement;
 }

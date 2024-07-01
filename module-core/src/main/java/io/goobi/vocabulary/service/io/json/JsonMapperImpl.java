@@ -53,6 +53,7 @@ public class JsonMapperImpl implements JsonMapper {
         Schema result = new Schema();
         result.setId(original.getId());
         result.setHierarchicalRecordsEnabled(original.isHierarchicalRecords());
+        result.setSingleRootElement(original.isSingleRootElement());
         result.setDefinitions(original.getDefinitions().stream()
                 .map(this::transform)
                 .collect(Collectors.toList()));

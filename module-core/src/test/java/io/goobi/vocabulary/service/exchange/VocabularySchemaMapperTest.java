@@ -132,6 +132,24 @@ class VocabularySchemaMapperTest {
     }
 
     @Test
+    void noSingleRootElement_toDTO() {
+        vocabularySchema.setSingleRootElement(false);
+
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
+
+        assertFalse(result.getSingleRootElement());
+    }
+
+    @Test
+    void singleRootElement_toDTO() {
+        vocabularySchema.setSingleRootElement(true);
+
+        VocabularySchema result = mapper.toDTO(vocabularySchema);
+
+        assertTrue(result.getSingleRootElement());
+    }
+
+    @Test
     void validId_fromDTO() {
         VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
@@ -168,5 +186,23 @@ class VocabularySchemaMapperTest {
         VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
 
         assertTrue(result.isHierarchicalRecords());
+    }
+
+    @Test
+    void noSingleRootElement_fromDTO() {
+        vocabularySchemaDTO.setSingleRootElement(false);
+
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertFalse(result.isSingleRootElement());
+    }
+
+    @Test
+    void singleRootElement_fromDTO() {
+        vocabularySchemaDTO.setSingleRootElement(true);
+
+        VocabularySchemaEntity result = mapper.toEntity(vocabularySchemaDTO);
+
+        assertTrue(result.isSingleRootElement());
     }
 }
