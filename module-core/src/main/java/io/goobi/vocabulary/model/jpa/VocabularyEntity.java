@@ -30,6 +30,10 @@ public class VocabularyEntity {
     @JoinColumn(name = "schema_id", nullable = false)
     private VocabularySchemaEntity schema;
 
+    @ManyToOne
+    @JoinColumn(name = "metadata_schema_id")
+    private VocabularySchemaEntity metadataSchema;
+
     // `name` is a reserved Mysql keyword
     @Column(name = "title", nullable = false, unique = true)
     private String name;

@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 public class Vocabulary extends BaseObject {
     private Long id;
     private Long schemaId;
+    private Long metadataSchemaId;
     private String name;
     private String description;
 }

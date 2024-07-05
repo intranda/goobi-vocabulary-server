@@ -40,6 +40,9 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
             result.add(linkTo(methodOn(VocabularyController.class).exportAsRdfXml(entity.getId())).withRel("export_rdf_xml"));
             result.add(linkTo(methodOn(VocabularyController.class).exportAsRdfTurtle(entity.getId())).withRel("export_rdf_turtle"));
         }
+        if (entity.getMetadataSchemaId() != null) {
+            result.add(linkTo(methodOn(VocabularySchemaController.class).one(entity.getMetadataSchemaId())).withRel("metadata_schema"));
+        }
         return result;
     }
 }

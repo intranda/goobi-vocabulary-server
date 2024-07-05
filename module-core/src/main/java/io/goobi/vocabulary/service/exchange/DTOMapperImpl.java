@@ -334,6 +334,9 @@ public class DTOMapperImpl implements DTOMapper {
             throw new MissingAttributeException(FieldInstanceEntity.class, "schemaId");
         }
         result.setSchema(lookUpSchema(dto.getSchemaId()));
+        if (dto.getMetadataSchemaId() != null) {
+            result.setMetadataSchema(lookUpSchema(dto.getMetadataSchemaId()));
+        }
         result.setName(dto.getName());
         result.setDescription(dto.getDescription());
         return result;
@@ -344,6 +347,9 @@ public class DTOMapperImpl implements DTOMapper {
         Vocabulary result = new Vocabulary();
         result.setId(entity.getId());
         result.setSchemaId(entity.getSchema().getId());
+        if (entity.getMetadataSchema() != null) {
+            result.setMetadataSchemaId(entity.getMetadataSchema().getId());
+        }
         result.setName(entity.getName());
         result.setDescription(entity.getDescription());
         return result;
