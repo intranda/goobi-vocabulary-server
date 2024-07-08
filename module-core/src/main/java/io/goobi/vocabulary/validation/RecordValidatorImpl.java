@@ -33,8 +33,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
     }
 
     private void checkRequiredFieldsExistence(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
-        List<FieldDefinitionEntity> missingFields = vocabularyRecord.getVocabulary()
-                .getSchema()
+        List<FieldDefinitionEntity> missingFields = vocabularyRecord.getSchema()
                 .getDefinitions()
                 .stream()
                 .filter(FieldDefinitionEntity::isRequired)
@@ -62,7 +61,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
                 .stream()
                 .map(FieldInstanceEntity::getDefinition)
                 .collect(Collectors.toList());
-        providedFields.removeAll(vocabularyRecord.getVocabulary().getSchema().getDefinitions());
+        providedFields.removeAll(vocabularyRecord.getSchema().getDefinitions());
         if (!providedFields.isEmpty()) {
             throw new RecordValidationException(
                     "Non-defined fields given: "
@@ -74,7 +73,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
     }
 
     private void checkHierarchy(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
-        if (Boolean.FALSE.equals(vocabularyRecord.getVocabulary().getSchema().isHierarchicalRecords())) {
+        if (Boolean.FALSE.equals(vocabularyRecord.getSchema().isHierarchicalRecords())) {
             Set<String> errors = new HashSet<>();
             if (vocabularyRecord.getParentRecord() != null) {
                 errors.add("can't define parent record if hierarchical records are deactivated in vocabulary schema");
@@ -89,8 +88,8 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
     }
 
     private void checkRootElementRestriction(VocabularyRecordEntity vocabularyRecord) throws RecordValidationException {
-        if (vocabularyRecord.getParentRecord() == null && Boolean.TRUE.equals(vocabularyRecord.getVocabulary().getSchema().isSingleRootElement())) {
-            if (vocabularyRecordRepository.existsByVocabulary_IdAndParentRecordNullAndIdNot(vocabularyRecord.getVocabulary().getId(), vocabularyRecord.getId())) {
+        if (vocabularyRecord.getParentRecord() == null && Boolean.TRUE.equals(vocabularyRecord.getSchema().isSingleRootElement())) {
+            if (vocabularyRecordRepository.existsByVocabulary_IdAndParentRecordNullAndIdNotAndMetadata(vocabularyRecord.getVocabulary().getId(), vocabularyRecord.getId(), vocabularyRecord.isMetadata())) {
                 throw new RecordValidationException("Can't insert this root-level record, this vocabulary already contains a root-level record and is restricted to a single root-level record");
             }
         }

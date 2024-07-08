@@ -47,14 +47,14 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     }
 
     public List<VocabularyRecord> all(long id) {
-        return vocabularyRecordRepository.findByVocabulary_Id(id).stream()
+        return vocabularyRecordRepository.findByVocabulary_IdAndMetadataFalse(id).stream()
                 .map(modelMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public Page<VocabularyRecord> list(long id, Pageable pageRequest) {
         if (pageRequest.getSort().isUnsorted()) {
-            return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNull(id, pageRequest)
+            return vocabularyRecordRepository.findByVocabulary_IdAndParentRecordNullAndMetadataFalse(id, pageRequest)
                     .map(modelMapper::toDTO);
         } else {
             Sort.Order order = pageRequest.getSort().stream().toList().get(0);
@@ -158,8 +158,6 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         vocabularyRepository.save(vocabulary);
         return Collections.emptyList();
     }
-
-
 
     private void checkForExistingReferencesToSingleVocabularyRecord(VocabularyRecordEntity recordEntity) {
         List<DeletionOfReferencedRecordException> errors = checkForExistingReferencesToRecords(extractAllRecordsToCheckForReferences(recordEntity));
