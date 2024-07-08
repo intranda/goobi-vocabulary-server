@@ -33,6 +33,9 @@ public class VocabularyRecordEntity {
     @JoinColumn(name = "vocabulary_id", nullable = false)
     private VocabularyEntity vocabulary;
 
+    @Column(name = "metadata", nullable = false)
+    private boolean metadata = false;
+
     @OneToMany(mappedBy = "vocabularyRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FieldInstanceEntity> fields = new LinkedList<>();
 

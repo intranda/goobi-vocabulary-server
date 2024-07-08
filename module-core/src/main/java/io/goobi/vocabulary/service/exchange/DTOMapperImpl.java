@@ -390,6 +390,7 @@ public class DTOMapperImpl implements DTOMapper {
             throw new MissingAttributeException(FieldInstanceEntity.class, "vocabularyId");
         }
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
+        result.setMetadata(Boolean.TRUE.equals(dto.getMetadata()));
         result.setFields(dto.getFields().stream()
                 .map(f -> this.toEntity(f, false))
                 .collect(Collectors.toList()));
@@ -411,6 +412,7 @@ public class DTOMapperImpl implements DTOMapper {
             result.setParentId(entity.getParentRecord().getId());
         }
         result.setVocabularyId(entity.getVocabulary().getId());
+        result.setMetadata(entity.isMetadata());
         result.setFields(entity.getFields().stream().map(this::toDTO).collect(Collectors.toSet()));
         result.setChildren(entity.getChildren().stream()
                 .map(VocabularyRecordEntity::getId)

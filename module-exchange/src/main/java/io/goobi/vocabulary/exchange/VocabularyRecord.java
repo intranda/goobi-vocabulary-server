@@ -15,6 +15,7 @@ public class VocabularyRecord extends BaseObject {
     private Long id;
     private Long parentId;
     private Long vocabularyId;
+    private Boolean metadata;
     private Set<FieldInstance> fields;
     private Set<Long> children;
 }
