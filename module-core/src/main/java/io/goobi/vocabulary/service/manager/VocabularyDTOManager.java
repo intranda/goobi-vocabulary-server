@@ -58,6 +58,7 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
     @Override
     public Vocabulary create(Vocabulary newVocabularyDTO) {
         VocabularyEntity jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
+        // TODO: Vocabulary validation - Metadata schema must be single-root and non-hierarchical
         return modelMapper.toDTO(vocabularyRepository.save(jpaVocabulary));
     }
 
