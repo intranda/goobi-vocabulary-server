@@ -88,6 +88,9 @@ public class ExcelMapperImpl implements ExcelMapper {
                     numberOfColumns = j;
                 }
             }
+            while (rowData.size() <= numberOfColumns) {
+                rowData.add(null);
+            }
             if (rowData.stream().anyMatch(Objects::nonNull)) {
                 data.add(rowData.subList(0, numberOfColumns+1));
             }
