@@ -83,8 +83,7 @@ public class RDFMapperImpl implements RDFMapper {
         try {
             // TODO: Think about how to export / resolve referenced entries
             if (entity.getSchema().getDefinitions().stream()
-                    .map(FieldDefinitionEntity::getType)
-                    .anyMatch(Objects::isNull)) {
+                    .anyMatch(d -> d.getType() == null && d.getReferenceVocabulary() == null)) {
                 return false;
             }
             // TODO: Metadata schema validation
@@ -186,8 +185,16 @@ public class RDFMapperImpl implements RDFMapper {
 
     private void processField(Model model, FieldInstanceEntity field, Resource record) {
         for (FieldValueEntity value : field.getFieldValues()) {
-            String type = field.getDefinition().getType().getName();
-            Property property = findSkosProperty(type);
+            FieldTypeEntity type = field.getDefinition().getType();
+            VocabularyEntity referenceVocabulary = field.getDefinition().getReferenceVocabulary();
+            Property property;
+            if (type != null) {
+                property = findSkosProperty(type.getName());
+            } else if (referenceVocabulary != null) {
+                property = SKOS.related;
+            } else {
+                throw new IllegalStateException("Field definition has neither type nor reference vocabulary set");
+            }
             for (FieldTranslationEntity t : value.getTranslations()) {
                 record.addProperty(property, generatePropertyDependingNode(model, property, t));
             }
@@ -195,7 +202,9 @@ public class RDFMapperImpl implements RDFMapper {
     }
 
     private RDFNode generatePropertyDependingNode(Model model, Property property, FieldTranslationEntity t) {
-        if (property.equals(DCTerms.license) || property.equals(SKOS.closeMatch) || property.equals(SKOS.exactMatch)) {
+        if (property.equals(SKOS.related)) {
+            return model.createResource(generateURIForId(VocabularyRecordController.class, Long.parseLong(t.getValue())));
+        } else if (property.equals(DCTerms.license) || property.equals(SKOS.closeMatch) || property.equals(SKOS.exactMatch)) {
             return model.createResource(t.getValue());
         } else if (property.equals(DCTerms.created)) {
             return model.createTypedLiteral(t.getValue(), XSDDatatype.XSDdate);

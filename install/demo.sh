@@ -5,7 +5,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
     "definitions": [
         {
             "name": "Title",
-            "typeId": 13,
+            "typeId": 12,
             "required": true,
             "unique": false,
             "mainEntry": true,
@@ -30,7 +30,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Author",
-            "typeId": 14,
+            "typeId": 13,
             "required": false,
             "unique": false,
             "mainEntry": false,
@@ -56,7 +56,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Creation Date",
-            "typeId": 15,
+            "typeId": 14,
             "required": true,
             "unique": false,
             "mainEntry": false,
@@ -64,7 +64,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "License",
-            "typeId": 16,
+            "typeId": 15,
             "required": false,
             "unique": false,
             "mainEntry": false,
@@ -183,8 +183,17 @@ curl --location 'localhost:8081/api/v1/schemas' \
             ]
         },
         {
+            "name": "Related",
+            "typeId": 1,
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
             "name": "Close Match",
-            "typeId": 11,
+            "typeId": 10,
             "required": false,
             "unique": false,
             "mainEntry": false,
@@ -193,7 +202,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Exact Match",
-            "typeId": 12,
+            "typeId": 11,
             "required": false,
             "unique": false,
             "mainEntry": false,
@@ -254,7 +263,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Rating",
-            "typeId": 17,
+            "typeId": 16,
             "required": false,
             "unique": false,
             "mainEntry": false,
