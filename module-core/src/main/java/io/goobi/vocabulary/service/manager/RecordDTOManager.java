@@ -154,7 +154,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         VocabularyEntity vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
         checkForExistingReferencesInWholeVocabulary(vocabulary);
-        vocabulary.getRecords().clear();
+        vocabulary.getRecords().removeIf(r -> !r.isMetadata());
         vocabularyRepository.save(vocabulary);
         return Collections.emptyList();
     }
