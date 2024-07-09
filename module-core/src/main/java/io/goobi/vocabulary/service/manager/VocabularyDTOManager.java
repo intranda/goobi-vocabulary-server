@@ -4,10 +4,12 @@ import io.goobi.vocabulary.exception.DeletionOfReferencedVocabularyException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingValuesException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
+import io.goobi.vocabulary.exception.ValidationException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
+import io.goobi.vocabulary.validation.Validator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,12 @@ import java.util.stream.Collectors;
 public class VocabularyDTOManager implements Manager<Vocabulary> {
     private final VocabularyRepository vocabularyRepository;
     private final DTOMapper modelMapper;
+    private final Validator<VocabularyEntity> validator;
 
-    public VocabularyDTOManager(VocabularyRepository vocabularyRepository, DTOMapper modelMapper) {
+    public VocabularyDTOManager(VocabularyRepository vocabularyRepository, DTOMapper modelMapper, Validator<VocabularyEntity> validator) {
         this.vocabularyRepository = vocabularyRepository;
         this.modelMapper = modelMapper;
+        this.validator = validator;
     }
 
     @Override
@@ -56,9 +60,9 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
     }
 
     @Override
-    public Vocabulary create(Vocabulary newVocabularyDTO) {
+    public Vocabulary create(Vocabulary newVocabularyDTO) throws ValidationException {
         VocabularyEntity jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
-        // TODO: Vocabulary validation - Metadata schema must be single-root and non-hierarchical
+        validator.validate(jpaVocabulary);
         return modelMapper.toDTO(vocabularyRepository.save(jpaVocabulary));
     }
 
