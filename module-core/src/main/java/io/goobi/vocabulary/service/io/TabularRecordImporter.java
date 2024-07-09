@@ -137,7 +137,7 @@ public class TabularRecordImporter {
         VocabularyRecord resultRecord = new VocabularyRecord();
 
         if (rec.size() != fields.size()) {
-            throw new IllegalArgumentException("Malformed CSV, number of fields does not match header");
+            throw new IllegalArgumentException("Malformed tabular data, number of fields does not match header");
         }
 
         Map<String, FieldInstance> fieldMap = new HashMap<>();
