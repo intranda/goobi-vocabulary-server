@@ -3,6 +3,7 @@ package io.goobi.vocabulary.service.rdf;
 import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
+import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MappingException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
@@ -13,14 +14,18 @@ import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.service.rdf.vocabulary.LANGUAGE;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
+import org.apache.jena.vocabulary.XSD;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,6 +86,10 @@ public class RDFMapperImpl implements RDFMapper {
                     .anyMatch(Objects::isNull)) {
                 return false;
             }
+            // TODO: Metadata schema validation
+            if (entity.getMetadataSchema() == null) {
+                return false;
+            }
             entity.getSchema().getDefinitions().stream()
                     .map(FieldDefinitionEntity::getType)
                     .filter(Objects::nonNull)
@@ -121,16 +130,45 @@ public class RDFMapperImpl implements RDFMapper {
         Resource vocabulary = model.createResource(uri)
                 .addProperty(RDF.type, SKOS.Concept);
 
-        for (VocabularyRecordEntity r : entity.getRecords()) {
-            generateRecordResource(model, recordMap, r);
-        }
+        // Should be only one entry
+        VocabularyRecordEntity metadata = entity.getRecords().stream()
+                .filter(VocabularyRecordEntity::isMetadata)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, "metadata"));
+        Resource conceptScheme = generateConceptSchemeResource(model, recordMap, metadata);
+
+        entity.getRecords().stream()
+                .filter(r -> !r.isMetadata())
+                .forEachOrdered(r -> generateRecordResource(model, recordMap, r));
 
         // Create between record references
-        entity.getRecords().forEach(r -> generateBetweenRecordReferences(r, recordMap));
+        entity.getRecords().stream()
+                .filter(r -> !r.isMetadata())
+                .forEach(r -> generateBetweenRecordReferences(r, recordMap));
+
+        // Create top concept references
+        entity.getRecords().stream()
+                .filter(r -> !r.isMetadata())
+                .filter(r -> r.getParentRecord() == null)
+                .forEach(r -> generateTopConceptReferences(conceptScheme, r, recordMap));
 
         model.setNsPrefix("skos", SKOS.uri);
+        model.setNsPrefix("dct", DCTerms.NS);
+        model.setNsPrefix("xsd", XSD.NS);
 
         return model;
+    }
+
+    private Resource generateConceptSchemeResource(Model model, Map<Long, Resource> recordMap, VocabularyRecordEntity record) {
+        Resource result = model.createResource(generateURIForId(VocabularyController.class, record.getVocabulary().getId()))
+                .addProperty(RDF.type, SKOS.ConceptScheme);
+        recordMap.put(record.getId(), result);
+
+        record.getFields().forEach(f -> processField(model, f, result));
+
+        // No child processing required
+
+        return result;
     }
 
     private Resource generateRecordResource(Model model, Map<Long, Resource> recordMap, VocabularyRecordEntity record) {
@@ -138,7 +176,7 @@ public class RDFMapperImpl implements RDFMapper {
                 .addProperty(RDF.type, SKOS.Concept);
         recordMap.put(record.getId(), result);
 
-        record.getFields().forEach(f -> processField(f, result));
+        record.getFields().forEach(f -> processField(model, f, result));
 
         for (VocabularyRecordEntity child : record.getChildren()) {
             generateRecordResource(model, recordMap, child);
@@ -147,13 +185,23 @@ public class RDFMapperImpl implements RDFMapper {
         return result;
     }
 
-    private void processField(FieldInstanceEntity field, Resource record) {
+    private void processField(Model model, FieldInstanceEntity field, Resource record) {
         for (FieldValueEntity value : field.getFieldValues()) {
             String type = field.getDefinition().getType().getName();
             Property property = findSkosProperty(type);
             for (FieldTranslationEntity t : value.getTranslations()) {
-                record.addProperty(property, t.getValue(), transformToTwoCharacterLanguageIdentifier(t.getLanguage().getAbbreviation()));
+                record.addProperty(property, generatePropertyDependingNode(model, property, t));
             }
+        }
+    }
+
+    private RDFNode generatePropertyDependingNode(Model model, Property property, FieldTranslationEntity t) {
+        if (property.equals(DCTerms.license)) {
+            return model.createResource(t.getValue());
+        } else if (property.equals(DCTerms.created)) {
+            return model.createTypedLiteral(t.getValue(), XSDDatatype.XSDdate);
+        } else {
+            return generateTranslatedNode(model, t);
         }
     }
 
@@ -163,8 +211,19 @@ public class RDFMapperImpl implements RDFMapper {
             case "skos:altLabel" -> SKOS.altLabel;
             case "skos:definition" -> SKOS.definition;
             case "skos:editorialNote" -> SKOS.editorialNote;
-            default -> throw new IllegalArgumentException("Unknown SKOS type \"" + type + "\"");
+            case "dct:title" -> DCTerms.title;
+            case "dct:creator" -> DCTerms.creator;
+            case "dct:created" -> DCTerms.created;
+            case "dct:license" -> DCTerms.license;
+            default -> throw new IllegalArgumentException("Unknown SKOS/DCT type \"" + type + "\"");
         };
+    }
+
+    private RDFNode generateTranslatedNode(Model model, FieldTranslationEntity t) {
+        if (t.getLanguage() == null) {
+            return model.createLiteral(t.getValue());
+        }
+        return model.createLiteral(t.getValue(), transformToTwoCharacterLanguageIdentifier(t.getLanguage().getAbbreviation()));
     }
 
     private String transformToTwoCharacterLanguageIdentifier(String abbreviation) {
@@ -191,6 +250,12 @@ public class RDFMapperImpl implements RDFMapper {
         for (VocabularyRecordEntity child : record.getChildren()) {
             generateBetweenRecordReferences(child, recordMap);
         }
+    }
+
+    private void generateTopConceptReferences(Resource conceptScheme, VocabularyRecordEntity r, Map<Long, Resource> recordMap) {
+        Resource recordResource = recordMap.get(r.getId());
+        conceptScheme.addProperty(SKOS.hasTopConcept, recordResource);
+        recordResource.addProperty(SKOS.topConceptOf, conceptScheme);
     }
 
     private Model generateLanguageModel(LanguageEntity entity) {

@@ -61,9 +61,19 @@ curl --location 'localhost:8081/api/v1/schemas' \
             "unique": false,
             "mainEntry": false,
             "titleField": false
+        },
+        {
+            "name": "License",
+            "typeId": 16,
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
         }
     ],
-    "hierarchicalRecords": false
+    "hierarchicalRecords": false,
+    "singleRootElement": true
 }'
 curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
@@ -178,8 +188,8 @@ curl --location 'localhost:8081/api/v1/schemas' \
 curl --location 'localhost:8081/api/v1/vocabularies' \
 --header 'Content-Type: application/json' \
 --data '{
-    "schemaId": 1,
-    "metadataSchemaId": 2,
+    "schemaId": 2,
+    "metadataSchemaId": 1,
     "name": "SKOS",
     "description": "SKOS example vocabulary."
 }'
@@ -226,7 +236,7 @@ curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Rating",
-            "typeId": 16,
+            "typeId": 17,
             "required": false,
             "unique": false,
             "mainEntry": false,
