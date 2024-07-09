@@ -152,6 +152,9 @@ public class RDFMapperImpl implements RDFMapper {
                 .filter(r -> r.getParentRecord() == null)
                 .forEach(r -> generateTopConceptReferences(conceptScheme, r, recordMap));
 
+        // SKOS:inScheme attribute for singleRootElement vocabularies
+        createSkosInSchemePropertyIfApplicable(model, entity.getRecords(), recordMap);
+
         model.setNsPrefix("skos", SKOS.uri);
         model.setNsPrefix("dct", DCTerms.NS);
         model.setNsPrefix("xsd", XSD.NS);
@@ -256,6 +259,23 @@ public class RDFMapperImpl implements RDFMapper {
         Resource recordResource = recordMap.get(r.getId());
         conceptScheme.addProperty(SKOS.hasTopConcept, recordResource);
         recordResource.addProperty(SKOS.topConceptOf, conceptScheme);
+    }
+
+    private void createSkosInSchemePropertyIfApplicable(Model model, List<VocabularyRecordEntity> records, Map<Long, Resource> recordMap) {
+        List<VocabularyRecordEntity> topRecords = records.stream()
+                .filter(r -> !r.isMetadata() && r.getParentRecord() == null)
+                .toList();
+        if (topRecords.size() != 1) {
+            return;
+        }
+        VocabularyRecordEntity topRecord = topRecords.getFirst();
+        long topRecordId = topRecord.getId();
+        Resource topElement = recordMap.get(topRecord.getId());
+
+        // Find all other records and add the property
+        records.stream()
+                .filter(r -> !r.isMetadata() && r.getId() != topRecordId)
+                .forEach(r -> recordMap.get(r.getId()).addProperty(SKOS.inScheme, topElement));
     }
 
     private Model generateLanguageModel(LanguageEntity entity) {
