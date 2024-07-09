@@ -126,6 +126,9 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
                 .findById(newRecord.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newRecord.getClass(), newRecord.getId()));
 
+        // TODO: Check why the following line is required in metadata but not here
+//        newRecord.getFields().forEach(f -> f.setRecordId(jpaRecord.getId()));
+
         List<Runnable> replacements = new LinkedList<>();
         if (!newRecord.getFields().isEmpty()) {
             replacements.add(() -> jpaRecord.getFields().clear());
