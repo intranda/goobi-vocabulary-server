@@ -123,13 +123,8 @@ public class RDFMapperImpl implements RDFMapper {
     }
 
     private Model generateVocabularyModel(VocabularyEntity entity) {
-        String uri = generateURIForId(VocabularyController.class, entity.getId());
-
         Model model = ModelFactory.createDefaultModel();
         Map<Long, Resource> recordMap = new HashMap<>();
-
-        Resource vocabulary = model.createResource(uri)
-                .addProperty(RDF.type, SKOS.Concept);
 
         // Should be only one entry
         VocabularyRecordEntity metadata = entity.getRecords().stream()
