@@ -266,7 +266,7 @@ public class RDFMapperImpl implements RDFMapper {
         if (topRecords.size() != 1) {
             return;
         }
-        VocabularyRecordEntity topRecord = topRecords.getFirst();
+        VocabularyRecordEntity topRecord = topRecords.get(0);
         long topRecordId = topRecord.getId();
         Resource topElement = recordMap.get(topRecord.getId());
 
