@@ -108,4 +108,35 @@ public class VocabularyRecordController {
     public ResponseEntity<Collection<VocabularyRecord>> deleteAllRecords(@PathVariable long vocabularyId) {
         return ResponseEntity.ok(manager.deleteAllRecords(vocabularyId));
     }
+
+    // Metadata routes
+
+    @GetMapping("/vocabularies/{vocabularyId}/metadata")
+    public EntityModel<VocabularyRecord> getMetadata(@PathVariable long vocabularyId) {
+        return assembler.toModel(manager.getMetadata(vocabularyId));
+    }
+
+    @PostMapping("/vocabularies/{vocabularyId}/metadata")
+    @ResponseStatus(HttpStatus.OK)
+    public EntityModel<VocabularyRecord> createMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws ValidationException {
+        if (vocabularyRecordDTO.getMetadata() != null) {
+            throw new IllegalAttributeProvidedException("metadata");
+        }
+        vocabularyRecordDTO.setMetadata(true);
+        return create(vocabularyId, vocabularyRecordDTO);
+    }
+
+    @PutMapping("/vocabularies/{vocabularyId}/metadata")
+    @ResponseStatus(HttpStatus.OK)
+    public EntityModel<VocabularyRecord> updateMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws ValidationException {
+        if (vocabularyRecordDTO.getVocabularyId() != null) {
+            throw new IllegalAttributeProvidedException("vocabularyId");
+        }
+        if (vocabularyRecordDTO.getMetadata() != null) {
+            throw new IllegalAttributeProvidedException("metadata");
+        }
+        vocabularyRecordDTO.setVocabularyId(vocabularyId);
+        vocabularyRecordDTO.setMetadata(true);
+        return assembler.toModel(manager.replaceMetadata(vocabularyRecordDTO));
+    }
 }

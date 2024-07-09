@@ -244,4 +244,34 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
                     .map(modelMapper::toDTO);
         }
     }
+
+    public VocabularyRecord getMetadata(long vocabularyId) {
+        return modelMapper.toDTO(
+                vocabularyRecordRepository.findByVocabulary_IdAndMetadataTrue(vocabularyId)
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, "metadata"))
+        );
+    }
+
+    public VocabularyRecord replaceMetadata(VocabularyRecord newRecord) throws ValidationException {
+        VocabularyRecordEntity jpaRecord = vocabularyRecordRepository
+                .findByVocabulary_IdAndMetadataTrue(newRecord.getVocabularyId())
+                .orElseThrow(() -> new UnsupportedEntityReplacementException(newRecord.getClass(), newRecord.getId()));
+
+        newRecord.getFields().forEach(f -> f.setRecordId(jpaRecord.getId()));
+
+        List<Runnable> replacements = new LinkedList<>();
+        if (!newRecord.getFields().isEmpty()) {
+            replacements.add(() -> jpaRecord.getFields().clear());
+            newRecord.getFields().stream()
+                    .map(modelMapper::toEntity)
+                    .forEach(f -> replacements.add(() -> jpaRecord.getFields().add(f)));
+        }
+        // TODO: Plan children replacement
+        if (replacements.isEmpty()) {
+            throw new MissingValuesException(newRecord.getClass(), List.of("fields"));
+        }
+        replacements.forEach(Runnable::run);
+        validator.validate(jpaRecord);
+        return modelMapper.toDTO(vocabularyRecordRepository.save(jpaRecord));
+    }
 }

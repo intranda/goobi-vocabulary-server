@@ -82,4 +82,6 @@ public interface VocabularyRecordRepository extends CrudRepository<VocabularyRec
     List<VocabularyRecordEntity> findByVocabulary_IdAndMetadataFalse(@NonNull long id);
 
     boolean existsByVocabulary_IdAndParentRecordNullAndIdNotAndMetadata(@NonNull long id, long id1, @NonNull boolean metadata);
+
+    Optional<VocabularyRecordEntity> findByVocabulary_IdAndMetadataTrue(@NonNull long id);
 }
