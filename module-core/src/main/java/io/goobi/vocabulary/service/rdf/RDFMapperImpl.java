@@ -129,7 +129,11 @@ public class RDFMapperImpl implements RDFMapper {
         VocabularyRecordEntity metadata = entity.getRecords().stream()
                 .filter(VocabularyRecordEntity::isMetadata)
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, "metadata"));
+                .orElseGet(() -> {
+                    VocabularyRecordEntity emptyMetadata = new VocabularyRecordEntity();
+                    emptyMetadata.setVocabulary(entity);
+                    return emptyMetadata;
+                });
         Resource conceptScheme = generateConceptSchemeResource(model, recordMap, metadata);
 
         entity.getRecords().stream()
