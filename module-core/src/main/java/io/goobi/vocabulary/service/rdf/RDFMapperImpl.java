@@ -164,7 +164,7 @@ public class RDFMapperImpl implements RDFMapper {
     private Resource generateConceptSchemeResource(Model model, Map<Long, Resource> recordMap, VocabularyRecordEntity record) {
         Resource result = model.createResource(generateURIForId(VocabularyController.class, record.getVocabulary().getId()))
                 .addProperty(RDF.type, SKOS.ConceptScheme);
-        recordMap.put(record.getId(), result);
+        recordMap.put(record.getVocabulary().getId(), result);
 
         record.getFields().forEach(f -> processField(model, f, result));
 
