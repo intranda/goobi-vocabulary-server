@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -199,7 +200,7 @@ public class RDFMapperImpl implements RDFMapper {
     }
 
     private RDFNode generatePropertyDependingNode(Model model, Property property, FieldTranslationEntity t) {
-        if (property.equals(DCTerms.license)) {
+        if (property.equals(DCTerms.license) || property.equals(SKOS.closeMatch) || property.equals(SKOS.exactMatch)) {
             return model.createResource(t.getValue());
         } else if (property.equals(DCTerms.created)) {
             return model.createTypedLiteral(t.getValue(), XSDDatatype.XSDdate);
@@ -214,6 +215,8 @@ public class RDFMapperImpl implements RDFMapper {
             case "skos:altLabel" -> SKOS.altLabel;
             case "skos:definition" -> SKOS.definition;
             case "skos:editorialNote" -> SKOS.editorialNote;
+            case "skos:closeMatch" -> SKOS.closeMatch;
+            case "skos:exactMatch" -> SKOS.exactMatch;
             case "dct:title" -> DCTerms.title;
             case "dct:creator" -> DCTerms.creator;
             case "dct:created" -> DCTerms.created;

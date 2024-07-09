@@ -181,6 +181,24 @@ curl --location 'localhost:8081/api/v1/schemas' \
                     "required": false
                 }
             ]
+        },
+        {
+            "name": "Close Match",
+            "typeId": 11,
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
+            "name": "Exact Match",
+            "typeId": 12,
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
         }
     ],
     "hierarchicalRecords": true
