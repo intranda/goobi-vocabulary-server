@@ -74,6 +74,7 @@ public class ExcelMapperImpl implements ExcelMapper {
                     switch (cell.getCellType()) {
                         case STRING -> value = cell.getStringCellValue();
                         case NUMERIC -> value = String.valueOf(cell.getNumericCellValue());
+                        case BLANK -> value = "";
                         default ->
                                 throw new IllegalArgumentException("Unsupported cell type \"" + cell.getCellType() + "\"");
                     }
