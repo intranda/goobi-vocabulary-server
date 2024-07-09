@@ -120,7 +120,7 @@ public class VocabularyImportManager {
             }
         }
         if (!importErrors.isEmpty()) {
-            throw new IllegalArgumentException("Error(s) during csv import:\n\t"
+            throw new IllegalArgumentException("Error(s) during tabular import:\n\t"
                     + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
         }
     }
