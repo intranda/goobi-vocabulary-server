@@ -179,6 +179,7 @@ def migrate_record(record_id, data, vocabulary, ctx):
     try:
         r.insert(ctx)
         ctx.log_processed(r)
+        ctx.log_migration_info(r)
     except Exception as e:
         ctx.log_non_migrated_record(r, record_id, data, e)
         if ctx.continue_on_error:
