@@ -172,11 +172,12 @@ def migrate_record(record_id, data, vocabulary, ctx):
     if len(data) == 0:
         logging.warning(f'Skipping empty record [{record_id}')
         return
-    fields = parse_fields(data, vocabulary.schema['definitions'])
-    for f in fields:
-        if len(f['values']) > 0:
-            r.add_field(f)
     try:
+        fields = parse_fields(data, vocabulary.schema['definitions'], ctx)
+        for f in fields:
+            if len(f['values']) > 0:
+                r.add_field(f)
+    
         r.insert(ctx)
         ctx.log_processed(r)
         ctx.log_migration_info(r)
@@ -187,7 +188,7 @@ def migrate_record(record_id, data, vocabulary, ctx):
         else:
             raise e
 
-def parse_fields(raw_fields, definitions):
+def parse_fields(raw_fields, definitions, ctx):
     fields = {} # definitionId -> field
     for line in raw_fields:
         old_definition_id = int(line[3])
@@ -199,7 +200,10 @@ def parse_fields(raw_fields, definitions):
         if new_definition_id not in fields:
             fields[new_definition_id] = FieldInstance(matching_definitions[0])
 
-        parsed_values = parse_values(language=line[5], raw_value=line[6])
+        # Check if this value is a vocabulary record reference
+        referencing_value = 'referenceVocabularyId' in matching_definitions[0]
+
+        parsed_values = parse_values(language=line[5], raw_value=line[6], referencing_value=referencing_value, ctx=ctx)
         # TODO: Think about correct strategy to find merging
         for v in parsed_values:
             if len(fields[new_definition_id]['values']) == 0:
@@ -208,6 +212,24 @@ def parse_fields(raw_fields, definitions):
                 # This is only one entry
                 for t in v['translations']:
                     fields[new_definition_id]['values'][0].add_translation(t['language'], t['value'])
+            
+            if referencing_value:
+                value = None
+
+                for tt in fields[new_definition_id]['values'][0]['translations']:
+                    if value == None:
+                        value = tt['value']
+                        if 'language' in tt:
+                            del tt['language']
+                    elif tt['value'] != value:
+                        msg = f'Reference value differs within translations, fix your data!\n\tRecord: {raw_fields}'
+                        if ctx.continue_on_error:
+                            logging.error(msg)
+                        else:
+                            raise Exception(msg)
+                
+                while len(fields[new_definition_id]['values'][0]['translations']) > 1:
+                    del fields[new_definition_id]['values'][0]['translations'][1]
         
         # Fill translations that are required and missing with duplicates
         if 'translationDefinitions' in matching_definitions[0]:
@@ -222,16 +244,19 @@ def parse_fields(raw_fields, definitions):
 
     return list(fields.values())
 
-def parse_values(language, raw_value):
+def parse_values(language, raw_value, referencing_value, ctx):
     if raw_value == None:
         return []
     raw_value = raw_value.strip()
     if len(raw_value) == 0 or raw_value == 'null':
         return []
+
     # TODO: Test this
     raw_values = raw_value.split('|')
     results = []
     for rv in raw_values:
+        if referencing_value:
+            rv = ctx.lookup.lookup_reference_value(rv)
         result = FieldValue()
         result.add_translation(language, rv)
         results.append(result)

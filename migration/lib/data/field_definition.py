@@ -31,6 +31,19 @@ class FieldDefinition(dict):
     
     def resolve_type(self, ctx):
         if self.validation != None or self.selection != None:
+            existing_type = ctx.lookup.lookup_type(self.selection)
+            if existing_type != None:
+                self['typeId'] = existing_type
+                return
+
+            existing_reference_vocabulary = ctx.lookup.lookup_reference_definition(self.selection)
+            if existing_reference_vocabulary != None:
+                self['referenceVocabularyId'] = existing_reference_vocabulary
+
+                if 'translationDefinitions' in self:
+                    del self['translationDefinitions']
+                return
+            
             newType = FieldType(validation=self.validation, selection=self.selection, large=self.itype == 'textarea')
             self['typeId'] = ctx.api.insert_type(newType)
         else:
