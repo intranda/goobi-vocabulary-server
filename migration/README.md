@@ -3,10 +3,10 @@
 ```bash
 python -m venv vmenv
 . vmenv/bin/activate
-pip install requests mysql-connector-python alive_progress
+pip install requests mysql-connector-python==8.4.0 alive_progress
 ```
 
-## Run
+## Run vocabulary data migration
 ```bash
 . vmenv/bin/activate
 python vocabulary-migrator.py

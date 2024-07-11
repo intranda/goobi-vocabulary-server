@@ -170,7 +170,7 @@ def migrate_record(record_id, data, vocabulary, ctx):
     r = Record(vocabulary, record_id)
     #raw_fields = ctx.db.query(f'SELECT * FROM vocabulary_record_data WHERE record_id = {record_id}')
     if len(data) == 0:
-        logging.warning(f'Skipping empty record [{record_id}')
+        logging.warning(f'Skipping empty record [{record_id}]')
         return
     try:
         fields = parse_fields(data, vocabulary.schema['definitions'], ctx)
