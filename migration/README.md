@@ -13,3 +13,9 @@ python vocabulary-migrator.py
 ```
 
 See `python vocabulary-migrator.py --help` for all available options.
+
+## Run mets file migration
+```bash
+. vmenv/bin/activate
+python metadata-migrator.py -m migration.csv -d /opt/digiverso/goobi/metadata
+```
