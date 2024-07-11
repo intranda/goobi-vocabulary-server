@@ -54,12 +54,6 @@ def parse_args():
     parser.add_argument('--continue-on-error', default=False, action='store_const', const=True, help='Should the migration continue on errors?')
     parser.add_argument('--fallback-language', type=str, help='In case some schema contains optional, translatable fields and none of the languages is required, which language should be used as a fallback language?')
     
-    #parser.add_argument('action', help='''action to be performed, possible actions:
-    #    status\t\tprint the state of all plugins
-    #    clean\t\tclean all installed plugins
-    #    install\t\tinstall all plugins that are not yet installed
-    #    upgrade\t\tupgrade all outdated plugins''')
-
     return parser.parse_args()
 
 if __name__ == '__main__':
