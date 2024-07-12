@@ -79,6 +79,8 @@ class MetsManipulator:
                         record_id_new = self.ctx.lookup_record_id(record_id_old)
                     else:
                         # If that fails, try to intreprete the last part as a main value and search for a record containing this value
+                        if vocabulary_id_old == None:
+                            raise Exception('No vocabulary ID found')
                         vocabulary_id_new = self.ctx.lookup_vocabulary_id(vocabulary_id_old)
                         record_id_new = self.ctx.api.find_record(self.ctx, vocabulary_id_new, parts[-1])
                 except Exception as e:
