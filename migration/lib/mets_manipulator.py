@@ -80,7 +80,7 @@ class MetsManipulator:
                     else:
                         # If that fails, try to intreprete the last part as a main value and search for a record containing this value
                         vocabulary_id_new = self.ctx.lookup_vocabulary_id(vocabulary_id_old)
-                        record_id_new = self.ctx.api.find_record(vocabulary_id_new, parts[-1])
+                        record_id_new = self.ctx.api.find_record(self.ctx, vocabulary_id_new, parts[-1])
                 except Exception as e:
                     raise e
             
