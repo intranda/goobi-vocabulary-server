@@ -3,11 +3,18 @@ import requests
 import json
 
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
+SCHEMA_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas/{{SCHEMA_ID}}'
+
 VOCABULARY_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies'
+VOCABULARY_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}'
+
 RECORD_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records'
 RECORD_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records/search'
+RECORD_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/records/{{RECORD_ID}}'
+
 TYPE_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types'
 TYPE_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types/find/{{NAME}}'
+
 HEADERS = {
     'Content-Type': 'application/json'
 }
@@ -18,6 +25,9 @@ RECORD_INSERTION = 3
 TYPE_INSERTION = 4
 TYPE_SEARCH = 5
 RECORD_SEARCH = 6
+RECORD_LOOKUP = 7
+VOCABULARY_LOOKUP = 8
+SCHEMA_LOOKUP = 9
 
 class API:
     def __init__(self, host, port):
@@ -26,6 +36,9 @@ class API:
         self.urls[VOCABULARY_INSERTION] = VOCABULARY_INSERTION_URL
         self.urls[RECORD_INSERTION] = RECORD_INSERTION_URL
         self.urls[RECORD_SEARCH] = RECORD_FIND_URL
+        self.urls[RECORD_LOOKUP] = RECORD_LOOKUP_URL
+        self.urls[VOCABULARY_LOOKUP] = VOCABULARY_LOOKUP_URL
+        self.urls[SCHEMA_LOOKUP] = SCHEMA_LOOKUP_URL
         self.urls[TYPE_INSERTION] = TYPE_INSERTION_URL
         self.urls[TYPE_SEARCH] = TYPE_FIND_URL
         self.type_id_map = {}
@@ -97,7 +110,6 @@ class API:
         url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id))
         url += f'?query={search_term}'
         result = self.query(url, obj=None, method='GET')
-        print(result)
         results = result['_embedded']['vocabularyRecordList']
         if len(results) == 0:
             raise Exception(f'Record search for search term "{search_term}" has no results')
@@ -106,3 +118,14 @@ class API:
         
         return results[0]['id']
 
+    def lookup_vocabulary(self, vocabulary_id):
+        url = self.urls[VOCABULARY_LOOKUP].replace('{{VOCABULARY_ID}}', str(vocabulary_id))
+        return self.query(url, obj=None, method='GET')
+
+    def lookup_schema(self, schema_id):
+        url = self.urls[SCHEMA_LOOKUP].replace('{{SCHEMA_ID}}', str(schema_id))
+        return self.query(url, obj=None, method='GET')
+
+    def lookup_record(self, record_id):
+        url = self.urls[RECORD_LOOKUP].replace('{{RECORD_ID}}', str(record_id))
+        return self.query(url, obj=None, method='GET')
