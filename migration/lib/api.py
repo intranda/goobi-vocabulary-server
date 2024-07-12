@@ -5,6 +5,7 @@ import json
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
 VOCABULARY_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies'
 RECORD_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records'
+RECORD_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records/search'
 TYPE_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types'
 TYPE_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types/find/{{NAME}}'
 HEADERS = {
@@ -16,6 +17,7 @@ VOCABULARY_INSERTION = 2
 RECORD_INSERTION = 3
 TYPE_INSERTION = 4
 TYPE_SEARCH = 5
+RECORD_SEARCH = 6
 
 class API:
     def __init__(self, host, port):
@@ -23,6 +25,7 @@ class API:
         self.urls[SCHEMA_INSERTION] = SCHEMA_INSERTION_URL
         self.urls[VOCABULARY_INSERTION] = VOCABULARY_INSERTION_URL
         self.urls[RECORD_INSERTION] = RECORD_INSERTION_URL
+        self.urls[RECORD_SEARCH] = RECORD_FIND_URL
         self.urls[TYPE_INSERTION] = TYPE_INSERTION_URL
         self.urls[TYPE_SEARCH] = TYPE_FIND_URL
         self.type_id_map = {}
@@ -89,3 +92,17 @@ class API:
             return
         result = self.query(url, record)
         return result['id']
+    
+    def find_record(self, vocabulary_id, search_term):
+        url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id))
+        url += f'?query={search_term}'
+        result = self.query(url, obj=None, method='GET')
+        print(result)
+        results = result['_embedded']['vocabularyRecordList']
+        if len(results) == 0:
+            raise Exception(f'Record search for search term "{search_term}" has no results')
+        elif len(results) > 1:
+            raise Exception(f'Record search for search term "{search_term}" has no unique result, {len(results)} records found')
+        
+        return results[0]['id']
+

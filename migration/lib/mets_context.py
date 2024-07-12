@@ -1,7 +1,8 @@
 import os
 
 class Context:
-    def __init__(self, verbose, continue_on_error, metadata_directory, mapping_file):
+    def __init__(self, api, verbose, continue_on_error, metadata_directory, mapping_file):
+        self.api = api
         self.verbose = verbose
         self.continue_on_error = continue_on_error
         self.metadata_directory = metadata_directory

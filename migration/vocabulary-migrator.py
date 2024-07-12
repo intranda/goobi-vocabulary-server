@@ -44,7 +44,7 @@ def parse_args():
     parser.add_argument('--verbose', required=False, default=False, action='store_const', const=True, help='Verbose output')
     parser.add_argument('--dry', type=str, required=False, help='Don\'t call the API but instead write the API calls to a file, provide the filename as a parameter')
     parser.add_argument('--vocabulary-server-host', type=str, default='localhost', help='vocabulary server host')
-    parser.add_argument('--vocabulary-server-port', type=str, default='8080', help='vocabulary server port')
+    parser.add_argument('--vocabulary-server-port', type=str, default='8081', help='vocabulary server port')
     parser.add_argument('--goobi-database-host', type=str, default='localhost', help='Goobi database host')
     parser.add_argument('--goobi-database-port', type=str, default='3306', help='Goobi database port')
     parser.add_argument('--goobi-database-name', type=str, default='goobi', help='Goobi database name')

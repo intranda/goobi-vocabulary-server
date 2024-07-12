@@ -47,11 +47,20 @@ class MetsManipulator:
             # Extract old vocabulary and record ids
             valueURI = node.attrib['valueURI']
             parts = valueURI.split('/')
+
             vocabulary_id_old = int(parts[-2])
-            record_id_old = int(parts[-1])
-        
             vocabulary_id_new = self.ctx.lookup_vocabulary_id(vocabulary_id_old)
-            record_id_new = self.ctx.lookup_record_id(record_id_old)
+            
+            record_id_old = None
+            try:
+                record_id_old = int(parts[-1])
+                record_id_new = self.ctx.lookup_record_id(record_id_old)
+            except Exception as e:
+                try:
+                    record_id_new = self.ctx.api.find_record(vocabulary_id_new, parts[-1])
+                except Exception as e:
+                    raise e
+
             vocabulary_name = self.ctx.lookup_vocabulary_name(vocabulary_id_new)
 
             node.attrib['authority'] = vocabulary_name
