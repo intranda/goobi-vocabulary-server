@@ -25,42 +25,15 @@ Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
 
 ## Vocabulary Migration
 - The vocabulary server doesn't contain any vocabularies yet.
-- In order to migrate existing vocabularies to the new vocabulary server, perform the following steps:
-    - Download and extract the [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip).
-    - Install required Python dependencies (and Python3 if not existing):
-        - **with a virtual python environment**
-        - Navigate to the extracted vocabulary migration tool directory.
-        - Run `python -m venv vmenv` to create a virtual python environment named `vmenv`.
-        - Activate the python environment with `. vmenv/bin/activate`.
-        - Install the python dependencies with `pip install requests mysql-connector-python alive_progress`.
-    - In the activated virtual python environment, run:
-```bash
-python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
-```
-**Hint** Change the parameters according to your configuration. The `fallback-language` parameter defines the default language to be used for a multi-lingual vocabulary field for which no default language could be derived. The `continue-on-error` option prevents the migration tool to stop on data migration errors. These errors can occur if the data could not be inserted into the new vocabulary server. Possible reasons might be:
-- The vocabulary record is empty.
-- The vocabulary record contains data that is incompatible with some type restrictions.
-- Something unexpected.
-
-- After the migration is done, check the file `migration_issues.log` for all unsuccessful record migrations:
-    - Run `cat migration_issues.log | grep "Error validating Record" | wc -l` to get the number of unsuccessful record migrations.
-    - If the record doesn't contain useful data (empty record, broken data), ignore the issue.
-    - If the record contains valid information, check the reason of the failed data migration and try to fix it in the original `goobi` database (for a re-import) or add the new record manually later.
-    - If the record contains valid information and you are not able to change it to work, contact the support.
-    - If you have adapted any records due to migration issues, do the following for a re-import of the data:
-        - Shutdown the vocabulary server.
-        - Wipe the vocabulary server database.
-        - Start the vocabulary server.
-        - Perform the initial setup.
-        - Perform the vocabulary migration as described above.
-- After the migration is done, save the `migration.log` file at a safe place. This file contains all information about the migrated data with their old and new IDs. This information is mandatory to update vocabulary record references in metadata files later on.
-
+- In order to migrate existing vocabularies to the new vocabulary server, follow the [documentation of the vocabulary migration tool](migration/README.md).
+   
 *Data cleanup* When the data migration is done and successful and you are sure you will never need the old data anymore, you can manually remove all vocabulary tables from the `goobi` database of your Goobi instance:
 - `vocabulary`
 - `vocabulary_record`
 - `vocabulary_record_data`
 - `vocabulary_structure`
-  We suggest keeping this data for some time in case anything unexpected happens.
+
+We suggest keeping this data for some time in case anything unexpected happens.
 
 ## Security
 - You can set-up Apache url restrictions in order to secure the vocabulary server from unauthorized access.
