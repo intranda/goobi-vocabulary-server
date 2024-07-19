@@ -8,4 +8,8 @@ public class EntityNotFoundException extends IllegalArgumentException {
     public EntityNotFoundException(Class<?> type, String searchTerm) {
         super(type.getSimpleName() + " for search term \"" + searchTerm + "\" not found");
     }
+
+    public EntityNotFoundException(Class<?> type) {
+        super(type.getSimpleName() + " not found");
+    }
 }

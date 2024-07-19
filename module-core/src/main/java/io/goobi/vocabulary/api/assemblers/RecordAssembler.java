@@ -17,7 +17,7 @@ public class RecordAssembler implements RepresentationModelAssembler<VocabularyR
         EntityModel<VocabularyRecord> result = EntityModel.of(entity,
                 linkTo(methodOn(VocabularyRecordController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(VocabularyController.class).one(entity.getVocabularyId())).withRel("vocabulary"),
-                linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getVocabularyId(), null, null)).withRel("vocabulary_records"),
+                linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getVocabularyId(), null, null, null)).withRel("vocabulary_records"),
                 linkTo(methodOn(VocabularyRecordController.class).delete(entity.getId())).withRel("delete")
         );
         result.addIf(entity.getParentId() != null, () -> linkTo(methodOn(VocabularyRecordController.class).one(entity.getParentId())).withRel("parent_record"));

@@ -42,8 +42,12 @@ public class VocabularyRecordController {
     }
 
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public PagedModel<EntityModel<VocabularyRecord>> listInVocabulary(@PathVariable long vocabularyId, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.list(vocabularyId, pageRequest), assembler);
+    public PagedModel<EntityModel<VocabularyRecord>> listInVocabulary(@PathVariable long vocabularyId, @RequestParam(required = false, name = "search") String search, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
+        if (search == null) {
+            return pagedResourcesAssembler.toModel(manager.list(vocabularyId, pageRequest), assembler);
+        } else {
+            return pagedResourcesAssembler.toModel(manager.search(vocabularyId, search, pageRequest), assembler);
+        }
     }
 
     @GetMapping("/records/{id}")
@@ -54,11 +58,6 @@ public class VocabularyRecordController {
     @GetMapping(value = "/records/{id}", produces = {"application/xml"})
     public VocabularyRecord oneAsXml(@PathVariable long id) {
         return manager.get(id);
-    }
-
-    @GetMapping("/vocabularies/{vocabularyId}/records/search")
-    public PagedModel<EntityModel<VocabularyRecord>> searchInVocabulary(@PathVariable long vocabularyId, @RequestParam String query, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(manager.search(vocabularyId, query, pageRequest), assembler);
     }
 
     @PostMapping("/vocabularies/{vocabularyId}/records")

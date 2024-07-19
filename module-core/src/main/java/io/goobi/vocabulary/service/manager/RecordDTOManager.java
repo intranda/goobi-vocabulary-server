@@ -251,7 +251,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     public VocabularyRecord getMetadata(long vocabularyId) {
         return modelMapper.toDTO(
                 vocabularyRecordRepository.findByVocabulary_IdAndMetadataTrue(vocabularyId)
-                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, "metadata"))
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class))
         );
     }
 
