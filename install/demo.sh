@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-curl --location 'localhost:8081/api/v1/schemas' \
+METADATA_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
 --data '{
     "definitions": [
@@ -74,8 +74,8 @@ curl --location 'localhost:8081/api/v1/schemas' \
     ],
     "hierarchicalRecords": false,
     "singleRootElement": true
-}'
-curl --location 'localhost:8081/api/v1/schemas' \
+}' | jq ".id")
+SKOS_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
 --data '{
     "definitions": [
@@ -211,16 +211,16 @@ curl --location 'localhost:8081/api/v1/schemas' \
         }
     ],
     "hierarchicalRecords": true
-}'
+}' | jq ".id")
 curl --location 'localhost:8081/api/v1/vocabularies' \
 --header 'Content-Type: application/json' \
---data '{
-    "schemaId": 2,
-    "metadataSchemaId": 1,
-    "name": "SKOS",
-    "description": "SKOS example vocabulary."
-}'
-curl --location 'localhost:8081/api/v1/types' \
+--data "{
+    \"schemaId\": $SKOS_ID,
+    \"metadataSchemaId\": $METADATA_ID,
+    \"name\": \"SKOS\",
+    \"description\": \"SKOS example vocabulary.\"
+}"
+RATING_ID=$(curl --location 'localhost:8081/api/v1/types' \
 --header 'Content-Type: application/json' \
 --data '{
     "name": "Rating",
@@ -228,58 +228,58 @@ curl --location 'localhost:8081/api/v1/types' \
     "selectableValues": [
         "1", "2", "3", "4", "5"
     ]
-}'
-curl --location 'localhost:8081/api/v1/schemas' \
+}' | jq ".id")
+MOVIE_SCHEMA_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
---data '{
-    "definitions": [
+--data "{
+    \"definitions\": [
         {
-            "name": "Name",
-            "typeId": 5,
-            "required": true,
-            "unique": true,
-            "mainEntry": true,
-            "titleField": true
+            \"name\": \"Name\",
+            \"typeId\": 5,
+            \"required\": true,
+            \"unique\": true,
+            \"mainEntry\": true,
+            \"titleField\": true
         },
         {
-            "name": "Description",
-            "typeId": 1,
-            "required": false,
-            "unique": false,
-            "mainEntry": false,
-            "titleField": false,
-            "translationDefinitions": [
+            \"name\": \"Description\",
+            \"typeId\": 1,
+            \"required\": false,
+            \"unique\": false,
+            \"mainEntry\": false,
+            \"titleField\": false,
+            \"translationDefinitions\": [
                 {
-                    "language": "eng",
-                    "fallback": true,
-                    "required": true
+                    \"language\": \"eng\",
+                    \"fallback\": true,
+                    \"required\": true
                 },
                 {
-                    "language": "ger",
-                    "fallback": false,
-                    "required": true
+                    \"language\": \"ger\",
+                    \"fallback\": false,
+                    \"required\": true
                 }
             ]
         },
         {
-            "name": "Rating",
-            "typeId": 16,
-            "required": false,
-            "unique": false,
-            "mainEntry": false,
-            "titleField": false
+            \"name\": \"Rating\",
+            \"typeId\": $RATING_ID,
+            \"required\": false,
+            \"unique\": false,
+            \"mainEntry\": false,
+            \"titleField\": false
         }
     ],
-    "hierarchicalRecords": true
-}'
-curl --location 'localhost:8081/api/v1/vocabularies' \
+    \"hierarchicalRecords\": true
+}" | jq ".id")
+MOVIE_VOCAB_ID=$(curl --location 'localhost:8081/api/v1/vocabularies' \
 --header 'Content-Type: application/json' \
---data '{
-    "schemaId": 3,
-    "name": "MovieDB",
-    "description": "Personal movie database."
-}'
-curl --location 'localhost:8081/api/v1/schemas' \
+--data "{
+    \"schemaId\": $MOVIE_SCHEMA_ID,
+    \"name\": \"MovieDB\",
+    \"description\": \"Personal movie database.\"
+}" | jq ".id")
+HOBBY_SCHEMA_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
 --data '{
     "definitions": [
@@ -305,49 +305,49 @@ curl --location 'localhost:8081/api/v1/schemas' \
         }
     ],
     "hierarchicalRecords": false
-}'
-curl --location 'localhost:8081/api/v1/vocabularies' \
+}' | jq ".id")
+HOBBY_VOCAB_ID=$(curl --location 'localhost:8081/api/v1/vocabularies' \
 --header 'Content-Type: application/json' \
---data '{
-    "schemaId": 4,
-    "name": "Hobbies",
-    "description": "Collection of typical hobbies."
-}'
-curl --location 'localhost:8081/api/v1/schemas' \
+--data "{
+    \"schemaId\": $HOBBY_SCHEMA_ID,
+    \"name\": \"Hobbies\",
+    \"description\": \"Collection of typical hobbies.\"
+}" | jq ".id")
+FACEBOOK_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
 --header 'Content-Type: application/json' \
---data '{
-   "definitions": [
+--data "{
+   \"definitions\": [
          {
-            "name": "Full Name",
-            "typeId": 1,
-            "required": true,
-            "unique": true,
-            "mainEntry": true,
-            "titleField": true
+            \"name\": \"Full Name\",
+            \"typeId\": 1,
+            \"required\": true,
+            \"unique\": true,
+            \"mainEntry\": true,
+            \"titleField\": true
         },
         {
-            "name": "Favorite Movie",
-            "referenceVocabularyId": 2,
-            "required": true,
-            "unique": false,
-            "mainEntry": false,
-            "titleField": true
+            \"name\": \"Favorite Movie\",
+            \"referenceVocabularyId\": $MOVIE_VOCAB_ID,
+            \"required\": true,
+            \"unique\": false,
+            \"mainEntry\": false,
+            \"titleField\": true
         },
         {
-            "name": "Hobbies",
-            "referenceVocabularyId": 3,
-            "required": false,
-            "unique": false,
-            "mainEntry": false,
-            "titleField": false,
-            "multiValued": true
+            \"name\": \"Hobbies\",
+            \"referenceVocabularyId\": $HOBBY_VOCAB_ID,
+            \"required\": false,
+            \"unique\": false,
+            \"mainEntry\": false,
+            \"titleField\": false,
+            \"multiValued\": true
         }
     ]
-}'
+}" | jq ".id")
 curl --location 'localhost:8081/api/v1/vocabularies' \
 --header 'Content-Type: application/json' \
---data '{
-    "schemaId": 5,
-    "name": "Facebook",
-    "description": "My best friends with their favorite movies."
-}'
+--data "{
+    \"schemaId\": $FACEBOOK_ID,
+    \"name\": \"Facebook\",
+    \"description\": \"My best friends with their favorite movies.\"
+}"
