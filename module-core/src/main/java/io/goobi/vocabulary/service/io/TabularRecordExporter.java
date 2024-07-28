@@ -80,7 +80,10 @@ public class TabularRecordExporter {
         result.add(fieldDefinitions.stream()
                 .map(FieldInformation::toString)
                 .collect(Collectors.toList()));
-        entity.getRecords().forEach(r -> result.add(dumpRecord(fieldDefinitions, entity, r)));
+        entity.getRecords()
+                .stream()
+                .filter(r -> !r.isMetadata())
+                .forEach(r -> result.add(dumpRecord(fieldDefinitions, entity, r)));
         return result;
     }
 

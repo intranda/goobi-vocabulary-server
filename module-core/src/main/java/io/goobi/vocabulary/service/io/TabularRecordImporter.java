@@ -149,9 +149,9 @@ public class TabularRecordImporter {
             }
             // Special treatment for ID's
             if ("ID".equals(info.name)) {
-                resultRecord.setId(Long.parseLong(multiValue));
+                resultRecord.setId(parseId(multiValue));
             } else if ("Parent-ID".equals(info.name)) {
-                resultRecord.setParentId(Long.parseLong(multiValue));
+                resultRecord.setParentId(parseId(multiValue));
             } else {
                 FieldInstance field = fieldMap.computeIfAbsent(info.name, k -> {
                     FieldInstance result = new FieldInstance();
@@ -184,5 +184,12 @@ public class TabularRecordImporter {
         resultRecord.setFields(new HashSet<>(fieldMap.values()));
 
         return resultRecord;
+    }
+
+    private static long parseId(String multiValue) {
+        if (multiValue.contains(".")) {
+            return (long) Double.parseDouble(multiValue);
+        }
+        return Long.parseLong(multiValue);
     }
 }
