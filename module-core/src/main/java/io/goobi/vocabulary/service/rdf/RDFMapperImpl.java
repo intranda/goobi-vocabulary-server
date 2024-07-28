@@ -86,11 +86,15 @@ public class RDFMapperImpl implements RDFMapper {
                     .anyMatch(d -> d.getType() == null && d.getReferenceVocabulary() == null)) {
                 return false;
             }
-            // TODO: Metadata schema validation
             if (entity.getMetadataSchema() == null) {
                 return false;
             }
             entity.getSchema().getDefinitions().stream()
+                    .map(FieldDefinitionEntity::getType)
+                    .filter(Objects::nonNull)
+                    .map(FieldTypeEntity::getName)
+                    .forEach(this::findSkosProperty);
+            entity.getMetadataSchema().getDefinitions().stream()
                     .map(FieldDefinitionEntity::getType)
                     .filter(Objects::nonNull)
                     .map(FieldTypeEntity::getName)
@@ -225,6 +229,7 @@ public class RDFMapperImpl implements RDFMapper {
             case "skos:editorialNote" -> SKOS.editorialNote;
             case "skos:closeMatch" -> SKOS.closeMatch;
             case "skos:exactMatch" -> SKOS.exactMatch;
+            case "skos:related" -> SKOS.related;
             case "dct:title" -> DCTerms.title;
             case "dct:creator" -> DCTerms.creator;
             case "dct:created" -> DCTerms.created;

@@ -184,15 +184,6 @@ SKOS_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
         },
         {
             "name": "Related",
-            "typeId": 1,
-            "required": false,
-            "unique": false,
-            "mainEntry": false,
-            "titleField": false,
-            "multiValued": true
-        },
-        {
-            "name": "Close Match",
             "typeId": 10,
             "required": false,
             "unique": false,
@@ -201,8 +192,17 @@ SKOS_ID=$(curl --location 'localhost:8081/api/v1/schemas' \
             "multiValued": true
         },
         {
-            "name": "Exact Match",
+            "name": "Close Match",
             "typeId": 11,
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
+            "name": "Exact Match",
+            "typeId": 12,
             "required": false,
             "unique": false,
             "mainEntry": false,
