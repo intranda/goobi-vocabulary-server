@@ -36,13 +36,11 @@ public class VocabularyRecordController {
         this.assembler = assembler;
     }
 
-    @GetMapping("/vocabularies/{vocabularyId}/records/all")
-    public CollectionModel<EntityModel<VocabularyRecord>> allInVocabulary(@PathVariable long vocabularyId) {
-        return assembler.toCollectionModel(manager.all(vocabularyId));
-    }
-
     @GetMapping("/vocabularies/{vocabularyId}/records")
-    public PagedModel<EntityModel<VocabularyRecord>> listInVocabulary(@PathVariable long vocabularyId, @RequestParam(required = false, name = "search") String search, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<VocabularyRecord>> listInVocabulary(@PathVariable long vocabularyId, @RequestParam(required = false, name = "search") String search, @RequestParam(required = false, name = "all") Boolean all, Pageable pageRequest, PagedResourcesAssembler<VocabularyRecord> pagedResourcesAssembler) {
+        if (Boolean.TRUE.equals(all)) {
+            pageRequest = Pageable.unpaged(pageRequest.getSort());
+        }
         if (search == null) {
             return pagedResourcesAssembler.toModel(manager.list(vocabularyId, pageRequest), assembler);
         } else {

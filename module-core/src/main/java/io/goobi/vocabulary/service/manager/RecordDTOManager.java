@@ -36,21 +36,13 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     private final DTOMapper modelMapper;
     private final Validator<VocabularyRecordEntity> validator;
     private final VocabularyRepository vocabularyRepository;
-    private final VocabularySchemaRepository vocabularySchemaRepository;
 
     public RecordDTOManager(VocabularyRecordRepository vocabularyRecordRepository, DTOMapper modelMapper, Validator<VocabularyRecordEntity> validator, VocabularyRepository vocabularyRepository, VocabularySchemaRepository vocabularySchemaRepository) {
         this.vocabularyRecordRepository = vocabularyRecordRepository;
         this.modelMapper = modelMapper;
         this.validator = validator;
         this.vocabularyRepository = vocabularyRepository;
-        this.vocabularySchemaRepository = vocabularySchemaRepository;
-    }
-
-    public List<VocabularyRecord> all(long id) {
-        return vocabularyRecordRepository.findByVocabulary_IdAndMetadataFalse(id).stream()
-                .map(modelMapper::toDTO)
-                .collect(Collectors.toList());
-    }
+   }
 
     public Page<VocabularyRecord> list(long id, Pageable pageRequest) {
         if (pageRequest.getSort().isUnsorted()) {
@@ -58,7 +50,13 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
                     .map(modelMapper::toDTO);
         } else {
             Sort.Order order = pageRequest.getSort().stream().toList().get(0);
-            PageRequest cleanedUp = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+            Pageable cleanedUp;
+            try {
+                cleanedUp = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+            } catch (UnsupportedOperationException e) {
+                // Pageable might have been unpaged
+                cleanedUp = Pageable.unpaged();
+            }
             if (order.isAscending()) {
                 return vocabularyRecordRepository.findByVocabulary_sortedByFieldDefinitionASC(id, Long.parseLong(order.getProperty()), cleanedUp)
                         .map(modelMapper::toDTO);
