@@ -16,7 +16,6 @@ import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -62,13 +61,11 @@ public class VocabularyController {
         this.vocabularyRepository = vocabularyRepository;
     }
 
-    @GetMapping("/vocabularies/all")
-    public CollectionModel<EntityModel<Vocabulary>> all() {
-        return assembler.toCollectionModel(manager.listAll());
-    }
-
     @GetMapping("/vocabularies")
-    public PagedModel<EntityModel<Vocabulary>> list(Pageable pageRequest, PagedResourcesAssembler<Vocabulary> pagedResourcesAssembler) {
+    public PagedModel<EntityModel<Vocabulary>> list(@RequestParam(required = false, name = "all") Boolean all, Pageable pageRequest, PagedResourcesAssembler<Vocabulary> pagedResourcesAssembler) {
+        if (Boolean.TRUE.equals(all)) {
+            pageRequest = Pageable.unpaged(pageRequest.getSort());
+        }
         return pagedResourcesAssembler.toModel(manager.list(pageRequest), assembler);
     }
 
@@ -81,6 +78,30 @@ public class VocabularyController {
     public EntityModel<Vocabulary> findByName(@PathVariable String name) {
         return assembler.toModel(manager.find(name));
     }
+
+    @PostMapping("/vocabularies")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws ValidationException {
+        return assembler.toModel(manager.create(vocabularyDTO));
+    }
+
+    @PutMapping("/vocabularies/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabularyDTO, @PathVariable long id) throws ValidationException {
+        if (vocabularyDTO.getId() != null) {
+            throw new IllegalAttributeProvidedException("id");
+        }
+        vocabularyDTO.setId(id);
+        return assembler.toModel(manager.replace(vocabularyDTO));
+    }
+
+    @DeleteMapping("/vocabularies/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Vocabulary> delete(@PathVariable long id) {
+        return ResponseEntity.ok(manager.delete(id));
+    }
+
+    // Import and export endpoints
 
     @GetMapping(
             value = "/vocabularies/{id}/export/json",
@@ -170,27 +191,5 @@ public class VocabularyController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".ttl\"")
                 .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
-    }
-
-    @PostMapping("/vocabularies")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws ValidationException {
-        return assembler.toModel(manager.create(vocabularyDTO));
-    }
-
-    @PutMapping("/vocabularies/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabularyDTO, @PathVariable long id) throws ValidationException {
-        if (vocabularyDTO.getId() != null) {
-            throw new IllegalAttributeProvidedException("id");
-        }
-        vocabularyDTO.setId(id);
-        return assembler.toModel(manager.replace(vocabularyDTO));
-    }
-
-    @DeleteMapping("/vocabularies/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Vocabulary> delete(@PathVariable long id) {
-        return ResponseEntity.ok(manager.delete(id));
     }
 }
