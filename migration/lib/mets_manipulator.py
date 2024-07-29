@@ -40,11 +40,16 @@ class MetsManipulator:
     def process_node(self, node):
         if self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
             self.process_vocabulary_reference(node)
+        if self.is_manual_id_reference(node):
+            self.process_manual_id_reference(node)
         for child in node:
             self.process_node(child)
 
     def is_vocabulary_reference(self, node):
-        return 'authority' in node.attrib and 'authorityURI' in node.attrib and 'valueURI' in node.attrib
+        return node.tag.endswith('metadata') and 'authority' in node.attrib and 'authorityURI' in node.attrib and 'valueURI' in node.attrib
+
+    def is_manual_id_reference(self, node):
+        return self.ctx.manual_id_fix != None and node.tag.endswith('metadata') and 'name' in node.attrib and node.attrib['name'] == self.ctx.manual_id_fix
     
     def is_already_migrated(self, node):
         return re.match(VOCABULARY_URI_REGEX, node.attrib['authorityURI']) != None and re.match(RECORD_URI_REGEX, node.attrib['valueURI']) != None
@@ -114,6 +119,11 @@ class MetsManipulator:
             logging.debug(error)
             self.ctx.log_issue(self.file_path, error)
 
+    def process_manual_id_reference(self, node):
+        record_id_old = int(node.text)
+        record_id_new = self.ctx.lookup_record_id(record_id_old)
+        node.text = str(record_id_new)
+        self.changed = True
 
 def generate_vocabulary_uri(vocabulary_id):
     return VOCABULARY_ENDPOINT.replace('{{ID}}', str(vocabulary_id))

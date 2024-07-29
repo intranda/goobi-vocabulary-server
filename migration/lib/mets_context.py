@@ -6,13 +6,14 @@ NUMBER_PATTERN = re.compile('^\\d+$')
 RECORD_PATTERN = re.compile('^(\d+).*$')
 
 class Context:
-    def __init__(self, api, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language):
+    def __init__(self, api, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix):
         self.api = api
         self.verbose = verbose
         self.continue_on_error = continue_on_error
         self.metadata_directory = metadata_directory
         self.mapping_file = mapping_file
         self.preferred_mets_main_value_language = preferred_mets_main_value_language
+        self.manual_id_fix = manual_id_fix
         self.vocabulary_id_name_map = {}
         self.vocabulary_id_map = {}
         self.record_id_map = {}
