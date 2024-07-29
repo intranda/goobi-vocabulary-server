@@ -95,3 +95,5 @@ python metadata-migrator.py -m migration.csv -d /opt/digiverso/goobi/metadata
 This will recursively process all mets files in all process directories.
 Whenever it finds a vocabulary reference in the mets file, it will try to replace this reference with the updated information.
 When anything is changed, a backup of the mets file is created beforehand.
+
+If the mets files contain additional references to records in separate XML elements (e. g. `<goobi:metadata name="SourceID">5661</goobi:metadata>`), the `metadata-migrator.py` can also update these references with the additional parameter `--manual-id-fix SourceID`. The parameter value has to match the `name` attribute of a `metadata` element in order to replace its record id value to the new record id. This step must not be executed twice, because it would break the IDs!
