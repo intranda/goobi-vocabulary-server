@@ -28,7 +28,7 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
         EntityModel<Vocabulary> result =
                 EntityModel.of(entity,
                 linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(VocabularyController.class).list(null, null, null)).withRel("vocabularies"),
+                linkTo(methodOn(VocabularyController.class).list(false, null, null)).withRel("vocabularies"),
                 linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
 //                linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getId(), null, null, null)).withRel("records"), // TODO: optional parameter is encoded as {?search}, this leads to JSON parsing issues
                 linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete"),
