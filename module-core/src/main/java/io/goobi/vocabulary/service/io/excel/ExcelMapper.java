@@ -10,5 +10,6 @@ import java.util.List;
 
 public interface ExcelMapper {
     void toExcel(VocabularyEntity vocabulary, OutputStream out) throws IOException;
+
     List<VocabularyRecord> fromExcel(VocabularyEntity vocabulary, InputStream in) throws IOException;
 }

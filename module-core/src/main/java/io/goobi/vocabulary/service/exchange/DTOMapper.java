@@ -23,6 +23,7 @@ public interface DTOMapper {
     default FieldDefinitionEntity toEntity(FieldDefinition dto) {
         return toEntity(dto, true);
     }
+
     FieldDefinitionEntity toEntity(FieldDefinition dto, boolean fullInitialization);
 
     FieldDefinition toDTO(FieldDefinitionEntity entity);
@@ -30,6 +31,7 @@ public interface DTOMapper {
     default TranslationDefinitionEntity toEntity(TranslationDefinition dto) {
         return toEntity(dto, true);
     }
+
     TranslationDefinitionEntity toEntity(TranslationDefinition dto, boolean fullInitialization);
 
     TranslationDefinition toDTO(TranslationDefinitionEntity entity);
@@ -37,6 +39,7 @@ public interface DTOMapper {
     default FieldInstanceEntity toEntity(FieldInstance dto) {
         return toEntity(dto, true);
     }
+
     FieldInstanceEntity toEntity(FieldInstance dto, boolean fullInitialization);
 
     FieldInstance toDTO(FieldInstanceEntity entity);
@@ -44,7 +47,9 @@ public interface DTOMapper {
     default FieldValueEntity toEntity(FieldValue dto) {
         return toEntity(dto, true);
     }
+
     FieldValueEntity toEntity(FieldValue dto, boolean fullInitialization);
+
     FieldValue toDTO(FieldValueEntity entity);
 
     FieldTypeEntity toEntity(FieldType dto);
@@ -64,5 +69,6 @@ public interface DTOMapper {
     VocabularyRecord toDTO(VocabularyRecordEntity entity);
 
     LanguageEntity toEntity(Language dto);
+
     Language toDTO(LanguageEntity entity);
 }

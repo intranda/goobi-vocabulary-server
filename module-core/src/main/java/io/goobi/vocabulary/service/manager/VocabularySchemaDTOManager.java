@@ -1,9 +1,9 @@
 package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.MissingValuesException;
+import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularySchema;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import io.goobi.vocabulary.repositories.VocabularySchemaRepository;
@@ -44,7 +44,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchema> {
     }
 
     @Override
-    public VocabularySchema create(VocabularySchema newSchema) throws ValidationException {
+    public VocabularySchema create(VocabularySchema newSchema) throws VocabularyException {
         VocabularySchemaEntity jpaSchema = modelMapper.toEntity(newSchema);
         validator.validate(jpaSchema);
         return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));
@@ -62,7 +62,7 @@ public class VocabularySchemaDTOManager implements Manager<VocabularySchema> {
             replacements.add(() -> jpaSchema.setHierarchicalRecords(newSchema.getHierarchicalRecords()));
         }
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newSchema.getClass(), List.of("hierarchicalRecords"));
+            throw new MissingAttributeException(newSchema.getClass(), List.of("hierarchicalRecords"));
         }
         replacements.forEach(Runnable::run);
         return modelMapper.toDTO(vocabularySchemaRepository.save(jpaSchema));

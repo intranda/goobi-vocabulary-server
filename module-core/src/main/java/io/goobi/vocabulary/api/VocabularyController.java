@@ -1,10 +1,9 @@
 package io.goobi.vocabulary.api;
 
-
 import io.goobi.vocabulary.api.assemblers.VocabularyAssembler;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
 import io.goobi.vocabulary.service.io.csv.CSVMapper;
@@ -81,13 +80,13 @@ public class VocabularyController {
 
     @PostMapping("/vocabularies")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws ValidationException {
+    public EntityModel<Vocabulary> create(@RequestBody Vocabulary vocabularyDTO) throws VocabularyException {
         return assembler.toModel(manager.create(vocabularyDTO));
     }
 
     @PutMapping("/vocabularies/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabularyDTO, @PathVariable long id) throws ValidationException {
+    public EntityModel<Vocabulary> update(@RequestBody Vocabulary vocabularyDTO, @PathVariable long id) throws VocabularyException {
         if (vocabularyDTO.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }
@@ -123,7 +122,7 @@ public class VocabularyController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping( "/vocabularies/{id}/import/csv")
+    @PostMapping("/vocabularies/{id}/import/csv")
     public ResponseEntity<?> importCsv(@PathVariable long id, @RequestParam MultipartFile file) throws IOException {
         importManager.importCsv(id, new String(file.getInputStream().readAllBytes()));
         return ResponseEntity.ok().build();

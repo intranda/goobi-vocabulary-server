@@ -5,8 +5,12 @@ import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 
 public interface RDFMapper {
     boolean isRDFCompatible(VocabularyEntity entity);
+
     String toRDFXML(LanguageEntity entity);
+
     String toRDFXML(VocabularyEntity entity);
+
     String toRDFTurtle(LanguageEntity entity);
+
     String toRDFTurtle(VocabularyEntity entity);
 }

@@ -2,9 +2,9 @@ package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.DeletionOfReferencedVocabularyException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.MissingValuesException;
+import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
@@ -48,7 +48,7 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
     public Vocabulary get(long id) {
         return modelMapper.toDTO(
                 vocabularyRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, id))
+                        .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, id))
         );
     }
 
@@ -60,7 +60,7 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
     }
 
     @Override
-    public Vocabulary create(Vocabulary newVocabularyDTO) throws ValidationException {
+    public Vocabulary create(Vocabulary newVocabularyDTO) throws VocabularyException {
         VocabularyEntity jpaVocabulary = modelMapper.toEntity(newVocabularyDTO);
         validator.validate(jpaVocabulary);
         return modelMapper.toDTO(vocabularyRepository.save(jpaVocabulary));
@@ -82,7 +82,7 @@ public class VocabularyDTOManager implements Manager<Vocabulary> {
             replacements.add(() -> jpaVocabulary.setDescription(newVocabularyDTO.getDescription()));
         }
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newVocabularyDTO.getClass(), List.of("name", "description"));
+            throw new MissingAttributeException(newVocabularyDTO.getClass(), List.of("name", "description"));
         }
         replacements.forEach(Runnable::run);
         return modelMapper.toDTO(vocabularyRepository.save(jpaVocabulary));

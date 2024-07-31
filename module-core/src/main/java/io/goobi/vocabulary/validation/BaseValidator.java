@@ -1,11 +1,12 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.GenericValidation;
 
 public class BaseValidator<T> implements Validator<T> {
     private final String name;
@@ -17,22 +18,17 @@ public class BaseValidator<T> implements Validator<T> {
     }
 
     @Override
-    public final void validate(T t) throws ValidationException {
-        List<Throwable> errors = new LinkedList<>();
+    public final void validate(T t) throws VocabularyException {
+        List<VocabularyException> errors = new LinkedList<>();
         for (ValidationMethod<T> m : validations) {
             try {
                 m.validate(t);
-            } catch (ValidationException e) {
+            } catch (VocabularyException e) {
                 errors.add(e);
             }
         }
         if (!errors.isEmpty()) {
-            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
-            List<String> errorLines = List.of(errorMessages.split("\n"));
-            throw new ValidationException("Error validating " + name + ":\n"
-                    + errorLines.stream()
-                    .map(l -> "\t" + l)
-                    .collect(Collectors.joining("\n")));
+            throw new VocabularyException(GenericValidation, errors, null, (params) -> "Validation error");
         }
     }
 }

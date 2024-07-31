@@ -5,21 +5,22 @@ import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DeletionOfReferencedRecordException extends IllegalStateException {
+public class DeletionOfReferencedRecordException extends VocabularyException {
     public DeletionOfReferencedRecordException(VocabularyRecordEntity rec, Collection<VocabularyRecordEntity> referencingRecords) {
-        super("Cannot delete record [" + rec.getId() + "], it is referenced by the following records:\n\t" +
-                referencingRecords.stream()
-                        .map(Object::toString)
-                        .collect(Collectors.joining("\n\t")));
+        super(ErrorCode.DeletionOfReferencedVocabularyRecord, null, Map.of("recordId", String.valueOf(rec.getId()), "referencingRecordIds", referencingRecords.stream().map(VocabularyRecordEntity::getId).map(String::valueOf).collect(Collectors.joining(","))),
+                params -> "Cannot delete record [" + params.get("recordId") + "], it is referenced by the following records: " + params.get("referencingRecordIds"));
     }
 
-    public DeletionOfReferencedRecordException(VocabularyRecordEntity rec, List<DeletionOfReferencedRecordException> causes) {
-        super("Cannot delete record [" + rec.getId() + "], reason:\n" + causes.stream().map(Throwable::getMessage).collect(Collectors.joining((CharSequence) "\n")));
+    public DeletionOfReferencedRecordException(VocabularyRecordEntity rec, List<VocabularyException> causes) {
+        super(ErrorCode.DeletionOfReferencedVocabularyRecord, causes, Map.of("recordId", String.valueOf(rec.getId())),
+                params -> "Cannot delete record [" + params.get("recordId") + "], reason:\n" + causes.stream().map(Throwable::getMessage).collect(Collectors.joining((CharSequence) "\n")));
     }
 
-    public DeletionOfReferencedRecordException(VocabularyEntity vocabulary, List<DeletionOfReferencedRecordException> causes) {
-        super("Cannot remove all records of vocabulary [" + vocabulary.getId() + "], reason:\n" + causes.stream().map(Throwable::getMessage).collect(Collectors.joining((CharSequence) "\n")));
+    public DeletionOfReferencedRecordException(VocabularyEntity vocabulary, List<VocabularyException> causes) {
+        super(ErrorCode.DeletionOfReferencedVocabularyRecord, causes, Map.of("vocabularyId", String.valueOf(vocabulary.getId())),
+                params -> "Cannot remove all records of vocabulary [" + params.get("vocabularyId") + "], reason:\n" + causes.stream().map(Throwable::getMessage).collect(Collectors.joining((CharSequence) "\n")));
     }
 }

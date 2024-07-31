@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
@@ -63,7 +63,7 @@ class RecordValidationTests {
         VocabularyRecordEntity record = new VocabularyRecordEntity();
         record.setVocabulary(vocabulary);
 
-        assertThrows(ValidationException.class, () -> validator.validate(record));
+        assertThrows(VocabularyException.class, () -> validator.validate(record));
     }
 
     @Test
@@ -90,7 +90,7 @@ class RecordValidationTests {
 
         record.setFields(List.of(name, unknown));
 
-        assertThrows(ValidationException.class, () -> validator.validate(record));
+        assertThrows(VocabularyException.class, () -> validator.validate(record));
     }
 
     @Test
@@ -114,8 +114,8 @@ class RecordValidationTests {
         parent.setChildren(List.of(child));
 
         assertAll("Parent and child validations",
-                () -> assertThrows(ValidationException.class, () -> validator.validate(parent)),
-                () -> assertThrows(ValidationException.class, () -> validator.validate(child))
+                () -> assertThrows(VocabularyException.class, () -> validator.validate(parent)),
+                () -> assertThrows(VocabularyException.class, () -> validator.validate(child))
         );
     }
 

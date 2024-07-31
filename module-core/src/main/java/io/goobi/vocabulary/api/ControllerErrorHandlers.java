@@ -1,13 +1,6 @@
 package io.goobi.vocabulary.api;
 
-import io.goobi.vocabulary.exception.DeletionOfReferencedRecordException;
-import io.goobi.vocabulary.exception.DeletionOfReferencedVocabularyException;
-import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.MissingAttributeException;
-import io.goobi.vocabulary.exception.MissingValuesException;
-import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,13 +15,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @ControllerAdvice
 public class ControllerErrorHandlers {
     private Logger logger = LoggerFactory.getLogger(ControllerErrorHandlers.class);
-
-    @ResponseBody
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    String entityNotFoundHandler(EntityNotFoundException e) {
-        return e.getMessage();
-    }
 
     @ResponseBody
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -52,59 +38,10 @@ public class ControllerErrorHandlers {
     }
 
     @ResponseBody
-    @ExceptionHandler(MissingValuesException.class)
+    @ExceptionHandler(VocabularyException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String missingValuesHandler(MissingValuesException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(MissingAttributeException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String missingAttributesHandler(MissingAttributeException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(IllegalAttributeProvidedException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String illegalAttributeHandler(IllegalAttributeProvidedException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String validationFailsHandler(ValidationException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(DeletionOfReferencedRecordException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String deletionOfRecordNotPossible(DeletionOfReferencedRecordException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(DeletionOfReferencedVocabularyException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String deletionOfRecordNotPossible(DeletionOfReferencedVocabularyException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String illegalArgumentHandler(IllegalArgumentException e) {
-        return e.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(UnsupportedEntityReplacementException.class)
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    String unsupportedResourcesReplaceMethod(UnsupportedEntityReplacementException e) {
-        return e.getMessage();
+    VocabularyException validationFailsHandler(VocabularyException e) {
+        return e;
     }
 
     @ResponseBody

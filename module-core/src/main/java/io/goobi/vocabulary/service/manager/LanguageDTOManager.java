@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.service.manager;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.Language;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
@@ -30,12 +30,12 @@ public class LanguageDTOManager implements Manager<Language> {
     }
 
     @Override
-    public Language create(Language newLanguageDTO) throws ValidationException {
+    public Language create(Language newLanguageDTO) throws VocabularyException {
         return modelMapper.toDTO(languageEntityManager.create(modelMapper.toEntity(newLanguageDTO)));
     }
 
     @Override
-    public Language replace(Language newLanguageDTO) throws ValidationException {
+    public Language replace(Language newLanguageDTO) throws VocabularyException {
         return modelMapper.toDTO(languageEntityManager.replace(modelMapper.toEntity(newLanguageDTO)));
     }
 

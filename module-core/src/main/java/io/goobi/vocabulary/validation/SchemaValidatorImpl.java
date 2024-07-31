@@ -1,14 +1,21 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.SchemaValidationException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationDefinitionIssues;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationMainFieldIsNotRequired;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationMissingMainField;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationNoDefinitions;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationTitleFieldsAreNotRequired;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationTooManyMainFields;
 
 @Service
 public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
@@ -26,57 +33,68 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
         ));
     }
 
-    private void checkFieldDefinitionExistence(VocabularySchemaEntity schema) throws SchemaValidationException {
+    private void checkFieldDefinitionExistence(VocabularySchemaEntity schema) throws VocabularyException {
         if (schema.getDefinitions().isEmpty()) {
-            throw new SchemaValidationException("Empty field definitions are not allowed");
+            throw new VocabularyException(SchemaValidationNoDefinitions, null, null, params -> "Empty field definitions are not allowed");
         }
     }
 
-    private void checkSingleMainFieldDefinition(VocabularySchemaEntity schema) throws SchemaValidationException {
+    private void checkSingleMainFieldDefinition(VocabularySchemaEntity schema) throws VocabularyException {
         List<String> mainFieldDefinitionNames = schema.getDefinitions().stream()
                 .filter(d -> Boolean.TRUE.equals(d.getMainEntry()))
                 .map(FieldDefinitionEntity::getName)
                 .collect(Collectors.toList());
         if (mainFieldDefinitionNames.isEmpty()) {
-            throw new SchemaValidationException("Exactly one main field required but none was specified");
+            throw new VocabularyException(SchemaValidationMissingMainField, null, null, params -> "Exactly one main field required but none was specified");
         } else if (mainFieldDefinitionNames.size() > 1) {
-            throw new SchemaValidationException("Exactly one main field required but the following multiple main fields are specified: " + String.join(", ", mainFieldDefinitionNames));
+            throw new VocabularyException(SchemaValidationTooManyMainFields, null, Map.of(
+                    "mainFieldNames", String.join(",", mainFieldDefinitionNames)
+            ),
+                    params -> "Exactly one main field required but the following multiple main fields are specified: " + params.get("mainFieldNames"));
         }
     }
 
-    private void checkMainFieldIsRequired(VocabularySchemaEntity schema) throws SchemaValidationException {
+    private void checkMainFieldIsRequired(VocabularySchemaEntity schema) throws VocabularyException {
         List<FieldDefinitionEntity> mainEntries = schema.getDefinitions().stream()
-                .filter(d -> Boolean.TRUE.equals(d.getMainEntry())).collect(Collectors.toList());
+                .filter(d -> Boolean.TRUE.equals(d.getMainEntry()))
+                .collect(Collectors.toList());
         if (!mainEntries.isEmpty() && mainEntries.stream()
                 .filter(d -> Boolean.TRUE.equals(d.isRequired()))
                 .count() != 1) {
-            throw new SchemaValidationException("The main field needs to be set required");
+            throw new VocabularyException(SchemaValidationMainFieldIsNotRequired, null, Map.of(
+                    "mainFieldNames", String.join(",", mainEntries.stream()
+                            .map(FieldDefinitionEntity::getName)
+                            .collect(Collectors.joining(",")))
+            ),
+                    params -> "The main field needs to be set required: " + params.get("mainFieldNames"));
         }
     }
 
-    private void checkTitleFieldsAreRequired(VocabularySchemaEntity schema) throws SchemaValidationException {
+    private void checkTitleFieldsAreRequired(VocabularySchemaEntity schema) throws VocabularyException {
         List<String> titleFieldsThatAreNotRequired = schema.getDefinitions().stream()
                 .filter(d -> Boolean.TRUE.equals(d.isTitleField()))
                 .filter(d -> Boolean.FALSE.equals(d.isRequired()))
                 .map(FieldDefinitionEntity::getName)
                 .collect(Collectors.toList());
         if (!titleFieldsThatAreNotRequired.isEmpty()) {
-            throw new SchemaValidationException("Title fields need to be required: " + String.join(", ", titleFieldsThatAreNotRequired));
+            throw new VocabularyException(SchemaValidationTitleFieldsAreNotRequired, null, Map.of(
+                    "titleFieldNames", String.join(",", titleFieldsThatAreNotRequired)
+            ),
+                    params -> "Title fields need to be required: " + params.get("titleFieldNames"));
         }
     }
 
-    private void perFieldDefinitionChecks(VocabularySchemaEntity schema) throws SchemaValidationException {
-        List<Throwable> errors = new LinkedList<>();
+    private void perFieldDefinitionChecks(VocabularySchemaEntity schema) throws VocabularyException {
+        List<VocabularyException> errors = new LinkedList<>();
         for (FieldDefinitionEntity d : schema.getDefinitions()) {
             try {
                 fieldDefinitionValidator.validate(d);
-            } catch (ValidationException e) {
+            } catch (VocabularyException e) {
                 errors.add(e);
             }
         }
         if (!errors.isEmpty()) {
-            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
-            throw new SchemaValidationException(errorMessages);
+            throw new VocabularyException(SchemaValidationDefinitionIssues, errors, null, params -> "Error validating vocabulary schema");
         }
     }
 }

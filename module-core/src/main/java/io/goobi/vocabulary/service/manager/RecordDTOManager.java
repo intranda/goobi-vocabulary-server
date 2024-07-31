@@ -2,10 +2,9 @@ package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.DeletionOfReferencedRecordException;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.MissingValuesException;
-import io.goobi.vocabulary.exception.RecordValidationException;
+import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
@@ -26,8 +25,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.RecordValidation;
 
 @Service
 public class RecordDTOManager implements Manager<VocabularyRecord> {
@@ -42,7 +44,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         this.modelMapper = modelMapper;
         this.validator = validator;
         this.vocabularyRepository = vocabularyRepository;
-   }
+    }
 
     public Page<VocabularyRecord> list(long id, Pageable pageRequest) {
         if (pageRequest.getSort().isUnsorted()) {
@@ -80,13 +82,13 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     }
 
     @Override
-    public VocabularyRecord create(VocabularyRecord newRecord) throws ValidationException {
+    public VocabularyRecord create(VocabularyRecord newRecord) throws VocabularyException {
         VocabularyRecordEntity jpaVocabularyRecord = modelMapper.toEntity(newRecord);
         validator.validate(jpaVocabularyRecord);
         return modelMapper.toDTO(vocabularyRecordRepository.save(jpaVocabularyRecord));
     }
 
-    public VocabularyRecord createSubRecord(VocabularyRecord newRecord) throws ValidationException {
+    public VocabularyRecord createSubRecord(VocabularyRecord newRecord) throws VocabularyException {
         VocabularyRecordEntity jpaParent = vocabularyRecordRepository.findById(newRecord.getParentId())
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyRecordEntity.class, newRecord.getParentId()));
         newRecord.setVocabularyId(jpaParent.getVocabulary().getId());
@@ -99,27 +101,29 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         return modelMapper.toDTO(jpaNewChildRecord);
     }
 
-    private void recursiveRecordValidation(VocabularyRecordEntity recordToValidate) throws ValidationException {
-        List<Throwable> errors = new LinkedList<>();
+    private void recursiveRecordValidation(VocabularyRecordEntity recordToValidate) throws VocabularyException {
+        List<VocabularyException> errors = new LinkedList<>();
         try {
             validator.validate(recordToValidate);
-        } catch (ValidationException e) {
+        } catch (VocabularyException e) {
             errors.add(e);
         }
         for (VocabularyRecordEntity r : recordToValidate.getChildren()) {
             try {
                 validator.validate(r);
-            } catch (ValidationException e) {
+            } catch (VocabularyException e) {
                 errors.add(e);
             }
         }
         if (!errors.isEmpty()) {
-            throw new RecordValidationException(errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n")));
+            throw new VocabularyException(RecordValidation, errors, Map.of(
+                    "recordId", String.valueOf(recordToValidate.getId())
+            ), (params) -> "Error validating record [" + params.get("recordId") + "]");
         }
     }
 
     @Override
-    public VocabularyRecord replace(VocabularyRecord newRecord) throws ValidationException {
+    public VocabularyRecord replace(VocabularyRecord newRecord) throws VocabularyException {
         VocabularyRecordEntity jpaRecord = vocabularyRecordRepository
                 .findById(newRecord.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newRecord.getClass(), newRecord.getId()));
@@ -136,7 +140,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         }
         // TODO: Plan children replacement
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newRecord.getClass(), List.of("fields", "children"));
+            throw new MissingAttributeException(newRecord.getClass(), List.of("fields", "children"));
         }
         replacements.forEach(Runnable::run);
         validator.validate(jpaRecord);
@@ -161,14 +165,14 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
     }
 
     private void checkForExistingReferencesToSingleVocabularyRecord(VocabularyRecordEntity recordEntity) {
-        List<DeletionOfReferencedRecordException> errors = checkForExistingReferencesToRecords(extractAllRecordsToCheckForReferences(recordEntity));
+        List<VocabularyException> errors = checkForExistingReferencesToRecords(extractAllRecordsToCheckForReferences(recordEntity));
         if (!errors.isEmpty()) {
             throw new DeletionOfReferencedRecordException(recordEntity, errors);
         }
     }
 
     private void checkForExistingReferencesInWholeVocabulary(VocabularyEntity vocabulary) {
-        List<DeletionOfReferencedRecordException> errors = checkForExistingReferencesToRecords(
+        List<VocabularyException> errors = checkForExistingReferencesToRecords(
                 vocabulary.getRecords().stream()
                         .flatMap(r -> extractAllRecordsToCheckForReferences(r).stream())
                         .collect(Collectors.toList()));
@@ -184,12 +188,12 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         return result;
     }
 
-    private List<DeletionOfReferencedRecordException> checkForExistingReferencesToRecords(Collection<VocabularyRecordEntity> records) {
-        List<DeletionOfReferencedRecordException> errors = new LinkedList<>();
+    private List<VocabularyException> checkForExistingReferencesToRecords(Collection<VocabularyRecordEntity> records) {
+        List<VocabularyException> errors = new LinkedList<>();
         for (VocabularyRecordEntity r : records) {
             try {
                 recordReferenceValidation(r);
-            } catch (DeletionOfReferencedRecordException e) {
+            } catch (VocabularyException e) {
                 errors.add(e);
             }
         }
@@ -253,7 +257,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         );
     }
 
-    public VocabularyRecord replaceMetadata(VocabularyRecord newRecord) throws ValidationException {
+    public VocabularyRecord replaceMetadata(VocabularyRecord newRecord) throws VocabularyException {
         VocabularyRecordEntity jpaRecord = vocabularyRecordRepository
                 .findByVocabulary_IdAndMetadataTrue(newRecord.getVocabularyId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newRecord.getClass(), newRecord.getId()));
@@ -269,7 +273,7 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         }
         // TODO: Plan children replacement
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newRecord.getClass(), List.of("fields"));
+            throw new MissingAttributeException(newRecord.getClass(), List.of("fields"));
         }
         replacements.forEach(Runnable::run);
         validator.validate(jpaRecord);

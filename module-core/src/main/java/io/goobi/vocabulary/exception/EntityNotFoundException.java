@@ -1,15 +1,20 @@
 package io.goobi.vocabulary.exception;
 
-public class EntityNotFoundException extends IllegalArgumentException {
+import java.util.Map;
+
+public class EntityNotFoundException extends VocabularyException {
     public EntityNotFoundException(Class<?> type, long id) {
-        super(type.getSimpleName() + " with id \"" + id + "\" not found");
+        super(ErrorCode.EntityNotFound, null, Map.of("type", type.getSimpleName(), "id", String.valueOf(id)),
+                (params) -> params.get("type") + " with id \"" + params.get("id") + "\" not found");
     }
 
     public EntityNotFoundException(Class<?> type, String searchTerm) {
-        super(type.getSimpleName() + " for search term \"" + searchTerm + "\" not found");
+        super(ErrorCode.EntityNotFound, null, Map.of("type", type.getSimpleName(), "searchTerm", searchTerm),
+                (params) -> params.get("type") + " for search term \"" + params.get("searchTerm") + "\" not found");
     }
 
     public EntityNotFoundException(Class<?> type) {
-        super(type.getSimpleName() + " not found");
+        super(ErrorCode.EntityNotFound, null, Map.of("type", type.getSimpleName()),
+                (params) -> params.get("type") + " not found");
     }
 }

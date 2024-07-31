@@ -1,5 +1,6 @@
 package io.goobi.vocabulary.service.io.excel;
 
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.service.io.TabularRecordExporter;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -58,7 +60,7 @@ public class ExcelMapperImpl implements ExcelMapper {
     public List<VocabularyRecord> fromExcel(VocabularyEntity vocabulary, InputStream in) throws IOException {
         Workbook wb = WorkbookFactory.create(in);
         Sheet sheet = wb.getSheetAt(0);
-        List<List<String>> data = new ArrayList<>(sheet.getLastRowNum()+1);
+        List<List<String>> data = new ArrayList<>(sheet.getLastRowNum() + 1);
         int numberOfColumns = -1;
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
@@ -76,7 +78,8 @@ public class ExcelMapperImpl implements ExcelMapper {
                         case NUMERIC -> value = String.valueOf(cell.getNumericCellValue());
                         case BLANK -> value = "";
                         default ->
-                                throw new IllegalArgumentException("Unsupported cell type \"" + cell.getCellType() + "\"");
+                                throw new VocabularyException(VocabularyException.ErrorCode.UnsupportedExcelCellType, null, Map.of("cellType", cell.getCellType().toString()),
+                                        params -> "Unsupported cell type \"" + params.get("cellType") + "\"");
                     }
 
                     if (value.isBlank()) {
@@ -92,7 +95,7 @@ public class ExcelMapperImpl implements ExcelMapper {
                 rowData.add(null);
             }
             if (rowData.stream().anyMatch(Objects::nonNull)) {
-                data.add(rowData.subList(0, numberOfColumns+1));
+                data.add(rowData.subList(0, numberOfColumns + 1));
             }
         }
         return tabularRecordImporter.fromTabularData(vocabulary, data);

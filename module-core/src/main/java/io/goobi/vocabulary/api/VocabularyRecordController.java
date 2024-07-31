@@ -2,12 +2,11 @@ package io.goobi.vocabulary.api;
 
 import io.goobi.vocabulary.api.assemblers.RecordAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.service.manager.RecordDTOManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,7 @@ public class VocabularyRecordController {
 
     @PostMapping("/vocabularies/{vocabularyId}/records")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws ValidationException {
+    public EntityModel<VocabularyRecord> create(@PathVariable long vocabularyId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws VocabularyException {
         if (vocabularyRecordDTO.getVocabularyId() != null) {
             throw new IllegalAttributeProvidedException("vocabularyId");
         }
@@ -73,7 +72,7 @@ public class VocabularyRecordController {
 
     @PostMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularyRecord> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws ValidationException {
+    public EntityModel<VocabularyRecord> createSubRecord(@PathVariable long recordId, @RequestBody VocabularyRecord vocabularyRecordDTO) throws VocabularyException {
         if (vocabularyRecordDTO.getVocabularyId() != null) {
             throw new IllegalAttributeProvidedException("vocabularyId");
         }
@@ -86,7 +85,7 @@ public class VocabularyRecordController {
 
     @PutMapping("/records/{recordId}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularyRecord> update(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long recordId) throws ValidationException {
+    public EntityModel<VocabularyRecord> update(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long recordId) throws VocabularyException {
         if (vocabularyRecordDTO.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }
@@ -115,7 +114,7 @@ public class VocabularyRecordController {
 
     @PostMapping("/vocabularies/{vocabularyId}/metadata")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularyRecord> createMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws ValidationException {
+    public EntityModel<VocabularyRecord> createMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws VocabularyException {
         if (vocabularyRecordDTO.getMetadata() != null) {
             throw new IllegalAttributeProvidedException("metadata");
         }
@@ -125,7 +124,7 @@ public class VocabularyRecordController {
 
     @PutMapping("/vocabularies/{vocabularyId}/metadata")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularyRecord> updateMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws ValidationException {
+    public EntityModel<VocabularyRecord> updateMetadata(@RequestBody VocabularyRecord vocabularyRecordDTO, @PathVariable long vocabularyId) throws VocabularyException {
         if (vocabularyRecordDTO.getVocabularyId() != null) {
             throw new IllegalAttributeProvidedException("vocabularyId");
         }

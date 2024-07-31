@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.service.manager;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,6 +10,7 @@ public interface Manager<T> {
     default List<T> listAll() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
     default Page<T> list(Pageable pageable) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -18,11 +19,11 @@ public interface Manager<T> {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default T create(T newT) throws ValidationException {
+    default T create(T newT) throws VocabularyException {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default T replace(T newT) throws ValidationException {
+    default T replace(T newT) throws VocabularyException {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

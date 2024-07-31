@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class LanguageAssembler implements RepresentationModelAssembler<Language, EntityModel<Language>> {
     @Override
     public EntityModel<Language> toModel(Language entity) {
-         return EntityModel.of(entity,
+        return EntityModel.of(entity,
                 linkTo(methodOn(LanguageController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(LanguageController.class).all(null, null)).withRel("languages"),
                 linkTo(methodOn(LanguageController.class).delete(entity.getId())).withRel("delete")

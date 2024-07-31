@@ -1,9 +1,8 @@
 package io.goobi.vocabulary.api;
 
-
 import io.goobi.vocabulary.api.assemblers.LanguageAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.Language;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.service.manager.Manager;
@@ -86,13 +85,13 @@ public class LanguageController {
 
     @PostMapping("/languages")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<Language> create(@RequestBody Language newLanguage) throws ValidationException {
+    public EntityModel<Language> create(@RequestBody Language newLanguage) throws VocabularyException {
         return assembler.toModel(DTOmanager.create(newLanguage));
     }
 
     @PutMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Language> update(@RequestBody Language newLanguage, @PathVariable long id) throws ValidationException {
+    public EntityModel<Language> update(@RequestBody Language newLanguage, @PathVariable long id) throws VocabularyException {
         if (newLanguage.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }

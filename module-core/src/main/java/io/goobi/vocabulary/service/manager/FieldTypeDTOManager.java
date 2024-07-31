@@ -1,9 +1,9 @@
 package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.MissingValuesException;
+import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.FieldType;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
@@ -52,14 +52,14 @@ public class FieldTypeDTOManager implements Manager<FieldType> {
     }
 
     @Override
-    public FieldType create(FieldType newFieldTypeDTO) throws ValidationException {
+    public FieldType create(FieldType newFieldTypeDTO) throws VocabularyException {
         FieldTypeEntity jpaType = modelMapper.toEntity(newFieldTypeDTO);
         validator.validate(jpaType);
         return modelMapper.toDTO(fieldTypeRepository.save(jpaType));
     }
 
     @Override
-    public FieldType replace(FieldType newFieldTypeDTO) throws ValidationException {
+    public FieldType replace(FieldType newFieldTypeDTO) throws VocabularyException {
         FieldTypeEntity jpaFieldType = fieldTypeRepository
                 .findById(newFieldTypeDTO.getId())
                 .orElseThrow(() -> new UnsupportedEntityReplacementException(newFieldTypeDTO.getClass(), newFieldTypeDTO.getId()));
@@ -86,7 +86,7 @@ public class FieldTypeDTOManager implements Manager<FieldType> {
             });
         }
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newFieldTypeDTO.getClass(), List.of("name", "validation", "selectableValues"));
+            throw new MissingAttributeException(newFieldTypeDTO.getClass(), List.of("name", "validation", "selectableValues"));
         }
         replacements.forEach(Runnable::run);
         validator.validate(jpaFieldType);

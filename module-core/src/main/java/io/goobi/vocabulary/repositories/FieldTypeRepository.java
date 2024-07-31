@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface FieldTypeRepository extends CrudRepository<FieldTypeEntity, Long> {
     Page<FieldTypeEntity> findAll(Pageable pageable);
+
     Optional<FieldTypeEntity> findByName(@NonNull String name);
 }

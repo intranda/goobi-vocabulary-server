@@ -1,9 +1,8 @@
 package io.goobi.vocabulary.api;
 
-
 import io.goobi.vocabulary.api.assemblers.FieldTypeAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.FieldType;
 import io.goobi.vocabulary.service.manager.FieldTypeDTOManager;
 import org.springframework.data.domain.Pageable;
@@ -50,13 +49,13 @@ public class FieldTypeController {
 
     @PostMapping("/types")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<FieldType> create(@RequestBody FieldType newFieldType) throws ValidationException {
+    public EntityModel<FieldType> create(@RequestBody FieldType newFieldType) throws VocabularyException {
         return assembler.toModel(manager.create(newFieldType));
     }
 
     @PutMapping("/types/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<FieldType> update(@RequestBody FieldType newFieldType, @PathVariable long id) throws ValidationException {
+    public EntityModel<FieldType> update(@RequestBody FieldType newFieldType, @PathVariable long id) throws VocabularyException {
         if (newFieldType.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }

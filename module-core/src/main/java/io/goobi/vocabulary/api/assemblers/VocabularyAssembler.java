@@ -1,7 +1,6 @@
 package io.goobi.vocabulary.api.assemblers;
 
 import io.goobi.vocabulary.api.VocabularyController;
-import io.goobi.vocabulary.api.VocabularyRecordController;
 import io.goobi.vocabulary.api.VocabularySchemaController;
 import io.goobi.vocabulary.exchange.Vocabulary;
 import io.goobi.vocabulary.service.exchange.DTOMapper;
@@ -27,15 +26,15 @@ public class VocabularyAssembler implements RepresentationModelAssembler<Vocabul
     public EntityModel<Vocabulary> toModel(Vocabulary entity) {
         EntityModel<Vocabulary> result =
                 EntityModel.of(entity,
-                linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
-                linkTo(methodOn(VocabularyController.class).list(false, null, null)).withRel("vocabularies"),
-                linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
+                        linkTo(methodOn(VocabularyController.class).one(entity.getId())).withSelfRel(),
+                        linkTo(methodOn(VocabularyController.class).list(false, null, null)).withRel("vocabularies"),
+                        linkTo(methodOn(VocabularySchemaController.class).one(entity.getSchemaId())).withRel("schema"),
 //                linkTo(methodOn(VocabularyRecordController.class).listInVocabulary(entity.getId(), null, null, null)).withRel("records"), // TODO: optional parameter is encoded as {?search}, this leads to JSON parsing issues
-                linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete"),
-                linkTo(methodOn(VocabularyController.class).exportAsJson(entity.getId())).withRel("export_json"),
-                linkTo(methodOn(VocabularyController.class).exportAsCsv(entity.getId())).withRel("export_csv"),
-                linkTo(methodOn(VocabularyController.class).exportAsExcel(entity.getId())).withRel("export_excel")
-        );
+                        linkTo(methodOn(VocabularyController.class).delete(entity.getId())).withRel("delete"),
+                        linkTo(methodOn(VocabularyController.class).exportAsJson(entity.getId())).withRel("export_json"),
+                        linkTo(methodOn(VocabularyController.class).exportAsCsv(entity.getId())).withRel("export_csv"),
+                        linkTo(methodOn(VocabularyController.class).exportAsExcel(entity.getId())).withRel("export_excel")
+                );
         if (rdfMapper.isRDFCompatible(dtoMapper.toEntity(entity))) {
             result.add(linkTo(methodOn(VocabularyController.class).exportAsRdfXml(entity.getId())).withRel("export_rdf_xml"));
             result.add(linkTo(methodOn(VocabularyController.class).exportAsRdfTurtle(entity.getId())).withRel("export_rdf_turtle"));

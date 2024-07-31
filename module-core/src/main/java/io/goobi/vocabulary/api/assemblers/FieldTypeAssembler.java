@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FieldTypeAssembler implements RepresentationModelAssembler<FieldType, EntityModel<FieldType>> {
     @Override
     public EntityModel<FieldType> toModel(FieldType entity) {
-         return EntityModel.of(entity,
+        return EntityModel.of(entity,
                 linkTo(methodOn(FieldTypeController.class).one(entity.getId())).withSelfRel(),
                 linkTo(methodOn(FieldTypeController.class).all(null, null)).withRel("types"),
                 linkTo(methodOn(FieldTypeController.class).delete(entity.getId())).withRel("delete")

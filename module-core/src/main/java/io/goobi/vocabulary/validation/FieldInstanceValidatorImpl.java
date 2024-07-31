@@ -1,7 +1,6 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.FieldInstanceValidationException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
@@ -10,7 +9,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldInstanceBelongsToWrongSchema;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldInstanceIsEmpty;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldInstanceMultipleValuesNotAllowed;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldInstanceValueIssues;
 
 @Service
 public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstanceEntity> {
@@ -27,41 +32,49 @@ public class FieldInstanceValidatorImpl extends BaseValidator<FieldInstanceEntit
         ));
     }
 
-    private void fieldIsNotEmptyCheck(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
+    private void fieldIsNotEmptyCheck(FieldInstanceEntity fieldInstance) throws VocabularyException {
         if (fieldInstance.getFieldValues().isEmpty()) {
-            throw new FieldInstanceValidationException("The field is empty");
+            throw new VocabularyException(FieldInstanceIsEmpty, null, null, params -> "The field is empty");
         }
     }
 
-    private void fieldDefinitionBelongsToCorrectSchema(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
+    private void fieldDefinitionBelongsToCorrectSchema(FieldInstanceEntity fieldInstance) throws VocabularyException {
         long instanceSchema = fieldInstance.getDefinition().getSchema().getId();
         long correctSchema = fieldInstance.getVocabularyRecord().getSchema().getId();
         if (instanceSchema != correctSchema) {
-            throw new FieldInstanceValidationException("The field definition \"" + fieldInstance.getDefinition().getName() + "\" ["
-                    + fieldInstance.getDefinition().getId() + "] belongs to schema [" + instanceSchema + "], but this vocabulary uses schema [" + correctSchema + "]");
+            throw new VocabularyException(FieldInstanceBelongsToWrongSchema, null, Map.of(
+                    "definitionId", String.valueOf(fieldInstance.getDefinition().getId()),
+                    "definitionName", fieldInstance.getDefinition().getName(),
+                    "specifiedSchemaId", String.valueOf(instanceSchema),
+                    "requiredSchemaId", String.valueOf(correctSchema)
+            ),
+                    params -> "The field definition \"" + params.get("definitionName") + "\" [" + params.get("definitionId") + "] belongs to schema ["
+                            + params.get("specifiedSchemaId") + "], but this vocabulary uses schema [" + params.get("requiredSchemaId") + "]");
         }
     }
 
-    private void perValueChecks(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
-        List<Throwable> errors = new LinkedList<>();
+    private void perValueChecks(FieldInstanceEntity fieldInstance) throws VocabularyException {
+        List<VocabularyException> errors = new LinkedList<>();
         for (FieldValueEntity fv : fieldInstance.getFieldValues()) {
             try {
                 fieldValueValidator.validate(fv);
-            } catch (ValidationException e) {
+            } catch (VocabularyException e) {
                 errors.add(e);
             }
         }
         if (!errors.isEmpty()) {
-            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n"));
-            throw new FieldInstanceValidationException(errorMessages);
+            String errorMessages = errors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t"));
+            throw new VocabularyException(FieldInstanceValueIssues, errors, null, params -> "Error validating field value, reason(s): \n\t" + errorMessages);
         }
     }
 
-    private void multiValueCheck(FieldInstanceEntity fieldInstance) throws FieldInstanceValidationException {
+    private void multiValueCheck(FieldInstanceEntity fieldInstance) throws VocabularyException {
         if (Boolean.FALSE.equals(fieldInstance.getDefinition().isMultiValued()) && fieldInstance.getFieldValues().size() > 1) {
-            throw new FieldInstanceValidationException("The field definition \"" + fieldInstance.getDefinition().getName() + "\" ["
-                    + fieldInstance.getDefinition().getId() + "] is not multi-valued, but " + fieldInstance.getFieldValues().size()
-                    + " values were provided");
+            throw new VocabularyException(FieldInstanceMultipleValuesNotAllowed, null, Map.of(
+                    "definitionId", String.valueOf(fieldInstance.getDefinition().getId()),
+                    "definitionName", fieldInstance.getDefinition().getName(),
+                    "numberOfValues", String.valueOf(fieldInstance.getFieldValues().size())
+            ), params -> "The field definition \"" + params.get("definitionName") + "\" [" + params.get("definitionId") + "] is not multi-valued, but " + params.get("numberOfValues") + " values were provided");
         }
     }
 }

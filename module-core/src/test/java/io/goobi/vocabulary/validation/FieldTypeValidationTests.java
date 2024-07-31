@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,11 +46,11 @@ class FieldTypeValidationTests {
         fieldType.setValidation("\\d+");
         setUpSelectableValues("1", "2", "3", "nan");
 
-        assertThrows(ValidationException.class, () -> validator.validate(fieldType));
+        assertThrows(VocabularyException.class, () -> validator.validate(fieldType));
     }
 
     @Test
-    void givenSelectableValuesMatchingValidation_whenValidatingFieldType_success() throws ValidationException {
+    void givenSelectableValuesMatchingValidation_whenValidatingFieldType_success() throws VocabularyException {
         fieldType.setValidation("\\d+");
         setUpSelectableValues("1", "2", "3");
 

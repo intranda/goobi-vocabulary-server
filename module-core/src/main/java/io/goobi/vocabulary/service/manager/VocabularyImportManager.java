@@ -1,7 +1,7 @@
 package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularyRecord;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.repositories.VocabularyRepository;
@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.RecordImport;
 
 @Service
 public class VocabularyImportManager {
@@ -77,7 +79,7 @@ public class VocabularyImportManager {
     }
 
     private void performRecordImport(List<VocabularyRecord> insertionQueue) {
-        List<Throwable> importErrors = new LinkedList<>();
+        List<VocabularyException> importErrors = new LinkedList<>();
         // insert all records in this queue, if the parent has been already inserted, otherwise enqueue last
         Map<Long, Long> idMapping = new HashMap<>();
         // TODO: Might lead to infinite loop on ID or import errors
@@ -90,7 +92,9 @@ public class VocabularyImportManager {
 
                 // if parent is not yet processed, enqueue last
                 if (parentId != null && !idMapping.containsKey(parentId)) {
-                    throw new ValidationException("Undefined parent \"" + parentId + "\"");
+                    throw new VocabularyException(RecordImport, null, Map.of(
+                            "parentId", String.valueOf(parentId)
+                    ), (params) -> "Undefined parentId \"" + params.get("parentId") + "\"");
                 }
 
                 if (parentId != null) {
@@ -115,13 +119,14 @@ public class VocabularyImportManager {
                 if (oldId != null) {
                     idMapping.put(oldId, newId);
                 }
-            } catch (ValidationException e) {
+            } catch (VocabularyException e) {
                 importErrors.add(e);
             }
         }
         if (!importErrors.isEmpty()) {
-            throw new IllegalArgumentException("Error(s) during tabular import:\n\t"
-                    + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
+            // TODO: Use VocabularyException
+            throw new VocabularyException(RecordImport, importErrors, null,
+                    params -> "Error(s) during tabular import:\n\t" + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
         }
     }
 

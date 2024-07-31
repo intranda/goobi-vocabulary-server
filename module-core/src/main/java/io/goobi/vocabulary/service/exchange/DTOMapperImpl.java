@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class DTOMapperImpl implements DTOMapper {
-    private final RecordAssembler recordAssembler;
     private final FieldTypeRepository fieldTypeRepository;
     private final VocabularySchemaRepository vocabularySchemaRepository;
     private final VocabularyRecordRepository vocabularyRecordRepository;
@@ -46,13 +45,12 @@ public class DTOMapperImpl implements DTOMapper {
     private final FieldInstanceRepository fieldInstanceRepository;
     private final LanguageRepository languageRepository;
 
-    public DTOMapperImpl(RecordAssembler recordAssembler, FieldTypeRepository fieldTypeRepository, VocabularySchemaRepository vocabularySchemaRepository,
+    public DTOMapperImpl(FieldTypeRepository fieldTypeRepository, VocabularySchemaRepository vocabularySchemaRepository,
                          VocabularyRecordRepository vocabularyRecordRepository,
                          VocabularyRepository vocabularyRepository,
                          FieldDefinitionRepository fieldDefinitionRepository,
                          FieldInstanceRepository fieldInstanceRepository,
                          LanguageRepository languageRepository) {
-        this.recordAssembler = recordAssembler;
         this.fieldTypeRepository = fieldTypeRepository;
         this.vocabularySchemaRepository = vocabularySchemaRepository;
         this.vocabularyRecordRepository = vocabularyRecordRepository;
@@ -276,14 +274,14 @@ public class DTOMapperImpl implements DTOMapper {
         result.setId(entity.getId());
         result.setFieldId(entity.getFieldInstance().getId());
         result.setTranslations(entity.getTranslations().stream()
-                        .map(t -> {
-                            TranslationInstance translationInstance = new TranslationInstance();
-                            if (t.getLanguage() != null) {
-                                translationInstance.setLanguage(t.getLanguage().getAbbreviation());
-                            }
-                            translationInstance.setValue(t.getValue());
-                            return translationInstance;
-                        })
+                .map(t -> {
+                    TranslationInstance translationInstance = new TranslationInstance();
+                    if (t.getLanguage() != null) {
+                        translationInstance.setLanguage(t.getLanguage().getAbbreviation());
+                    }
+                    translationInstance.setValue(t.getValue());
+                    return translationInstance;
+                })
                 .collect(Collectors.toList())
         );
         return result;
@@ -391,6 +389,9 @@ public class DTOMapperImpl implements DTOMapper {
         }
         result.setVocabulary(lookUpVocabulary(dto.getVocabularyId()));
         result.setMetadata(Boolean.TRUE.equals(dto.getMetadata()));
+        if (dto.getFields() == null) {
+            throw new MissingAttributeException(FieldInstanceEntity.class, "fields");
+        }
         result.setFields(dto.getFields().stream()
                 .map(f -> this.toEntity(f, false))
                 .collect(Collectors.toList()));

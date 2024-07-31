@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface LanguageRepository extends CrudRepository<LanguageEntity, Long> {
     Optional<LanguageEntity> findByAbbreviation(@NonNull String abbreviation);
+
     Page<LanguageEntity> findAll(Pageable pageable);
 }

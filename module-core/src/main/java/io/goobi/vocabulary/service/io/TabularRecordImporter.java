@@ -8,8 +8,6 @@ import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
-import io.goobi.vocabulary.repositories.VocabularyRepository;
-import io.goobi.vocabulary.service.manager.RecordDTOManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -68,6 +66,7 @@ public class TabularRecordImporter {
         }
 
         if (!importErrors.isEmpty()) {
+            // TODO: Use VocabularyException
             throw new IllegalArgumentException("Error(s) during tabular data parsing:\n\t"
                     + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
         }
@@ -129,6 +128,7 @@ public class TabularRecordImporter {
             if (!missing.isEmpty()) {
                 error += "\n\tMissing fields: " + missing.stream().map(FieldInformation::toString).collect(Collectors.joining(", "));
             }
+            // TODO: Use VocabularyException
             throw new IllegalArgumentException(error);
         }
     }

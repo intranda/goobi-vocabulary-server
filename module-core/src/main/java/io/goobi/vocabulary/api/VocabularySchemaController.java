@@ -2,7 +2,7 @@ package io.goobi.vocabulary.api;
 
 import io.goobi.vocabulary.api.assemblers.VocabularySchemaAssembler;
 import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.VocabularySchema;
 import io.goobi.vocabulary.service.manager.VocabularySchemaDTOManager;
 import org.springframework.data.domain.Pageable;
@@ -44,13 +44,13 @@ public class VocabularySchemaController {
 
     @PostMapping("/schemas")
     @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<VocabularySchema> create(@RequestBody VocabularySchema newSchema) throws ValidationException {
+    public EntityModel<VocabularySchema> create(@RequestBody VocabularySchema newSchema) throws VocabularyException {
         return assembler.toModel(manager.create(newSchema));
     }
 
     @PutMapping("/schemas/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<VocabularySchema> update(@RequestBody VocabularySchema vocabularySchemaDTO, @PathVariable long id) {
+    public EntityModel<VocabularySchema> update(@RequestBody VocabularySchema vocabularySchemaDTO, @PathVariable long id) throws IllegalAttributeProvidedException {
         if (vocabularySchemaDTO.getId() != null) {
             throw new IllegalAttributeProvidedException("id");
         }

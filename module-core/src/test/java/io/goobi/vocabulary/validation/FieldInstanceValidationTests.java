@@ -1,6 +1,7 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
@@ -153,7 +154,7 @@ class FieldInstanceValidationTests {
         FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -162,11 +163,11 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false),
                 Pair.of("", "Thomas Lastname"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
-    void textFieldValueMatchingValidation_success() throws ValidationException {
+    void textFieldValueMatchingValidation_success() throws VocabularyException {
         FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("name", "\\w+", null, null,true, true, true, true, false),
                 Pair.of("", "Thomas"));
@@ -180,11 +181,11 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("age", "\\d+", null, null,true, true, true, true, false),
                 Pair.of("", "Thomas"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
-    void numberFieldValueMatchingValidation_fails() throws ValidationException {
+    void numberFieldValueMatchingValidation_fails() throws VocabularyException {
         FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("age", "\\d+", null, null,true, true, true, true, false),
                 Pair.of("", "32"));
@@ -193,7 +194,7 @@ class FieldInstanceValidationTests {
     }
 
     @Test
-    void valueIsOneOfTheSelectableValues_success() throws ValidationException {
+    void valueIsOneOfTheSelectableValues_success() throws VocabularyException {
         FieldInstanceEntity field = setupFieldInstance(
                 setupFieldDefinition("OS", null, List.of("Linux", "Windows"), null,false, false, false, false, false),
                 Pair.of("", "Linux"));
@@ -207,7 +208,7 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("OS", null, List.of("Linux", "Windows"), null,false, false, false, false, false),
                 Pair.of("", "MacOS"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -216,11 +217,11 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("hobbies", null, null, null,true, true, true, true, false),
                 Pair.of("", ""));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
-    void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws ValidationException {
+    void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws VocabularyException {
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, record.getId(), "Bob")).thenReturn(true);
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, record.getId(), "Bob")).thenReturn(false);
 
@@ -248,7 +249,7 @@ class FieldInstanceValidationTests {
                 Pair.of("", "Bob"));
         fieldName.getDefinition().setId(2L);
 
-        assertThrows(ValidationException.class, () -> validator.validate(fieldName));
+        assertThrows(VocabularyException.class, () -> validator.validate(fieldName));
     }
 
     @Test
@@ -257,11 +258,11 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("Fruit", null, null, null,false, true, false, true, false),
                 Pair.of("", "Apple"), Pair.of("", "Banana"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(multiValuedInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(multiValuedInstance));
     }
 
     @Test
-    void multipleFieldValuesIfMultiValuedIsEnabled_success() throws ValidationException {
+    void multipleFieldValuesIfMultiValuedIsEnabled_success() throws VocabularyException {
         FieldInstanceEntity multiValuedInstance = setupFieldInstance(
                 setupFieldDefinition("Fruit", null, null, null,false, true, false, true, true),
                 Pair.of("", "Apple"), Pair.of("", "Banana"));
@@ -270,7 +271,7 @@ class FieldInstanceValidationTests {
     }
 
     @Test
-    void noTranslationDefinitionGiven_success() throws ValidationException {
+    void noTranslationDefinitionGiven_success() throws VocabularyException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
                 setupFieldDefinition("Description", null, null, null,false, false, false, true, false),
                 Pair.of("", "Apple"));
@@ -284,11 +285,11 @@ class FieldInstanceValidationTests {
                 setupFieldDefinition("Description", null, null, null,false, false, false, true, false),
                 Pair.of("eng", "Apple"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
-    void translationDefinitionGivenAndCorrectTranslationGiven_success() throws ValidationException {
+    void translationDefinitionGivenAndCorrectTranslationGiven_success() throws VocabularyException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
                 setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true)
@@ -306,7 +307,7 @@ class FieldInstanceValidationTests {
                 ),false, false, false, true, false),
                 Pair.of("", "Apple"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
@@ -317,7 +318,7 @@ class FieldInstanceValidationTests {
                 ),false, false, false, true, false),
                 Pair.of("eng", "Apple"), Pair.of("ger", "Apfel"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
@@ -328,11 +329,11 @@ class FieldInstanceValidationTests {
                 ),false, false, false, true, false),
                 Pair.of("ger", "Apfel"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
-    void twoTranslationDefinitionsGivenAndBothTranslationsGiven_success() throws ValidationException {
+    void twoTranslationDefinitionsGivenAndBothTranslationsGiven_success() throws VocabularyException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
                 setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true),
@@ -385,7 +386,7 @@ class FieldInstanceValidationTests {
         );
         translationInstance.setFieldValues(List.of(description));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
@@ -409,11 +410,11 @@ class FieldInstanceValidationTests {
         );
         translationInstance.setFieldValues(List.of(description));
 
-        assertThrows(ValidationException.class, () -> validator.validate(translationInstance));
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
     }
 
     @Test
-    void twoTranslationDefinitionsWithOnlyOneRequiredGivenAndOnlyRequiredTranslationGiven_success() throws ValidationException {
+    void twoTranslationDefinitionsWithOnlyOneRequiredGivenAndOnlyRequiredTranslationGiven_success() throws VocabularyException {
         FieldInstanceEntity translationInstance = setupFieldInstance(
                 setupFieldDefinition("Description", null, null, List.of(
                         createTranslationDefinition("eng", true, true),
@@ -437,7 +438,7 @@ class FieldInstanceValidationTests {
     }
 
     @Test
-    void vocabularyRecordReferenceGiven_isPresent_success() throws ValidationException {
+    void vocabularyRecordReferenceGiven_isPresent_success() throws VocabularyException {
         VocabularyEntity colors = new VocabularyEntity();
         VocabularyRecordEntity red = new VocabularyRecordEntity();
         red.setId(1337);
@@ -487,6 +488,6 @@ class FieldInstanceValidationTests {
 
         FieldInstanceEntity instanceToTest = setupFieldInstance(definition, Pair.of("", "1337"));
 
-        assertThrows(ValidationException.class, () -> validator.validate(instanceToTest));
+        assertThrows(VocabularyException.class, () -> validator.validate(instanceToTest));
     }
 }

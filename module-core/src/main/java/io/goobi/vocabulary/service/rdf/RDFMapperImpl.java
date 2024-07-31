@@ -3,7 +3,6 @@ package io.goobi.vocabulary.service.rdf;
 import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
-import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MappingException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;

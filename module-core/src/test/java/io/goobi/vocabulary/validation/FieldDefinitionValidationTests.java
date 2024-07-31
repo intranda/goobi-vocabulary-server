@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
@@ -55,14 +55,14 @@ class FieldDefinitionValidationTests {
 
 
     @Test
-    void noLanguageDefinitionGiven_success() throws ValidationException {
+    void noLanguageDefinitionGiven_success() throws VocabularyException {
         field.setType(type);
 
         validator.validate(field);
     }
 
     @Test
-    void singleValidLanguageDefinitionGiven_success() throws ValidationException {
+    void singleValidLanguageDefinitionGiven_success() throws VocabularyException {
         field.setType(type);
         TranslationDefinitionEntity translationDefinition = new TranslationDefinitionEntity();
         translationDefinition.setId(168435354L);
@@ -86,7 +86,7 @@ class FieldDefinitionValidationTests {
         translationDefinition.setRequired(true);
         field.setTranslationDefinitions(List.of(translationDefinition));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -100,11 +100,11 @@ class FieldDefinitionValidationTests {
         translationDefinition.setRequired(false);
         field.setTranslationDefinitions(List.of(translationDefinition));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
-    void twoValidLanguageDefinitionsGiven_bothRequired_success() throws ValidationException {
+    void twoValidLanguageDefinitionsGiven_bothRequired_success() throws VocabularyException {
         field.setType(type);
         TranslationDefinitionEntity englishTranslationDefinition = new TranslationDefinitionEntity();
         englishTranslationDefinition.setId(168435354L);
@@ -140,7 +140,7 @@ class FieldDefinitionValidationTests {
         germanTranslationDefinition.setRequired(true);
         field.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -160,7 +160,7 @@ class FieldDefinitionValidationTests {
         germanTranslationDefinition.setRequired(true);
         field.setTranslationDefinitions(List.of(englishTranslationDefinition, germanTranslationDefinition));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -168,7 +168,7 @@ class FieldDefinitionValidationTests {
         field.setReferenceVocabulary(referenceVocabulary);
         field.setType(type);
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 
     @Test
@@ -182,6 +182,6 @@ class FieldDefinitionValidationTests {
         translationDefinition.setRequired(true);
         field.setTranslationDefinitions(List.of(translationDefinition));
 
-        assertThrows(ValidationException.class, () -> validator.validate(field));
+        assertThrows(VocabularyException.class, () -> validator.validate(field));
     }
 }

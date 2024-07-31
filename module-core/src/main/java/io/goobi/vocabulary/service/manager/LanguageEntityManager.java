@@ -1,9 +1,9 @@
 package io.goobi.vocabulary.service.manager;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
-import io.goobi.vocabulary.exception.MissingValuesException;
+import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exception.UnsupportedEntityReplacementException;
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.repositories.LanguageRepository;
 import org.springframework.data.domain.Page;
@@ -29,11 +29,11 @@ public class LanguageEntityManager implements Manager<LanguageEntity> {
     @Override
     public LanguageEntity get(long id) {
         return languageRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(LanguageEntity.class, id));
+                .orElseThrow(() -> new EntityNotFoundException(LanguageEntity.class, id));
     }
 
     @Override
-    public LanguageEntity create(LanguageEntity newLanguage) throws ValidationException {
+    public LanguageEntity create(LanguageEntity newLanguage) throws VocabularyException {
         return languageRepository.save(newLanguage);
     }
 
@@ -51,7 +51,7 @@ public class LanguageEntityManager implements Manager<LanguageEntity> {
             replacements.add(() -> jpaLanguage.setName(newLanguage.getName()));
         }
         if (replacements.isEmpty()) {
-            throw new MissingValuesException(newLanguage.getClass(), List.of("abbreviation", "name"));
+            throw new MissingAttributeException(newLanguage.getClass(), List.of("abbreviation", "name"));
         }
         replacements.forEach(Runnable::run);
         return languageRepository.save(jpaLanguage);

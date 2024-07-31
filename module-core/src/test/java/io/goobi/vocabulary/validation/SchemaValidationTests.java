@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.validation;
 
-import io.goobi.vocabulary.exception.ValidationException;
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.model.jpa.FieldDefinitionEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ class SchemaValidationTests {
     void noFieldDefinitions_fails() {
         VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
+        assertThrows(VocabularyException.class, () -> validator.validate(schema));
     }
 
     @Test
@@ -57,11 +57,11 @@ class SchemaValidationTests {
 
         schema.setDefinitions(List.of(nonMainEntryField));
 
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
+        assertThrows(VocabularyException.class, () -> validator.validate(schema));
     }
 
     @Test
-    void exactlyOneMainFieldDefinition_success() throws ValidationException {
+    void exactlyOneMainFieldDefinition_success() throws VocabularyException {
         VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
         FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
@@ -77,7 +77,7 @@ class SchemaValidationTests {
 
         schema.setDefinitions(List.of(validMainField(schema, "Main1"), validMainField(schema, "Main2")));
 
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
+        assertThrows(VocabularyException.class, () -> validator.validate(schema));
     }
 
     @Test
@@ -89,7 +89,7 @@ class SchemaValidationTests {
 
         schema.setDefinitions(List.of(mainEntryField));
 
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
+        assertThrows(VocabularyException.class, () -> validator.validate(schema));
     }
 
     @Test
@@ -105,11 +105,11 @@ class SchemaValidationTests {
 
         schema.setDefinitions(List.of(mainEntryField, titleField));
 
-        assertThrows(ValidationException.class, () -> validator.validate(schema));
+        assertThrows(VocabularyException.class, () -> validator.validate(schema));
     }
 
     @Test
-    void titleFieldsThatIsRequired_success() throws ValidationException {
+    void titleFieldsThatIsRequired_success() throws VocabularyException {
         VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
         FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");

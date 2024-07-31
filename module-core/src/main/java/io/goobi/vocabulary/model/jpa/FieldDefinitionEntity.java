@@ -21,9 +21,9 @@ import java.util.List;
 @Entity
 @Table(name = "field_definition",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"schema_id", "label"}),
-        @UniqueConstraint(columnNames = {"schema_id", "main_entry"})
-})
+                @UniqueConstraint(columnNames = {"schema_id", "label"}),
+                @UniqueConstraint(columnNames = {"schema_id", "main_entry"})
+        })
 @Getter
 @Setter
 public class FieldDefinitionEntity {
