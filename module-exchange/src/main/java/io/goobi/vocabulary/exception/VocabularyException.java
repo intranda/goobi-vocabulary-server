@@ -1,6 +1,8 @@
 package io.goobi.vocabulary.exception;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class VocabularyException extends RuntimeException {
     public enum ErrorCode {
         Mapping,
@@ -62,14 +66,14 @@ public class VocabularyException extends RuntimeException {
     private String exceptionType;
     private ErrorCode errorType;
     private String message;
-    private Optional<List<VocabularyException>> causes;
-    private Optional<Map<String, String>> params;
+    private List<VocabularyException> causes;
+    private Map<String, String> params;
 
     public VocabularyException(ErrorCode errorType, List<VocabularyException> causes, Map<String, String> params, Function<Map<String, String>, String> messageGenerator) {
         this.exceptionType = getClass().getSimpleName();
         this.errorType = errorType;
-        this.causes = Optional.ofNullable(causes);
-        this.params = Optional.ofNullable(params);
-        this.message = Optional.ofNullable(messageGenerator).map(g -> g.apply(params)).orElseThrow();
+        this.causes = causes;
+        this.params = params;
+        this.message = Optional.ofNullable(messageGenerator).map(g -> g.apply(params)).orElseThrow(() -> new RuntimeException("Something very unexpected happened"));
     }
 }
