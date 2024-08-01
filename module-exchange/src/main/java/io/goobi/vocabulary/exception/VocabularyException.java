@@ -14,6 +14,7 @@ import java.util.function.Function;
 @NoArgsConstructor
 public class VocabularyException extends RuntimeException {
     public enum ErrorCode {
+        DataIntegrityViolation,
         Mapping,
         EntityNotFound,
         MissingRequiredAttribute,

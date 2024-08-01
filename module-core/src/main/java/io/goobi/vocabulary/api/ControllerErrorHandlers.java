@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.Map;
+
 @ControllerAdvice
 public class ControllerErrorHandlers {
     private Logger logger = LoggerFactory.getLogger(ControllerErrorHandlers.class);
@@ -55,7 +57,7 @@ public class ControllerErrorHandlers {
     @ResponseBody
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String missingValuesHandler(DataIntegrityViolationException e) {
+    VocabularyException missingValuesHandler(DataIntegrityViolationException e) {
         // TODO: This is a bit too much magic
         int startIndex = e.getMessage().indexOf('[') + 1;
         int endIndex = e.getMessage().indexOf(']');
@@ -65,6 +67,9 @@ public class ControllerErrorHandlers {
         if (endIndex <= 0) {
             endIndex = e.getMessage().length();
         }
-        return "Data integrity violation:\n\t" + e.getMessage().substring(startIndex, endIndex);
+        return new VocabularyException(VocabularyException.ErrorCode.DataIntegrityViolation, null, Map.of(
+                "reason", e.getMessage().substring(startIndex, endIndex)
+        ),
+                (params) -> "Data integrity violation: " + params.get("reason"));
     }
 }
