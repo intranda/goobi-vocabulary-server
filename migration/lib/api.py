@@ -57,7 +57,7 @@ class API:
         try:
             # Check for success
             if response.status_code // 100 != 2:
-                error_msg = f'API call was not successful, reason:\n{response.text}'
+                error_msg = f'API call was not successful, reason:\n{extract_error_from_response(response)}'
                 logging.warning(error_msg)
                 raise Exception(error_msg)
             return response.json()
@@ -133,3 +133,17 @@ class API:
     def lookup_record(self, record_id):
         url = self.urls[RECORD_LOOKUP].replace('{{RECORD_ID}}', str(record_id))
         return self.query(url, obj=None, method='GET')
+
+def extract_error_from_response(response):
+    try:
+        return extract_error(response.json())
+    except:
+        return response.text
+
+def extract_error(json):
+    messages = []
+    messages.append(json['message'])
+    if 'causes' in json and json['causes'] != None:
+        for c in json['causes']:
+            messages.append(extract_error(c))
+    return '\n'.join(messages)
