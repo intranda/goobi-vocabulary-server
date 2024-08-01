@@ -1,4 +1,7 @@
 # Vocabulary migration
+This documentation will guide you through the process of migrating existing vocabulary data to the new vocabulary server.
+The vocabulary server needs to be running.
+
 ## Set-Up instructions
 First, create a virtual Python environment, activate it and install all required Python dependencies. All following instructions in this documentation always require an activated Python environment with all these dependencies present.
 
