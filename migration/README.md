@@ -12,9 +12,18 @@ pip install requests mysql-connector-python==8.4.0 alive_progress
 ```
 
 ## Perform vocabulary data migration
-Download and extract the [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip). During data migration, the Migration Tool generates new types on-the-fly. Each existing vocabulary schema that contains fields with selectable values will be migrated to a new type containing these selectable values. If you wish to re-use these types or create more complex types beforehand that should be used in the migrated data, create the types beforehand and pass them to the migration script with the `--lookup-file-directory`.
+Download and extract the [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip).
 
-You can start the data migration with the following command:
+**Hint** Before performing any of the following steps, please first read this documentation completely.
+There is no easy "only perform these steps" solution for every case, depending on the previous data and types of vocabularies, other steps may be required.
+
+During data migration, the Migration Tool generates new field types on-the-fly (please check out [the guide on how to create new data manually](../docs/creation.md) if you don't know what field types are or how vocabularies work in general).
+Each existing vocabulary schema that contains fields with selectable values will be migrated to a new type containing these selectable values.
+If you want to avoid re-creating these field types for every vocabulary or if you want to create more complex types beforehand that should be used in the migrated data, you can manually create those field types beforehand (right now) and pass this information to the migration script.
+By specifying the `--lookup-file-directory` parameter, you can instruct the migration script to map existing selectable values to the given field types instead of generating new ones on-the-fly.
+We will give detailed instructions on how to do this later on.
+
+If you don't want to create any field types, you can start the data migration with the following command:
 ```bash
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
 ```
@@ -39,10 +48,36 @@ This file contains all information about the migrated data with their old and ne
 This information is mandatory to update vocabulary record references in metadata files later on.
 - You should try to run the migration without the `--continue-on-error` parameter in the end. If it works, the data is migrated without any issues.
 
+**Example**
+Let's give an example of a possible migration issue (extracted from the `migration_issues.log` file):
+```json
+        ---------------------------------------------------------------------------------
+29293
+[(1441967, 29293, 1, 1, 'original value', '', 'some-value'), (1441968, 29293, 1, 2, 'corrected value', '', 'some-other-value'), (1441969, 29293, 1, 3, 'type', '', 'some-type'), (1441970, 29293, 1, 4, 'authority', '', 'Geonames'), (1441971, 29293, 1, 5, 'authorityURI', '', 'http://www.geonames.org/'), (1441972, 29293, 1, 25, 'valueURI', '', 'some-uri')]
+API call was not successful, reason:
+Validation error
+Error validating record fields
+Validation error
+Error validating field value, reason(s):
+Validation error
+Validation error
+Field values(s) "Geonames" are not one of the allowed selectable values for field "authority" [100775]: geonames,viaf
+---------------------------------------------------------------------------------
+```
+This issue is indicating, that one of the vocabulary records fields contains the value `Geonames`.
+During the migration, this field has been configured (based on existing data) with a new type, that has the following selectable values `geonames` and `viaf`.
+As you can see, the present value is written with a capital `G` but only the lower-case version of `geonames` is one of the selectable values.
+Therefore the validation of this vocabulary record fails and the script is unable to import this record.
+In this specific case, you could update all occurrences in the old database and perform a re-import of the data afterwards.
+Make sure to rename or remove the `migration_issues.log` before a re-import, because the file is appended and will contain possibly solved issues.
+Any vocabulary record that is reported in this file is not imported into the vocabulary server.
+If this is desired (because the vocabulary record contains bad data and should not be kept), you can just ignore this issue and go on.
+
 See `python vocabulary-migrator.py --help` for all available options.
 
 ### The lookup-file-directory
-If you plan to re-use existing types or other vocabularies for vocabulary reference migrations, create the following three files: `reference_type_lookup.csv`, `reference_value_lookup.csv` and `type_definition_lookup.csv`. Place all three files in a new directory and pass this directory path as the `--lookup-file-directory` parameter to the Migration Tool.
+If you plan to re-use existing field types or want to use other vocabularies for vocabulary references during a migration, create the following three files: `reference_type_lookup.csv`, `reference_value_lookup.csv` and `type_definition_lookup.csv`.
+Place all three files in a new directory and pass this directory path as the `--lookup-file-directory` parameter to the Migration Tool.
 
 To make the following configuration easier to understand, we will give an example. 
 Imagine you currently have a vocabulary with a field with the following selectable values: `red`, `blue`.
@@ -74,7 +109,10 @@ values,vocabulary_id
 red|blue,2
 rot|blau,2
 ```
-This file maps all selectable values (in all languages) to the ID of the vocabulary that contains the records.
+This file maps all selectable values (in all languages, one language per line) to the ID of the vocabulary that contains the records.
+Please pay attention to always define one language per line.
+The reason for this is, that different languages were existing as multiple field definitions beforehand and the migration processing requires this kind of separation.
+The value for the `values` columns needs to match the `selection` column in the `vocabulary_structure` table of the existing database. 
 
 The `reference_value_lookup.csv` looks like this:
 ```csv
