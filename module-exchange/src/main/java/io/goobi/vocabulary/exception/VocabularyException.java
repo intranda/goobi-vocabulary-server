@@ -40,6 +40,7 @@ public class VocabularyException extends RuntimeException {
         RecordValidationChildrenReferencesNotAllowed,
         RecordValidationSingleRootElementVocabularyAlreadyContainsRecord,
         RecordImport,
+        RecordImportUnsupportedExcelCellType,
         FieldInstanceIssues,
         FieldInstanceIsEmpty,
         FieldInstanceBelongsToWrongSchema,
@@ -60,8 +61,7 @@ public class VocabularyException extends RuntimeException {
         FieldValueUnspecifiedTranslations,
         FieldValueMissingRequiredTranslations,
         FieldValueReferencedRecordIssues,
-        FieldValueReferencedRecordBelongsToWrongVocabulary,
-        UnsupportedExcelCellType
+        FieldValueReferencedRecordBelongsToWrongVocabulary
     }
 
     private String exceptionType;

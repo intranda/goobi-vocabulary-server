@@ -78,7 +78,7 @@ public class ExcelMapperImpl implements ExcelMapper {
                         case NUMERIC -> value = String.valueOf(cell.getNumericCellValue());
                         case BLANK -> value = "";
                         default ->
-                                throw new VocabularyException(VocabularyException.ErrorCode.UnsupportedExcelCellType, null, Map.of("cellType", cell.getCellType().toString()),
+                                throw new VocabularyException(VocabularyException.ErrorCode.RecordImportUnsupportedExcelCellType, null, Map.of("cellType", cell.getCellType().toString()),
                                         params -> "Unsupported cell type \"" + params.get("cellType") + "\"");
                     }
 
