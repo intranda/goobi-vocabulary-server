@@ -1,6 +1,9 @@
 # Vocabulary migration
 This documentation will guide you through the process of migrating existing vocabulary data to the new vocabulary server.
-The vocabulary server needs to be running.
+You can check if there are any existing vocabularies with: `mysql goobi -e "select * from vocabulary;"`.
+If the output lists some vocabularies, you need to perform a migration in order to keep these vocabularies.
+
+For all of the following instructions, the vocabulary server needs to be running.
 
 ## Set-Up instructions
 First, create a virtual Python environment, activate it and install all required Python dependencies. All following instructions in this documentation always require an activated Python environment with all these dependencies present.
@@ -138,3 +141,15 @@ Whenever it finds a vocabulary reference in the mets file, it will try to replac
 When anything is changed, a backup of the mets file is created beforehand.
 
 If the mets files contain additional references to records in separate XML elements (e. g. `<goobi:metadata name="SourceID">5661</goobi:metadata>`), the `metadata-migrator.py` can also update these references with the additional parameter `--manual-id-fix SourceID`. The parameter value has to match the `name` attribute of a `metadata` element in order to replace its record id value to the new record id. This step must not be executed twice, because it would break the IDs!
+   
+## Data Cleanup
+When the data migration is done successfully, and you are sure you will never need the old data anymore, you can manually remove all vocabulary tables from the `goobi` database of your Goobi instance:
+- `vocabulary`
+- `vocabulary_record`
+- `vocabulary_record_data`
+- `vocabulary_structure`
+
+**Caution** The data cleanup cannot be reverted. 
+If you are not sure, don't perform the cleanup steps. 
+The old vocabulary data doesn't affect newer versions of Goobi workflow. 
+We suggest keeping this data for some time in case anything unexpected happens.
