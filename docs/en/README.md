@@ -7,5 +7,5 @@ Before you can start using the new vocabulary server, follow the [setup instruct
 ## Vocabulary Creation
 Vocabularies and vocabulary schemas are a complex topic on their own, therefore the [documentation of the creation of vocabularies, schemas and field types](creation.md) is covered separately.
 
-## Vocabulary Migration
+## Migration of existing Vocabularies
 If you have existing vocabulary data from earlier versions of Goobi that you want to migrate, please follow the [data migration documentation](migration.md).

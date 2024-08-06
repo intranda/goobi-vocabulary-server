@@ -39,8 +39,8 @@ At the lowest end, these translatable values represent data of some *field types
 ## Languages
 If you want to work with languages and translatable values in your vocabulary, you need to define these languages first.
 Each language consists of the following information:
-- A unique `name`
-- A language `abbreviation`
+- A unique `name`.
+- A language `abbreviation`.
 
 You can create languages with calls to the `languages` API endpoint:
 ```json
@@ -97,9 +97,9 @@ curl -s --location "http://BASE_PART/types" --header 'Content-Type: application/
 ## Vocabulary Schemas
 A vocabulary schema defines the structure of a vocabulary, i. e. all available fields each vocabulary record can have.
 A vocabulary schema consists of the following information:
-- A list of field `definitions`
-- A switch to enable `hierarchicalRecords`
-- A switch to restrict the vocabulary to a `singleRootElement`
+- A list of field `definitions`.
+- A switch to enable `hierarchicalRecords`.
+- A switch to restrict the vocabulary to a `singleRootElement`.
 
 You can create vocabulary schemas with calls to the `schemas` API endpoint.
 
@@ -120,14 +120,14 @@ If you don't set any of those values, they will be disabled by default.
 
 Let's now focus on the field definitions.
 Each field definition consists of the following information:
-- A unique `name` among all other definitions
-- Either a `typeId` referencing an existing field type (see previous section) or a `referenceVocabularyId` referencing an existing vocabulary
-- A switch to set the field value to be `required`
-- A switch to set the field value to be `unique` among all vocabulary records in the vocabulary
-- A switch to set the field value to be the `mainEntry` of the vocabulary record
-- A switch to set the field value to be a `titleField` of the vocabulary record
-- A switch to set the field to be `multiValued`
-- An optional list of `translationDefinitions`
+- A unique `name` among all other definitions.
+- Either a `typeId` referencing an existing field type (see previous section) or a `referenceVocabularyId` referencing an existing vocabulary.
+- A switch to set the field value to be `required`.
+- A switch to set the field value to be `unique` among all vocabulary records in the vocabulary.
+- A switch to set the field value to be the `mainEntry` of the vocabulary record.
+- A switch to set the field value to be a `titleField` of the vocabulary record.
+- A switch to set the field to be `multiValued`.
+- An optional list of `translationDefinitions`.
 
 Vocabularies represent structured data, i. e. all data entries (vocabulary records) have the same fields.
 The `name` of the field can be anything to describe the data that is stored in this field.
@@ -229,8 +229,8 @@ Its type ID `2` could correspond to a field type that is set to `large`.
 The "Rating" field should contain a numeric rating value and correspond to the "Rating" type we have created earlier.
 This vocabulary schema is not hierarchical and can contain any number of records.
 
-Please check out the [example vocabulary setup script](../install/demo.sh) to see some more complex examples.
-These examples require some field types to be present, you can [install these default field types with another provided script](../install/default_setup.sh).
+Please check out the [example vocabulary setup script](../../install/demo.sh) to see some more complex examples.
+These examples require some field types to be present, you can [install these default field types with another provided script](../../install/default_setup.sh).
 
 With vocabulary schemas created, we can finally create vocabularies.
 
@@ -239,10 +239,10 @@ In order to create vocabularies, you first need to create its vocabulary schemas
 Vocabulary schemas can be reused by as many vocabularies as you wish (e. g. you can use the vocabulary schema from the previous section for the two vocabularies "Movies" and "Amazon Wishlish").
 
 Each vocabulary consists of the following information:
-- A unique `name`
-- An optional `description`
-- A required `schemaId`
-- An optional `metadataSchemaId`
+- A unique `name`.
+- An optional `description`.
+- A required `schemaId`.
+- An optional `metadataSchemaId`.
 
 You can create vocabulary schemas with calls to the `vocabularies` API endpoint.
 
@@ -280,4 +280,4 @@ The vocabulary management server also supports special types for RDF compliant d
 For this to work, you need to have RDF compatible types created and create a schema that only consists of these types.
 The resulting vocabulary will additionally be exportable into RDF formats like RDF/XML or Turtle.
 
-If you used the [language and field type setup script](../install/default_setup.sh) and the [demo vocabulary setup script](../install/demo.sh), you will have an example of such a RDF vocabulary ready to go.
+If you used the [language and field type setup script](../../install/default_setup.sh) and the [demo vocabulary setup script](../../install/demo.sh), you will have an example of such a RDF vocabulary ready to go.

@@ -12,7 +12,6 @@ This documentation describes the process of bootstrapping the vocabulary server.
 ## Start as systemd service
 - **TODO** *Create a systemd service unit for the vocabulary server (The application should be able to correctly shutdown on SIGTERM)*
 - **TODO** *Admin documentation here*
-
 - Run `java -jar vocabulary-server-VERSION.jar`.
 - If startup succeeds, you will see a line like this after a few seconds:
 ```bash
@@ -31,7 +30,7 @@ Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
 - You can use the following script that installs some sample languages and field types.
 - Download the [Initial Data Script](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/install/default_setup.sh).
 - Change the `HOST` variable at the top according to the vocabulary server configuration, leave the `/api/v1` suffix unchanged.
-- Run the script
+- Run the script.
 
 ## Security
 - You can setup Apache url restrictions in order to secure the vocabulary server from unauthorized access.
