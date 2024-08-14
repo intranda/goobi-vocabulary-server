@@ -5,6 +5,7 @@ import io.goobi.vocabulary.exception.IllegalAttributeProvidedException;
 import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.Language;
 import io.goobi.vocabulary.model.jpa.LanguageEntity;
+import io.goobi.vocabulary.service.manager.LanguageDTOManager;
 import io.goobi.vocabulary.service.manager.Manager;
 import io.goobi.vocabulary.service.rdf.RDFMapper;
 import org.apache.commons.io.IOUtils;
@@ -29,13 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 public class LanguageController {
-    private final Manager<Language> DTOmanager;
+    private final LanguageDTOManager manager;
     private final Manager<LanguageEntity> managerEntity;
     private final LanguageAssembler assembler;
     private final RDFMapper rdfMapper;
 
-    public LanguageController(Manager<Language> managerDTO, Manager<LanguageEntity> managerEntity, LanguageAssembler assembler, RDFMapper rdfMapper) {
-        this.DTOmanager = managerDTO;
+    public LanguageController(LanguageDTOManager managerDTO, Manager<LanguageEntity> managerEntity, LanguageAssembler assembler, RDFMapper rdfMapper) {
+        this.manager = managerDTO;
         this.managerEntity = managerEntity;
         this.assembler = assembler;
         this.rdfMapper = rdfMapper;
@@ -43,12 +44,17 @@ public class LanguageController {
 
     @GetMapping("/languages")
     public PagedModel<EntityModel<Language>> all(Pageable pageRequest, PagedResourcesAssembler<Language> pagedResourcesAssembler) {
-        return pagedResourcesAssembler.toModel(DTOmanager.list(pageRequest), assembler);
+        return pagedResourcesAssembler.toModel(manager.list(pageRequest), assembler);
     }
 
     @GetMapping("/languages/{id}")
     public EntityModel<Language> one(@PathVariable long id) {
-        return assembler.toModel(DTOmanager.get(id));
+        return assembler.toModel(manager.get(id));
+    }
+
+    @GetMapping("/languages/by-abbreviation/{abbreviation}")
+    public EntityModel<Language> findByAbbreviation(@PathVariable String abbreviation) {
+        return assembler.toModel(manager.find(abbreviation));
     }
 
     @GetMapping(value = "/languages/{id}", produces = {"application/rdf+xml"})
@@ -86,7 +92,7 @@ public class LanguageController {
     @PostMapping("/languages")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<Language> create(@RequestBody Language newLanguage) throws VocabularyException {
-        return assembler.toModel(DTOmanager.create(newLanguage));
+        return assembler.toModel(manager.create(newLanguage));
     }
 
     @PutMapping("/languages/{id}")
@@ -96,12 +102,12 @@ public class LanguageController {
             throw new IllegalAttributeProvidedException("id");
         }
         newLanguage.setId(id);
-        return assembler.toModel(DTOmanager.replace(newLanguage));
+        return assembler.toModel(manager.replace(newLanguage));
     }
 
     @DeleteMapping("/languages/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Language> delete(@PathVariable long id) {
-        return ResponseEntity.ok(DTOmanager.delete(id));
+        return ResponseEntity.ok(manager.delete(id));
     }
 }

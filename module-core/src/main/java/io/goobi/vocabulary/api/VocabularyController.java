@@ -73,7 +73,7 @@ public class VocabularyController {
         return assembler.toModel(manager.get(id));
     }
 
-    @GetMapping("/vocabularies/find/{name}")
+    @GetMapping("/vocabularies/by-name/{name}")
     public EntityModel<Vocabulary> findByName(@PathVariable String name) {
         return assembler.toModel(manager.find(name));
     }
