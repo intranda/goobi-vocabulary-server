@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-core</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
