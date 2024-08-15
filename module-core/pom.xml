@@ -15,6 +15,12 @@
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <poi.version>5.2.5</poi.version>
     </properties>
     <dependencies>

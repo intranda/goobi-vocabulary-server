@@ -8,9 +8,6 @@
     <name>Vocabulary-Server</name>
     <packaging>pom</packaging>
     <description>RESTful webservice for vocabulary management</description>
-    <properties>
-        <java.version>11</java.version>
-    </properties>
     <modules>
         <module>module-core</module>
         <module>module-exchange</module>
