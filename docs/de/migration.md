@@ -11,7 +11,7 @@ Erstellen Sie zunächst eine virtuelle Python-Umgebung, aktivieren Sie diese und
 ```bash
 python -m venv vmenv
 . vmenv/bin/activate
-pip install requests mysql-connector-python==8.4.0 alive_progress
+pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ```
 
 ## Migration der Vokabulardaten durchführen

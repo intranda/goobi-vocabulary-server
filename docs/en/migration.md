@@ -11,7 +11,7 @@ First, create a virtual Python environment, activate it and install all required
 ```bash
 python -m venv vmenv
 . vmenv/bin/activate
-pip install requests mysql-connector-python==8.4.0 alive_progress
+pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ```
 
 ## Perform vocabulary data migration
