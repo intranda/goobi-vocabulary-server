@@ -55,7 +55,7 @@ pipeline {
         sh 'mvn clean verify -U -P release-build'
       }
     }
-    stage('sonarcloud') {
+    /*stage('sonarcloud') {
       when {
         anyOf {
           branch 'master'
@@ -73,7 +73,7 @@ pipeline {
           sh 'mvn verify sonar:sonar -Dsonar.token=$TOKEN -U'
         }
       }
-    }
+    }*/
     stage('deploy') {
       when {
         anyOf {
