@@ -3,6 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.log
 
 ### STS ###
 .apt_generated
@@ -35,3 +36,4 @@ build/
 
 ### Python ###
 /migration/vmenv
+__pycache__/
