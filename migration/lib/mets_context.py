@@ -3,7 +3,7 @@ import sys
 import re
 
 NUMBER_PATTERN = re.compile('^\\d+$')
-RECORD_PATTERN = re.compile('^(\d+).*$')
+RECORD_PATTERN = re.compile('^(\\d+).*$')
 
 class Context:
     def __init__(self, api, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix):
