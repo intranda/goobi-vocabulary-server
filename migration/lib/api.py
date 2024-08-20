@@ -9,7 +9,7 @@ VOCABULARY_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies'
 VOCABULARY_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}'
 
 RECORD_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records'
-RECORD_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records/search'
+RECORD_FIND_URL = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{VOCABULARY_ID}}/records?search={{SEARCH_TERM}}'
 RECORD_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/records/{{RECORD_ID}}'
 
 TYPE_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/types'
@@ -107,8 +107,7 @@ class API:
         return result['id']
     
     def find_record(self, ctx, vocabulary_id, search_term):
-        url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id))
-        url += f'?query={search_term}'
+        url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id)).replace('{{SEARCH_TERM}}', search_term)
         result = self.query(url, obj=None, method='GET')
         if not '_embedded' in result:
             raise Exception(f'Record search for search term "{search_term}" has no results')
