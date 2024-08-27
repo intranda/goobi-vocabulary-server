@@ -2,8 +2,8 @@
 This documentation describes the process of bootstrapping the vocabulary server.
 
 ## Download and Installation
-- Download [Latest Build](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/target/) of vocabulary server.
-- Download [Configuration File](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/src/main/resources/application.properties) of the vocabulary server.
+- Download [Latest Build](https://github.com/intranda/goobi-vocabulary-server/releases/latest) of vocabulary server.
+- Download [Configuration File](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties) of the vocabulary server.
 - Adapt configuration file properly and remove unmodified lines.
     - Database credentials and database name.
     - Base URL and port.

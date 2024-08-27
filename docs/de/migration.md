@@ -9,13 +9,13 @@ Für alle folgenden Anweisungen muss der Vokabularserver bereits laufen.
 Erstellen Sie zunächst eine virtuelle Python-Umgebung, aktivieren Sie diese und installieren Sie alle erforderlichen Python-Abhängigkeiten. Alle folgenden Anweisungen in dieser Dokumentation setzen immer eine aktivierte Python-Umgebung voraus, in der alle diese Abhängigkeiten vorhanden sind.
 
 ```bash
-python -m venv vmenv
+python3 -m venv vmenv
 . vmenv/bin/activate
 pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ```
 
 ## Migration der Vokabulardaten durchführen
-Laden Sie das [Vocabulary Migration Tool] herunter und entpacken Sie es (https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip).
+Laden Sie das [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip) herunter und entpacken Sie es, falls nicht schon bei der Installation geschehen.
 
 **Hinweis** Bevor Sie einen der folgenden Schritte durchführen, lesen Sie diese Dokumentation bitte zuerst vollständig durch.
 Es gibt keine einfache "Nur diese Schritte ausführen"-Lösung für jeden Anwendungsfall.
@@ -30,6 +30,18 @@ Detaillierte Anweisungen hierzu werden später gegeben.
 Wenn Sie keine Feldtypen erstellen wollen, können Sie die Datenmigration mit dem folgenden Befehl starten:
 ```bash
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
+```
+
+### Skript
+Die obigen beiden Puntke, die virtuelle Python-Umgebung und die Migration der Vokabulardaten in einer typischen Installation:
+```bash
+cd /opt/digiverso/vocabulary/migration
+python3 -m venv vmenv
+. vmenv/bin/activate
+pip install requests mysql-connector-python==8.4.0 alive_progress lxml
+VOC_PORT=$(sudo grep -oP '^server.port=\K.*' /opt/digiverso/vocabulary/application.properties)
+DB_GOOBI_PW=$(sudo xmlstarlet sel -t -v '//Resource/@password' -n /etc/tomcat9/Catalina/localhost/goobi.xml)
+python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
 ```
 
 **Hinweis** Ändern Sie die Parameter entsprechend Ihrer Konfiguration. Der Parameter `fallback-language` definiert die Standardsprache, die für ein mehrsprachiges Vokabularfeld verwendet wird, für das keine Standardsprache abgeleitet werden konnte. Die Option `continue-on-error` verhindert, dass das Migrationstool bei Fehlern bei der Datenmigration anhält. Diese Fehler können auftreten, wenn die Daten nicht in den neuen Vokabularserver eingefügt werden konnten. Mögliche Gründe dafür könnten sein:
@@ -48,7 +60,7 @@ python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-se
         - Führen Sie die Ersteinrichtung durch.
         - Führen Sie die Vokabular-Migration wie oben beschrieben durch.
 - Speichern Sie nach Abschluss der Migration die Datei `migration.csv` an einem sicheren Ort.
-Diese Datei enthält alle Informationen über die migrierten Datensätze mit ihren alten und neuen IDs. 
+Diese Datei enthält alle Informationen über die migrierten Datensätze mit ihren alten und neuen IDs.
 Diese Informationen werden benötigt, um später die Verweise auf die Vokabulardatensätze in den Metadaten-Dateien zu aktualisieren.
 - Sie sollten versuchen, die Migration am Ende ohne den Parameter `--continue-on-error` durchzuführen. Wenn dies funktioniert, dann wissen Sie dass alles problemslos migriert werden konnte.
 
@@ -72,7 +84,7 @@ Dieses Problem zeigt an, dass eines der Vokabulardatensatzfelder den Wert `Geona
 Während der Migration wurde dieses Feld (auf der Grundlage vorhandener Daten) mit einem neuen Typ konfiguriert, der die folgenden auswählbaren Werte `geonames` und `viaf` enthält.
 Wie Sie sehen können, wird der aktuelle Wert mit einem großen `G` geschrieben, aber nur die klein geschriebene Version von `geonames` ist einer der auswählbaren Werte.
 Daher schlägt die Validierung dieses Vokabeldatensatzes fehl und das Skript ist nicht in der Lage, diesen Datensatz zu importieren.
-In diesem speziellen Fall könnten Sie alle Vorkommen in der alten Datenbank aktualisieren und anschließend einen erneuten Import der Daten durchführen.
+In diesem speziellen Fall könnten Sie alle Vorkommen in der alten Datenbank aktualisieren und anschließend einen erneuten Import der Daten durchführen. Leeren Sie dazu zunächst die Vokabular-(SQL)-Datenbank.
 Stellen Sie sicher, dass Sie die Datei `migration_issues.log` vor einem Re-Import umbenennen oder entfernen, da das Migrationsscript immer an diese Datei anhängt und so bereits gelöste Probleme enthalten würde.
 Jeder Vokabulardatensatz, der in dieser Datei gemeldet wird, wurde nicht in den Vokabularserver importiert.
 Wenn dies gewünscht ist (weil der Vokabeldatensatz fehlerhafte Daten enthält und nicht beibehalten werden soll), können Sie dieses Problem einfach ignorieren und weitermachen.
@@ -83,7 +95,7 @@ Mit `python vocabulary-migrator.py --help` können Sie sich alle verfügbaren Op
 Wenn Sie vorhaben, bestehende Feldtypen wiederzuverwenden oder andere Vokabulare für Vokabularreferenzen während einer Migration zu verwenden, erstellen Sie die folgenden drei Dateien: `reference_type_lookup.csv`, `reference_value_lookup.csv` und `type_definition_lookup.csv`.
 Legen Sie alle drei Dateien in einem neuen Verzeichnis ab und übergeben Sie diesen Verzeichnispfad als Parameter `--lookup-file-directory` an das Migrationstool.
 
-Um die folgende Konfiguration besser zu verstehen, geben wir ein Beispiel. 
+Um die folgende Konfiguration besser zu verstehen, geben wir ein Beispiel.
 Stellen Sie sich vor, Sie haben derzeit ein Vokabular mit einem Feld mit den folgenden auswählbaren Werten: `red`, `blue`.
 Datensätze können jeden dieser beiden Werte enthalten.
 Die Unterstützung mehrerer Sprachen wird derzeit erreicht, indem eine neue Felddefinition mit einem anderen Sprachwert erstellt wird und die gleiche Anzahl von auswählbaren Werten, diesmal in der anderen Sprache, bereitgestellt wird: `rot`, `blau` (auf Deutsch).
@@ -113,7 +125,7 @@ rot|blau,2
 Diese Datei ordnet allen auswählbaren Werten (in allen Sprachen, eine Sprache pro Zeile) die ID des Vokabulars zu, welches die Farbdatensätze enthält.
 Achten Sie bitte darauf, immer eine Sprache pro Zeile zu definieren.
 Der Grund dafür ist, dass verschiedene Sprachen vorher als mehrere Felddefinitionen vorhanden waren und die Migrationsverarbeitung diese Art der Trennung erfordert.
-Der Wert für die Spalten `values` muss mit der Spalte `selection` in der Tabelle `vocabulary_structure` der bestehenden Datenbank übereinstimmen. 
+Der Wert für die Spalten `values` muss mit der Spalte `selection` in der Tabelle `vocabulary_structure` der bestehenden Datenbank übereinstimmen.
 
 Die Datei `reference_value_lookup.csv` sieht wie folgt aus:
 ```csv
@@ -125,11 +137,32 @@ blau,123
 ```
 Diese Datei ordnet allen Datensatzwerten die entsprechende Datensatz-IDs im Referenzvokabular zu (also die ID des Farbdatensatzes im Farbvokabular).
 
+### Test der Vokabulardaten-Migration
+- Wenn eine Datenmigration stattgefunden hat, prüfen Sie, ob alle Vokabulare migriert wurden:
+```bash
+curl -s http://localhost:8081/api/v1/vocabularies | jq -r '._embedded.vocabularyList[] .name'
+```
+- Prüfen Sie, ob die Links korrekt aufgelöst werden (siehe Konfiguration):
+```bash
+curl http://localhost:8081/api/v1/records/1 | jq
+```
+Das JSON-Element `_links` sollte Verweise auf andere Ressourcen enthalten.
+Diese URLs sollten gültig und auflösbar sein.
+Wenn Sie keinen dieser Verweise öffnen können, überprüfen Sie die Konfiguration des Vokabularservers (Konfigurationsoption `vocabulary-server.base-url`).
+Bei Problemen mit diesen URLs müssen die Daten nicht neu importiert werden.
+Aktualisieren Sie einfach die Konfigurationsdatei und starten Sie den Vokabularserver neu, damit die Änderungen wirksam werden.
+
 ## Migration der Mets-Datei
 Dieser Schritt kann nur durchgeführt werden, wenn die Migration der Vokabulardaten erfolgreich abgeschlossen wurde!
 
 Wenn die Datei `migration.csv` vorhanden ist, führen Sie den folgenden Befehl in der aktivierten Python-Umgebung aus:
 ```bash
+cd /opt/digiverso/vocabulary/migration
+sudo -s
+. vmenv/bin/activate
+# dry-run:
+python metadata-migrator.py --verbose --log INFO -m migration.csv -d /opt/digiverso/goobi/metadata --dry
+# metadata migration
 python metadata-migrator.py -m migration.csv -d /opt/digiverso/goobi/metadata
 ```
 
@@ -138,7 +171,7 @@ Wann immer das Script eine Vokabularreferenz in der Mets-Datei findet, wird es v
 Wenn etwas geändert wird, wird zuvor ein Backup der Mets-Datei erstellt.
 
 Wenn die Mets-Dateien zusätzliche Referenzen auf Datensätze in separaten XML-Elementen enthalten (z. B. `<goobi:metadata name="SourceID">5661</goobi:metadata>`), kann das `metadata-migrator.py` Script diese Referenzen auch mit dem zusätzlichen Parameter `--manual-id-fix SourceID` aktualisieren. Der Wert des Parameters muss mit dem Attribut `Name` eines `Metadaten`-Elements übereinstimmen, damit dessen Datensatz-ID durch die neue Datensatz-ID ersetzt werden kann. Dieser Schritt darf nicht zweimal ausgeführt werden, da dies die IDs verfälschen würde!
-   
+
 ## Datenbereinigung
 Wenn die Datenmigration erfolgreich abgeschlossen ist und Sie sicher sind, dass Sie die alten Daten nicht mehr benötigen, können Sie alle Vokabulartabellen manuell aus der Datenbank `goobi` Ihrer Goobi-Instanz entfernen:
 - `vocabulary`
@@ -146,7 +179,7 @@ Wenn die Datenmigration erfolgreich abgeschlossen ist und Sie sicher sind, dass 
 - `vocabulary_record_data`
 - `vocabulary_structure`
 
-**Achtung** Die Datenbereinigung kann nicht rückgängig gemacht werden. 
-Wenn Sie sich nicht sicher sind, führen Sie die Bereinigungsschritte nicht durch. 
-Die alten Vokabulardaten haben keinen Einfluss auf neuere Versionen von Goobi Workflow. 
+**Achtung** Die Datenbereinigung kann nicht rückgängig gemacht werden.
+Wenn Sie sich nicht sicher sind, führen Sie die Bereinigungsschritte nicht durch.
+Die alten Vokabulardaten haben keinen Einfluss auf neuere Versionen von Goobi Workflow.
 Wir empfehlen, diese Daten für den Fall der Fälle für einige Zeit aufzubewahren.
