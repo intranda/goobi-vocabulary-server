@@ -22,10 +22,11 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.apache.jena.vocabulary.XSD;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -36,12 +37,6 @@ import java.util.Objects;
 
 @Service
 public class RDFMapperImpl implements RDFMapper {
-    @Value("${vocabulary-server.base-url}")
-    private String host;
-
-    @Value("${server.port}")
-    private int port;
-
     public static final RDFFormat RDF_XML_SYNTAX = RDFFormat.RDFXML;
     public static final RDFFormat RDF_TURTLE_SYNTAX = RDFFormat.TURTLE_BLOCKS;
 
@@ -53,13 +48,22 @@ public class RDFMapperImpl implements RDFMapper {
 
     private String generateURIForId(Class<?> clazz, long id) {
         try {
+            String baseUrl = extractBaseURI();
             String classRoute = extractClassEndpoint(clazz);
             String methodRoute = extractMethodEndpoint(clazz.getMethod("one", long.class));
             String endpoint = classRoute + methodRoute.replace("{id}", Long.toString(id));
-            return host + ':' + port + endpoint;
+            return baseUrl + endpoint;
         } catch (NoSuchMethodException e) {
             throw new MappingException(clazz, String.class, e);
         }
+    }
+
+    private String extractBaseURI() {
+        UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+        String scheme = uriComponents.getScheme();
+        String host = uriComponents.getHost();
+        String port = String.valueOf(uriComponents.getPort());
+        return scheme + "://" + host + ':' + port;
     }
 
     private static String extractClassEndpoint(Class<?> clazz) throws NoSuchMethodException {
