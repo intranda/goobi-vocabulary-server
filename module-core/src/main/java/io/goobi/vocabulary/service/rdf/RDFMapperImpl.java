@@ -1,6 +1,5 @@
 package io.goobi.vocabulary.service.rdf;
 
-import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
 import io.goobi.vocabulary.exception.MappingException;
@@ -9,10 +8,8 @@ import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
-import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
-import io.goobi.vocabulary.service.rdf.vocabulary.LANGUAGE;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -105,18 +102,8 @@ public class RDFMapperImpl implements RDFMapper {
     }
 
     @Override
-    public String toRDFXML(LanguageEntity entity) {
-        return transform(entity, this::generateLanguageModel, RDF_XML_SYNTAX);
-    }
-
-    @Override
     public String toRDFXML(VocabularyEntity entity) {
         return transform(entity, this::generateVocabularyModel, RDF_XML_SYNTAX);
-    }
-
-    @Override
-    public String toRDFTurtle(LanguageEntity entity) {
-        return transform(entity, this::generateLanguageModel, RDF_TURTLE_SYNTAX);
     }
 
     @Override
@@ -291,17 +278,5 @@ public class RDFMapperImpl implements RDFMapper {
         records.stream()
                 .filter(r -> !r.isMetadata() && r.getId() != topRecordId)
                 .forEach(r -> recordMap.get(r.getId()).addProperty(SKOS.inScheme, topElement));
-    }
-
-    private Model generateLanguageModel(LanguageEntity entity) {
-        String uri = generateURIForId(LanguageController.class, entity.getId());
-
-        Model model = ModelFactory.createDefaultModel();
-
-        Resource resource = model.createResource(uri)
-                .addProperty(LANGUAGE.NAME, entity.getName())
-                .addProperty(LANGUAGE.ABBREVIATION, entity.getAbbreviation());
-
-        return model;
     }
 }
