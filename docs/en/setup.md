@@ -66,6 +66,4 @@ curl http://localhost:8081/api/v1/records/1 | jq
 ```
 The `_links` JSON element should contain references to other resources. 
 These URLs should be valid and resolvable. 
-If you are unable to open any of these references, check the configuration of the vocabulary server (`vocabulary-server.base-url` configuration option).
-Any issues regarding these URLs doesn't require a re-import of the data. 
-Just update the configuration file and restart the vocabulary server for the changes to take effect.
+The host part of these URLs is generated from the request.

@@ -148,9 +148,7 @@ curl http://localhost:8081/api/v1/records/1 | jq
 ```
 Das JSON-Element `_links` sollte Verweise auf andere Ressourcen enthalten.
 Diese URLs sollten gültig und auflösbar sein.
-Wenn Sie keinen dieser Verweise öffnen können, überprüfen Sie die Konfiguration des Vokabularservers (Konfigurationsoption `vocabulary-server.base-url`).
-Bei Problemen mit diesen URLs müssen die Daten nicht neu importiert werden.
-Aktualisieren Sie einfach die Konfigurationsdatei und starten Sie den Vokabularserver neu, damit die Änderungen wirksam werden.
+Der Host-Teil dieser URLs wird aus der Anfrage generiert.
 
 ## Migration der Mets-Datei
 Dieser Schritt kann nur durchgeführt werden, wenn die Migration der Vokabulardaten erfolgreich abgeschlossen wurde!
