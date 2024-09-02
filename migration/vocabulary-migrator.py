@@ -19,7 +19,8 @@ def main():
     )
     api = API(
         args.vocabulary_server_host,
-        args.vocabulary_server_port
+        args.vocabulary_server_port,
+        args.vocabulary_server_token
     )
     ctx = Context(db, api, args.dry, args.fallback_language, args.continue_on_error, args.lookup_file_directory)
     api.set_context(ctx)
@@ -45,6 +46,7 @@ def parse_args():
     parser.add_argument('--dry', type=str, required=False, help='Don\'t call the API but instead write the API calls to a file, provide the filename as a parameter')
     parser.add_argument('--vocabulary-server-host', type=str, default='localhost', help='vocabulary server host')
     parser.add_argument('--vocabulary-server-port', type=str, default='8081', help='vocabulary server port')
+    parser.add_argument('--vocabulary-server-token', type=str, default=None, help='vocabulary server security token')
     parser.add_argument('--goobi-database-host', type=str, default='localhost', help='Goobi database host')
     parser.add_argument('--goobi-database-port', type=str, default='3306', help='Goobi database port')
     parser.add_argument('--goobi-database-name', type=str, default='goobi', help='Goobi database name')

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 HOST='localhost:8081/api/v1'
+TOKEN='secret'
 
 curl_call() {
-  curl --location "$HOST/$1" --header 'Content-Type: application/json' --data "$2"
+  curl --location "$HOST/$1" --header 'Content-Type: application/json' --header "Authorization: Bearer $TOKEN" --data "$2"
 }
 
 create_language() {

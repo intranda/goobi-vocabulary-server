@@ -30,7 +30,7 @@ VOCABULARY_LOOKUP = 8
 SCHEMA_LOOKUP = 9
 
 class API:
-    def __init__(self, host, port):
+    def __init__(self, host, port, token):
         self.urls = {}
         self.urls[SCHEMA_INSERTION] = SCHEMA_INSERTION_URL
         self.urls[VOCABULARY_INSERTION] = VOCABULARY_INSERTION_URL
@@ -45,6 +45,8 @@ class API:
         self.type_counter = 1
         for u in self.urls:
             self.urls[u] = self.urls[u].replace('{{HOST}}', host).replace('{{PORT}}', port)
+        if token != None:
+            HEADERS['Authorization'] = f'Bearer {token}'
     
     def set_context(self, ctx):
         self.ctx = ctx
