@@ -7,6 +7,7 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 - Passen Sie die Konfigurationsdatei entsprechend Ihrer Konfiguration an und entfernen Sie nicht geänderte Zeilen.
     - Datenbankanmeldeinformationen und Datenbankname.
     - Basis-URL und Port.
+    - Sicherheitstoken (dieses muss identisch auch in Goobi konfiguriert werden).
 - Erstellen Sie ein Systemd-Service, um den Dienst automatisch zu starten.
 
 ## Einrichtung von Goobi Workflow zur Kommunikation mit dem Vokabularserver
@@ -27,6 +28,7 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 Für die obigen drei Punkte unter Ubuntu:
 ```bash
 export VOC_PORT=8081
+export VOC_TOKEN=supersecret
 export VOC_PATH=/opt/digiverso/vocabulary
 export VOC_USER=vocabulary
 export VOC_SQL_USER=${VOC_USER}
@@ -49,6 +51,7 @@ sudo cp -ait ${VOC_PATH} /tmp/goobi-vocabulary-server/migration
 # download and set up the config file
 wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties -O - | sudo tee ${VOC_PATH}/application.properties >/dev/null
 sudo sed -re "s|^(server.port=).*|\1${VOC_PORT}|" \
+     -e "s|^(security.token=).*|\1${VOC_TOKEN}|" \
      -e "s|^(spring.datasource.username=).*|\1${VOC_SQL_USER}|" \
      -e "s|^(spring.datasource.password=).*|\1${PW_SQL_VOC}|" \
      -e "s|^(spring.datasource.url=).*|\1jdbc:mariadb://localhost:3306/${VOC_SQL_DB}|" \
@@ -90,6 +93,7 @@ sudo mysql -e "CREATE DATABASE ${VOC_SQL_DB};
 # append vocabulary server address to the Goobi workflow config
 grep ^vocabularyServerHost= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerHost=localhost"   | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
 grep ^vocabularyServerPort= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerPort=${VOC_PORT}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+grep ^vocabularyServerToken= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerToken=${VOC_TOKEN}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
 
 # start the vocabulary server
 sudo systemctl start vocabulary.service

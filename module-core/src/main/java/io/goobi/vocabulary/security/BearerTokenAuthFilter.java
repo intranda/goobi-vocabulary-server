@@ -13,30 +13,30 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class BearerTokenAuthFilter extends OncePerRequestFilter {
-    @Value("${security.bearer.token}")
+    @Value("${security.token}")
     private String secretToken;
+
+    @Value("${security.anonymous.read-allowed}")
+    private boolean anonymousReadAllowed;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
-            final String jwt = authHeader.substring(7);
+            final String token = authHeader != null && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
+            final Optional<String> jwt = Optional.ofNullable(token);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null) {
                 User user = new User();
 
-                if (isTokenValid(jwt) || isPublic(request)) {
+                if (isPublic(request) || (jwt.isPresent() && isTokenValid(jwt.get()))) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             user,
                             null,
@@ -51,12 +51,13 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
 //            handlerExceptionResolver.resolveException(request, response, null, exception);
-            exception.printStackTrace();
+//            exception.printStackTrace();
         }
     }
 
     private boolean isPublic(HttpServletRequest request) {
-        return "GET".equals(request.getMethod());
+        // TODO: Vocabulary filtering
+        return anonymousReadAllowed && "GET".equals(request.getMethod());
     }
 
     private boolean isTokenValid(String accessToken) {
