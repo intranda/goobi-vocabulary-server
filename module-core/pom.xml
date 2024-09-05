@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-core</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>io.goobi.vocabulary</groupId>
             <artifactId>vocabulary-server-exchange</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
             <scope>compile</scope>
         </dependency>
 
@@ -162,6 +162,21 @@
                 </configuration>
             </plugin>
 
+            <!-- COMPILATION -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <compilerArgs>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:removal</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <!-- COMPILATION -->
+
             <!-- TEST COVERAGE -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -226,6 +241,9 @@
                                 </goals>
                                 <configuration>
                                     <rules>
+                                        <requireMavenVersion>
+                                            <version>${maven.version}</version>
+                                        </requireMavenVersion>
                                         <requireReleaseVersion>
                                             <message>This is not a release version!</message>
                                         </requireReleaseVersion>
@@ -259,6 +277,9 @@
                                 </goals>
                                 <configuration>
                                     <rules>
+                                        <requireMavenVersion>
+                                            <version>${maven.version}</version>
+                                        </requireMavenVersion>
                                         <requireSnapshotVersion>
                                             <message>This is not a snapshot version!</message>
                                             <failWhenParentIsRelease>false</failWhenParentIsRelease>
