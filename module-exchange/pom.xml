@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-exchange</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.1.1</version>
     <name>Vocabulary Exchange</name>
     <description>Vocabulary data exchange classes</description>
     <packaging>jar</packaging>
