@@ -10,12 +10,13 @@
     </parent>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-core</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
+        <maven.version>3.8.8</maven.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -25,7 +26,7 @@
         <dependency>
             <groupId>io.goobi.vocabulary</groupId>
             <artifactId>vocabulary-server-exchange</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
             <scope>compile</scope>
         </dependency>
 

@@ -28,7 +28,7 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 Für die obigen drei Punkte unter Ubuntu:
 ```bash
 export VOC_PORT=8081
-export VOC_TOKEN=supersecret
+export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
 export VOC_PATH=/opt/digiverso/vocabulary
 export VOC_USER=vocabulary
 export VOC_SQL_USER=${VOC_USER}
@@ -38,8 +38,7 @@ export PW_SQL_VOC=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
 # create install folder
 sudo mkdir ${VOC_PATH}
 # download and link vocabulary server application file
-wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-server-core-1.0.0.jar -O - | sudo tee ${VOC_PATH}/vocabulary-server-core-1.0.0.jar >/dev/null
-sudo ln -rs ${VOC_PATH}/vocabulary-server*.jar ${VOC_PATH}/vocabulary-server.jar
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-server-core.jar -O - | sudo tee ${VOC_PATH}/vocabulary-server-core.jar >/dev/null
 
 # create system user which will run the service
 sudo adduser --system --home ${VOC_PATH}/home --shell /usr/sbin/nologin --no-create-home --disabled-login ${VOC_USER}
@@ -72,7 +71,7 @@ Restart=always
 RestartSec=20s
 StartLimitInterval=100s
 StartLimitBurst=4
-ExecStart=/usr/bin/java -jar vocabulary-server.jar
+ExecStart=/usr/bin/java -jar vocabulary-server-core.jar
 User=${VOC_USER}
 NoNewPrivileges=true
 ProtectSystem=true
@@ -106,7 +105,7 @@ bash ${VOC_PATH}/default_setup.sh
 ## test
 curl -s http://localhost:${VOC_PORT}/api/v1/types | jq -r '._embedded.fieldTypeList[] .name'
 ```
-
+Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
 
 ## Erreichbarkeit
 - Sie können den Vokabularserver von außen erreichbar machen, indem Sie einen Proxy samt Zugriffskontrolle davorschalten.
