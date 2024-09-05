@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Component
 public class BearerTokenAuthFilter extends OncePerRequestFilter {
-    @Value("${security.token:#{null}")
+    @Value("${security.token:#{null}}")
     private String secretToken;
 
     @Value("${security.anonymous.read-allowed:false}")
