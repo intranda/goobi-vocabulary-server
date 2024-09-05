@@ -2,8 +2,8 @@
 This documentation describes the process of bootstrapping the vocabulary server.
 
 ## Download and Installation
-- Download [Latest Build](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/target/) of vocabulary server.
-- Download [Configuration File](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/src/main/resources/application.properties) of the vocabulary server.
+- Download [Latest Build](https://github.com/intranda/goobi-vocabulary-server/releases/latest) of vocabulary server.
+- Download [Configuration File](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties) of the vocabulary server.
 - Adapt configuration file properly and remove unmodified lines.
     - Database credentials and database name.
     - Base URL and port.
@@ -66,6 +66,4 @@ curl http://localhost:8081/api/v1/records/1 | jq
 ```
 The `_links` JSON element should contain references to other resources. 
 These URLs should be valid and resolvable. 
-If you are unable to open any of these references, check the configuration of the vocabulary server (`vocabulary-server.base-url` configuration option).
-Any issues regarding these URLs doesn't require a re-import of the data. 
-Just update the configuration file and restart the vocabulary server for the changes to take effect.
+The host part of these URLs is generated from the request.

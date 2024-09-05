@@ -32,7 +32,7 @@ class MetsManipulator:
         root = tree.getroot()
         self.process_node(root)
         
-        if self.changed:
+        if self.changed and not self.ctx.dry:
             self.create_backup()
             tree.write(self.file_path, encoding='utf-8', xml_declaration=True)
             self.ctx.log_processed(self.file_path)
@@ -40,8 +40,12 @@ class MetsManipulator:
     def process_node(self, node):
         if self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
             self.process_vocabulary_reference(node)
+            if self.ctx.dry:
+                dump_node(node)
         if self.is_manual_id_reference(node):
             self.process_manual_id_reference(node)
+            if self.ctx.dry:
+                dump_node(node)
         for child in node:
             self.process_node(child)
 
@@ -130,3 +134,7 @@ def generate_vocabulary_uri(vocabulary_id):
 
 def generate_record_uri(record_id):
     return RECORD_ENDPOINT.replace('{{ID}}', str(record_id))
+
+def dump_node(node):
+    attributes = ' '.join(f'{k}="{v}"' for k, v in node.attrib.items())
+    logging.info(f'<{node.tag} {attributes} />')

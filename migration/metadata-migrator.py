@@ -11,9 +11,10 @@ def main():
 
     api = API(
         args.vocabulary_server_host,
-        args.vocabulary_server_port
+        args.vocabulary_server_port,
+        args.vocabulary_server_token
     )
-    ctx = Context(api, args.verbose, args.continue_on_error, args.metadata_directory, args.mapping_file, args.preferred_mets_main_value_language, args.manual_id_fix)
+    ctx = Context(api, args.dry, args.verbose, args.continue_on_error, args.metadata_directory, args.mapping_file, args.preferred_mets_main_value_language, args.manual_id_fix)
 
     try:
         migrator = MetsMigrator(ctx)
@@ -31,10 +32,12 @@ class RawTextDefaultsHelpFormatter(argparse.RawTextHelpFormatter, argparse.Argum
 
 def parse_args():
     parser = argparse.ArgumentParser(prog='metadata-migrator.py', formatter_class=RawTextDefaultsHelpFormatter, description='Metadata migration tool.')
+    parser.add_argument('--dry', required=False, default=False, action='store_const', const=True, help='Don\'t persist changes but only print replacements to the console')
     parser.add_argument('--metadata-directory', '-d', required=True, help='directory to recursively scan for metadata to update')
     parser.add_argument('--mapping-file', '-m', required=True, help='vocabulary and record mapping file')
     parser.add_argument('--vocabulary-server-host', type=str, default='localhost', help='vocabulary server host')
     parser.add_argument('--vocabulary-server-port', type=str, default='8081', help='vocabulary server port')
+    parser.add_argument('--vocabulary-server-token', type=str, default=None, help='vocabulary server security token')
     parser.add_argument('--preferred-mets-main-value-language', type=str, default='eng', help='Default language to use for mets value writing, if present and prior value invalid')
     parser.add_argument('--manual-id-fix', type=str, default=None, help='Manually fix the record ID of elements whose name attribute matches this parameter. Caution, this must not be executed twice!')
     parser.add_argument('--log', required=False, default='INFO', help='logger level (possible values are: NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL)')

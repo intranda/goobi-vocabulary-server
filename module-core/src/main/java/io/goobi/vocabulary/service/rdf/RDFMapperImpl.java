@@ -1,6 +1,5 @@
 package io.goobi.vocabulary.service.rdf;
 
-import io.goobi.vocabulary.api.LanguageController;
 import io.goobi.vocabulary.api.VocabularyController;
 import io.goobi.vocabulary.api.VocabularyRecordController;
 import io.goobi.vocabulary.exception.MappingException;
@@ -9,10 +8,8 @@ import io.goobi.vocabulary.model.jpa.FieldInstanceEntity;
 import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
 import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.FieldValueEntity;
-import io.goobi.vocabulary.model.jpa.LanguageEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyEntity;
 import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
-import io.goobi.vocabulary.service.rdf.vocabulary.LANGUAGE;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -25,10 +22,11 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SKOS;
 import org.apache.jena.vocabulary.XSD;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -39,12 +37,6 @@ import java.util.Objects;
 
 @Service
 public class RDFMapperImpl implements RDFMapper {
-    @Value("${vocabulary-server.base-url}")
-    private String host;
-
-    @Value("${server.port}")
-    private int port;
-
     public static final RDFFormat RDF_XML_SYNTAX = RDFFormat.RDFXML;
     public static final RDFFormat RDF_TURTLE_SYNTAX = RDFFormat.TURTLE_BLOCKS;
 
@@ -56,13 +48,22 @@ public class RDFMapperImpl implements RDFMapper {
 
     private String generateURIForId(Class<?> clazz, long id) {
         try {
+            String baseUrl = extractBaseURI();
             String classRoute = extractClassEndpoint(clazz);
             String methodRoute = extractMethodEndpoint(clazz.getMethod("one", long.class));
             String endpoint = classRoute + methodRoute.replace("{id}", Long.toString(id));
-            return host + ':' + port + endpoint;
+            return baseUrl + endpoint;
         } catch (NoSuchMethodException e) {
             throw new MappingException(clazz, String.class, e);
         }
+    }
+
+    private String extractBaseURI() {
+        UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+        String scheme = uriComponents.getScheme();
+        String host = uriComponents.getHost();
+        String port = String.valueOf(uriComponents.getPort());
+        return scheme + "://" + host + ':' + port;
     }
 
     private static String extractClassEndpoint(Class<?> clazz) throws NoSuchMethodException {
@@ -105,18 +106,8 @@ public class RDFMapperImpl implements RDFMapper {
     }
 
     @Override
-    public String toRDFXML(LanguageEntity entity) {
-        return transform(entity, this::generateLanguageModel, RDF_XML_SYNTAX);
-    }
-
-    @Override
     public String toRDFXML(VocabularyEntity entity) {
         return transform(entity, this::generateVocabularyModel, RDF_XML_SYNTAX);
-    }
-
-    @Override
-    public String toRDFTurtle(LanguageEntity entity) {
-        return transform(entity, this::generateLanguageModel, RDF_TURTLE_SYNTAX);
     }
 
     @Override
@@ -291,17 +282,5 @@ public class RDFMapperImpl implements RDFMapper {
         records.stream()
                 .filter(r -> !r.isMetadata() && r.getId() != topRecordId)
                 .forEach(r -> recordMap.get(r.getId()).addProperty(SKOS.inScheme, topElement));
-    }
-
-    private Model generateLanguageModel(LanguageEntity entity) {
-        String uri = generateURIForId(LanguageController.class, entity.getId());
-
-        Model model = ModelFactory.createDefaultModel();
-
-        Resource resource = model.createResource(uri)
-                .addProperty(LANGUAGE.NAME, entity.getName())
-                .addProperty(LANGUAGE.ABBREVIATION, entity.getAbbreviation());
-
-        return model;
     }
 }

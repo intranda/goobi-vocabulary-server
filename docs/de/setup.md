@@ -2,21 +2,13 @@
 Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung des Vokabularservers.
 
 ## Download und Installation
-- Laden Sie die [Neuste Version](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/target/) des Vokabularservers herunter.
-- Laden Sie die [Konfigurationsdatei](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/module-core/src/main/resources/application.properties) des Vokabularservers herunter.
+- Laden Sie die [Neuste Version](https://github.com/intranda/goobi-vocabulary-server/releases/latest) des Vokabularservers herunter.
+- Laden Sie die [Konfigurationsdatei](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties) des Vokabularservers herunter.
 - Passen Sie die Konfigurationsdatei entsprechend Ihrer Konfiguration an und entfernen Sie nicht geänderte Zeilen.
     - Datenbankanmeldeinformationen und Datenbankname.
     - Basis-URL und Port.
-- **TODO** *Installieren Sie die `vocabulary-server.jar` und die Konfigurationsdatei `application.properties` direkt in einen neuen Ordner (z. B. `/opt/digiverso/vocabulary/`)*
-
-## Als systemd-Dienst starten
-- **TODO** *Erstellen einer systemd Service Unit für den Vokabularserver (Die Anwendung sollte bei SIGTERM korrekt herunterfahren können)*
-- **TODO** *Admin-Dokumentation hier*
-- Führen Sie `java -jar vocabulary-server-VERSION.jar` aus.
-- Wenn der Start erfolgreich war, werden Sie nach ein paar Sekunden eine Zeile wie diese sehen:
-```bash
-Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
-```
+    - Sicherheitstoken (dieses muss identisch auch in Goobi konfiguriert werden).
+- Erstellen Sie ein Systemd-Service, um den Dienst automatisch zu starten.
 
 ## Einrichtung von Goobi Workflow zur Kommunikation mit dem Vokabularserver
 - Goobi Workflow verwendet seit Version `24.07` den neuen Vokabularserver.
@@ -32,9 +24,92 @@ Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
 - Ändern Sie die Variable `HOST` am Anfang entsprechend der Konfiguration des Vokabularservers, lassen Sie das Suffix `/api/v1` unverändert.
 - Führen Sie das Skript aus.
 
-## Sicherheit
-- Sie können Apache-URL-Beschränkungen einrichten, um den Vokabularserver vor unberechtigtem Zugriff zu schützen.
-- **TODO** *Admins, bitte finden Sie heraus, was und wie man es im Detail macht.*
+## Installationsskript
+Für die obigen drei Punkte unter Ubuntu:
+```bash
+export VOC_PORT=8081
+export VOC_TOKEN=supersecret
+export VOC_PATH=/opt/digiverso/vocabulary
+export VOC_USER=vocabulary
+export VOC_SQL_USER=${VOC_USER}
+export VOC_SQL_DB=${VOC_USER}
+export PW_SQL_VOC=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
+
+# create install folder
+sudo mkdir ${VOC_PATH}
+# download and link vocabulary server application file
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-server-core-1.0.0.jar -O - | sudo tee ${VOC_PATH}/vocabulary-server-core-1.0.0.jar >/dev/null
+sudo ln -rs ${VOC_PATH}/vocabulary-server*.jar ${VOC_PATH}/vocabulary-server.jar
+
+# create system user which will run the service
+sudo adduser --system --home ${VOC_PATH}/home --shell /usr/sbin/nologin --no-create-home --disabled-login ${VOC_USER}
+
+# download the vocabulary migration tools
+git clone --depth=1 https://github.com/intranda/goobi-vocabulary-server.git /tmp/goobi-vocabulary-server
+sudo cp -ait ${VOC_PATH} /tmp/goobi-vocabulary-server/migration
+
+# download and set up the config file
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties -O - | sudo tee ${VOC_PATH}/application.properties >/dev/null
+sudo sed -re "s|^(server.port=).*|\1${VOC_PORT}|" \
+     -e "s|^(security.token=).*|\1${VOC_TOKEN}|" \
+     -e "s|^(spring.datasource.username=).*|\1${VOC_SQL_USER}|" \
+     -e "s|^(spring.datasource.password=).*|\1${PW_SQL_VOC}|" \
+     -e "s|^(spring.datasource.url=).*|\1jdbc:mariadb://localhost:3306/${VOC_SQL_DB}|" \
+     -i ${VOC_PATH}/application.properties
+sudo chown ${VOC_USER}: ${VOC_PATH}/application.properties
+sudo chmod 600 ${VOC_PATH}/application.properties
+
+# install a systemd service unit file
+cat << EOF | sudo tee /etc/systemd/system/vocabulary.service
+[Unit]
+Description=Goobi Vocabulary Server
+After=mysql.service remote-fs.target
+Requires=mysql.service remote-fs.target
+
+[Service]
+WorkingDirectory=${VOC_PATH}
+Restart=always
+RestartSec=20s
+StartLimitInterval=100s
+StartLimitBurst=4
+ExecStart=/usr/bin/java -jar vocabulary-server.jar
+User=${VOC_USER}
+NoNewPrivileges=true
+ProtectSystem=true
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target tomcat9.service
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable vocabulary.service
+
+# create and configure the database
+sudo mysql -e "CREATE DATABASE ${VOC_SQL_DB};
+               CREATE USER '${VOC_SQL_USER}'@'localhost' IDENTIFIED BY '${PW_SQL_VOC}';
+               GRANT ALL PRIVILEGES ON ${VOC_SQL_DB}.* TO '${VOC_SQL_USER}'@'localhost' WITH GRANT OPTION;
+               FLUSH PRIVILEGES;"
+
+# append vocabulary server address to the Goobi workflow config
+grep ^vocabularyServerHost= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerHost=localhost"   | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+grep ^vocabularyServerPort= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerPort=${VOC_PORT}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+grep ^vocabularyServerToken= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerToken=${VOC_TOKEN}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+
+# start the vocabulary server
+sudo systemctl start vocabulary.service
+## check startup
+journalctl -u vocabulary.service -f
+
+# initial set up
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/default_setup.sh -O - | sudo tee ${VOC_PATH}/default_setup.sh >/dev/null
+bash ${VOC_PATH}/default_setup.sh
+## test
+curl -s http://localhost:${VOC_PORT}/api/v1/types | jq -r '._embedded.fieldTypeList[] .name'
+```
+
+
+## Erreichbarkeit
+- Sie können den Vokabularserver von außen erreichbar machen, indem Sie einen Proxy samt Zugriffskontrolle davorschalten.
 
 ## Installationstest
 - Ändern Sie für alle Befehle Host und Port entsprechend.
@@ -56,16 +131,3 @@ skos:related
 skos:closeMatch
 skos:exactMatch
 ```
-- Wenn eine Datenmigration stattgefunden hat, prüfen Sie, ob alle Vokabulare migriert wurden:
-```bash
-curl http://localhost:8081/api/v1/vocabularies/all | jq -r '._embedded.vocabularyList[] .name'                
-```
-- Prüfen Sie, ob die Links korrekt aufgelöst werden (siehe Konfiguration):
-```bash
-curl http://localhost:8081/api/v1/records/1 | jq
-```
-Das JSON-Element `_links` sollte Verweise auf andere Ressourcen enthalten. 
-Diese URLs sollten gültig und auflösbar sein. 
-Wenn Sie keinen dieser Verweise öffnen können, überprüfen Sie die Konfiguration des Vokabularservers (Konfigurationsoption `vocabulary-server.base-url`).
-Bei Problemen mit diesen URLs müssen die Daten nicht neu importiert werden. 
-Aktualisieren Sie einfach die Konfigurationsdatei und starten Sie den Vokabularserver neu, damit die Änderungen wirksam werden.
