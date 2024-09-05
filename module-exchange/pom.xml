@@ -10,6 +10,7 @@
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
+        <maven.version>3.8.8</maven.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -40,6 +41,21 @@
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
+            <!-- COMPILATION -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <compilerArgs>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:removal</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <!-- COMPILATION -->
+
             <!-- TEST COVERAGE -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -104,6 +120,9 @@
                                 </goals>
                                 <configuration>
                                     <rules>
+                                        <requireMavenVersion>
+                                            <version>${maven.version}</version>
+                                        </requireMavenVersion>
                                         <requireReleaseVersion>
                                             <message>This is not a release version!</message>
                                         </requireReleaseVersion>
@@ -137,6 +156,9 @@
                                 </goals>
                                 <configuration>
                                     <rules>
+                                        <requireMavenVersion>
+                                            <version>${maven.version}</version>
+                                        </requireMavenVersion>
                                         <requireSnapshotVersion>
                                             <message>This is not a snapshot version!</message>
                                             <failWhenParentIsRelease>false</failWhenParentIsRelease>
