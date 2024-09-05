@@ -19,10 +19,10 @@ import java.util.Optional;
 
 @Component
 public class BearerTokenAuthFilter extends OncePerRequestFilter {
-    @Value("${security.token}")
+    @Value("${security.token:#{null}")
     private String secretToken;
 
-    @Value("${security.anonymous.read-allowed}")
+    @Value("${security.anonymous.read-allowed:false}")
     private boolean anonymousReadAllowed;
 
     @Bean
@@ -64,6 +64,10 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isTokenValid(String accessToken) {
+        // If secret token is not set, deny
+        if (secretToken == null) {
+            return false;
+        }
         return secretToken.equals(accessToken);
     }
 }
