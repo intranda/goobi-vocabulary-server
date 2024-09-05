@@ -162,21 +162,6 @@
                 </configuration>
             </plugin>
 
-            <!-- COMPILATION -->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <compilerArgs>
-                        <arg>-Xlint:deprecation</arg>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:removal</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <!-- COMPILATION -->
-
             <!-- TEST COVERAGE -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -241,9 +226,6 @@
                                 </goals>
                                 <configuration>
                                     <rules>
-                                        <requireMavenVersion>
-                                            <version>${maven.version}</version>
-                                        </requireMavenVersion>
                                         <requireReleaseVersion>
                                             <message>This is not a release version!</message>
                                         </requireReleaseVersion>
@@ -277,9 +259,6 @@
                                 </goals>
                                 <configuration>
                                     <rules>
-                                        <requireMavenVersion>
-                                            <version>${maven.version}</version>
-                                        </requireMavenVersion>
                                         <requireSnapshotVersion>
                                             <message>This is not a snapshot version!</message>
                                             <failWhenParentIsRelease>false</failWhenParentIsRelease>
