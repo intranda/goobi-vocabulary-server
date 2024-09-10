@@ -1,5 +1,6 @@
 package io.goobi.vocabulary.service.io;
 
+import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.exchange.FieldInstance;
 import io.goobi.vocabulary.exchange.FieldValue;
 import io.goobi.vocabulary.exchange.TranslationInstance;
@@ -53,22 +54,21 @@ public class TabularRecordImporter {
         List<String> header = data.get(0);
         parseHeader(header);
         validateHeader();
-        List<Throwable> importErrors = new LinkedList<>();
+        List<VocabularyException> importErrors = new LinkedList<>();
 
         // parse all records and create a queue
         List<VocabularyRecord> result = new LinkedList<>();
         for (int i = 1; i < data.size(); i++) {
             try {
                 result.add(parseRecord(data.get(i)));
-            } catch (IllegalArgumentException e) {
+            } catch (VocabularyException e) {
                 importErrors.add(e);
             }
         }
 
         if (!importErrors.isEmpty()) {
-            // TODO: Use VocabularyException
-            throw new IllegalArgumentException("Error(s) during tabular data parsing:\n\t"
-                    + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
+            throw new VocabularyException(VocabularyException.ErrorCode.RecordImportParsingIssues, importErrors, null,
+                    params -> "Errors during record parsing");
         }
 
         return result;
@@ -113,7 +113,7 @@ public class TabularRecordImporter {
                             .map(l -> new FieldInformation(name, l));
                 })
                 .collect(Collectors.toSet()));
-        Set<FieldInformation> presentFields = fields.stream().collect(Collectors.toSet());
+        Set<FieldInformation> presentFields = new HashSet<>(fields);
         if (!definedFields.equals(presentFields)) {
             Set<FieldInformation> undefined = presentFields.stream()
                     .filter(f -> !definedFields.contains(f))
@@ -121,15 +121,11 @@ public class TabularRecordImporter {
             Set<FieldInformation> missing = definedFields.stream()
                     .filter(f -> !presentFields.contains(f))
                     .collect(Collectors.toSet());
-            String error = "Given fields do not match vocabulary schema:";
-            if (!undefined.isEmpty()) {
-                error += "\n\tUndefined fields: " + undefined.stream().map(FieldInformation::toString).collect(Collectors.joining(", "));
-            }
-            if (!missing.isEmpty()) {
-                error += "\n\tMissing fields: " + missing.stream().map(FieldInformation::toString).collect(Collectors.joining(", "));
-            }
-            // TODO: Use VocabularyException
-            throw new IllegalArgumentException(error);
+            throw new VocabularyException(VocabularyException.ErrorCode.RecordImportHeaderIssues, null, Map.of(
+                    "undefinedFields", undefined.stream().map(FieldInformation::toString).collect(Collectors.joining(",")),
+                    "missingFields", missing.stream().map(FieldInformation::toString).collect(Collectors.joining(","))
+            ),
+                    params -> "Given fields do not match vocabulary schema, undefined fields \"" + params.get("undefinedFields") + "\", missing fields \"" + params.get("missingFields") + "\"");
         }
     }
 
@@ -137,7 +133,11 @@ public class TabularRecordImporter {
         VocabularyRecord resultRecord = new VocabularyRecord();
 
         if (rec.size() != fields.size()) {
-            throw new IllegalArgumentException("Malformed tabular data, number of fields does not match header");
+            throw new VocabularyException(VocabularyException.ErrorCode.RecordImportFieldCountIssue, null, Map.of(
+                    "expectedSize", String.valueOf(fields.size()),
+                    "realSize", String.valueOf(rec.size())
+            ),
+                    params -> "Malformed tabular data, number of fields does not match header. Header size \"" + params.get("expectedSize") + "\", data row size \"" + params.get("realSize") + "\"");
         }
 
         Map<String, FieldInstance> fieldMap = new HashMap<>();

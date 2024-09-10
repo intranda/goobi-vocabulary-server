@@ -124,7 +124,6 @@ public class VocabularyImportManager {
             }
         }
         if (!importErrors.isEmpty()) {
-            // TODO: Use VocabularyException
             throw new VocabularyException(RecordImport, importErrors, null,
                     params -> "Error(s) during tabular import:\n\t" + importErrors.stream().map(Throwable::getMessage).collect(Collectors.joining("\n\t")));
         }
