@@ -40,7 +40,7 @@ python3 -m venv vmenv
 . vmenv/bin/activate
 pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 VOC_PORT=$(sudo grep -oP '^server.port=\K.*' /opt/digiverso/vocabulary/application.properties)
-VOC_TOKEN=$(grep -oP '^security.token=\K.*' /opt/digiverso/vocabulary/application.properties)
+VOC_TOKEN=$(sudo grep -oP '^security.token=\K.*' /opt/digiverso/vocabulary/application.properties)
 DB_GOOBI_PW=$(sudo xmlstarlet sel -t -v '//Resource/@password' -n /etc/tomcat9/Catalina/localhost/goobi.xml)
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --vocabulary-server-token "${VOC_TOKEN}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
 ```
