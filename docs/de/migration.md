@@ -33,7 +33,7 @@ python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-se
 ```
 
 ### Skript
-Die obigen beiden Puntke, die virtuelle Python-Umgebung und die Migration der Vokabulardaten in einer typischen Installation:
+Die obigen beiden Puntke, die virtuelle Python-Umgebung und die Migration der Vokabulardaten in einer typischen Installation, als root:
 ```bash
 cd /opt/digiverso/vocabulary/migration
 python3 -m venv vmenv
@@ -43,6 +43,9 @@ VOC_PORT=$(sudo grep -oP '^server.port=\K.*' /opt/digiverso/vocabulary/applicati
 VOC_TOKEN=$(sudo grep -oP '^security.token=\K.*' /opt/digiverso/vocabulary/application.properties)
 DB_GOOBI_PW=$(sudo xmlstarlet sel -t -v '//Resource/@password' -n /etc/tomcat9/Catalina/localhost/goobi.xml)
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --vocabulary-server-token "${VOC_TOKEN}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
+
+# Test
+curl -s http://localhost:8081/api/v1/vocabularies --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.vocabularyList[] .name'
 ```
 
 **Hinweis** Ändern Sie die Parameter entsprechend Ihrer Konfiguration. Der Parameter `fallback-language` definiert die Standardsprache, die für ein mehrsprachiges Vokabularfeld verwendet wird, für das keine Standardsprache abgeleitet werden konnte. Die Option `continue-on-error` verhindert, dass das Migrationstool bei Fehlern bei der Datenmigration anhält. Diese Fehler können auftreten, wenn die Daten nicht in den neuen Vokabularserver eingefügt werden konnten. Mögliche Gründe dafür könnten sein:
