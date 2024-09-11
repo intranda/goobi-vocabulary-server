@@ -11,7 +11,7 @@ Sie müssen den `BASE_PART` auf `localhost:8081/api/v1` setzen, den Hostnamen un
 Ändern Sie nur die Teile `API_ENDPOINT` und `DATA`, abhängig von der Art der Abfrage, die Sie durchführen:
 
 ```bash
-curl -s --location "http://BASE_PART/API_ENDPOINT" --header 'Content-Type: application/json' --data "DATA"
+curl -s --location "http://BASE_PART/API_ENDPOINT" --header "Authorization: Bearer TOKEN" --header 'Content-Type: application/json' --data "DATA"
 ```
 
 Wenn Sie Fehler erhalten, werden die Fehlerinformationen als komplexe JSON-Objekte zurückgegeben.
@@ -89,7 +89,7 @@ Sie können genau den gleichen Feldtypen auch erreichen, indem Sie dies durch ei
 
 Wenn Sie es versäumt haben, die IDs zu speichern, können Sie den folgenden Befehl aufrufen, um alle vorhandenen Feldtypen mit ihren IDs abzurufen:
 ```bash
-curl -s --location "http://BASE_PART/types" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
+curl -s --location "http://BASE_PART/types" --header "Authorization: Bearer TOKEN" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
 
 *Bitte beachten Sie den fehlenden `--data` Parameter in diesem Aufruf.*

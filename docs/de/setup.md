@@ -101,9 +101,12 @@ journalctl -u vocabulary.service -f
 
 # initial set up
 wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/default_setup.sh -O - | sudo tee ${VOC_PATH}/default_setup.sh >/dev/null
+
+# edit credentials
+vim ${VOC_PATH}/default_setup.sh
 bash ${VOC_PATH}/default_setup.sh
 ## test
-curl -s http://localhost:${VOC_PORT}/api/v1/types | jq -r '._embedded.fieldTypeList[] .name'
+curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
 Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
 
@@ -114,7 +117,7 @@ Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass 
 - Ändern Sie für alle Befehle Host und Port entsprechend.
 - Prüfen Sie nach der Ersteinrichtung, ob die Feldtypen erfolgreich erstellt wurden:
 ```bash
-curl http://localhost:8081/api/v1/types | jq -r '._embedded.fieldTypeList[] .name'
+curl http://localhost:8081/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
 - Das Ergebnis sollte wie folgt aussehen:
 ```bash

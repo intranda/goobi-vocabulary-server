@@ -29,7 +29,7 @@ Detaillierte Anweisungen hierzu werden später gegeben.
 
 Wenn Sie keine Feldtypen erstellen wollen, können Sie die Datenmigration mit dem folgenden Befehl starten:
 ```bash
-python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
+python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --vocabulary-server-token TOKEN --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
 ```
 
 ### Skript
@@ -40,8 +40,9 @@ python3 -m venv vmenv
 . vmenv/bin/activate
 pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 VOC_PORT=$(sudo grep -oP '^server.port=\K.*' /opt/digiverso/vocabulary/application.properties)
+VOC_TOKEN=$(grep -oP '^security.token=\K.*' /opt/digiverso/vocabulary/application.properties)
 DB_GOOBI_PW=$(sudo xmlstarlet sel -t -v '//Resource/@password' -n /etc/tomcat9/Catalina/localhost/goobi.xml)
-python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
+python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --vocabulary-server-token "${VOC_TOKEN}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
 ```
 
 **Hinweis** Ändern Sie die Parameter entsprechend Ihrer Konfiguration. Der Parameter `fallback-language` definiert die Standardsprache, die für ein mehrsprachiges Vokabularfeld verwendet wird, für das keine Standardsprache abgeleitet werden konnte. Die Option `continue-on-error` verhindert, dass das Migrationstool bei Fehlern bei der Datenmigration anhält. Diese Fehler können auftreten, wenn die Daten nicht in den neuen Vokabularserver eingefügt werden konnten. Mögliche Gründe dafür könnten sein:
@@ -140,11 +141,11 @@ Diese Datei ordnet allen Datensatzwerten die entsprechende Datensatz-IDs im Refe
 ### Test der Vokabulardaten-Migration
 - Wenn eine Datenmigration stattgefunden hat, prüfen Sie, ob alle Vokabulare migriert wurden:
 ```bash
-curl -s http://localhost:8081/api/v1/vocabularies | jq -r '._embedded.vocabularyList[] .name'
+curl -s http://localhost:8081/api/v1/vocabularies --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.vocabularyList[] .name'
 ```
 - Prüfen Sie, ob die Links korrekt aufgelöst werden (siehe Konfiguration):
 ```bash
-curl http://localhost:8081/api/v1/records/1 | jq
+curl http://localhost:8081/api/v1/records/1 --header "Authorization: Bearer $VOC_TOKEN" | jq
 ```
 Das JSON-Element `_links` sollte Verweise auf andere Ressourcen enthalten.
 Diese URLs sollten gültig und auflösbar sein.
@@ -159,9 +160,9 @@ cd /opt/digiverso/vocabulary/migration
 sudo -s
 . vmenv/bin/activate
 # dry-run:
-python metadata-migrator.py --verbose --log INFO -m migration.csv -d /opt/digiverso/goobi/metadata --dry
+python metadata-migrator.py --vocabulary-server-token "${VOC_TOKEN}" --verbose --log INFO -m migration.csv -d /opt/digiverso/goobi/metadata --dry
 # metadata migration
-python metadata-migrator.py -m migration.csv -d /opt/digiverso/goobi/metadata
+python metadata-migrator.py --vocabulary-server-token "${VOC_TOKEN}" -m migration.csv -d /opt/digiverso/goobi/metadata
 ```
 
 Dadurch werden alle mets-Dateien in allen Prozessverzeichnissen rekursiv verarbeitet.
