@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-HOST='localhost:8081/api/v1'
-TOKEN='secret'
+HOST="localhost:${VOC_PORT:-8081}/api/v1"
+TOKEN="${VOC_TOKEN:-CHANGEME}"
 
 curl_call() {
   curl --location "$HOST/$1" --header 'Content-Type: application/json' --header "Authorization: Bearer $TOKEN" --data "$2"
@@ -49,3 +49,6 @@ create_type "dct:title"
 create_type "dct:creator"
 create_type "dct:created" "\\\\d{4}\\\\-\\\\d{2}\\\\-\\\\d{2}"
 create_type "dct:license" "https?.*"
+echo
+
+curl -s "${HOST}"/types --header "Authorization: Bearer $TOKEN" | jq -r '._embedded.fieldTypeList[] .name' | grep Anything -q || { echo "ERROR while executing $0"; exit 1; }
