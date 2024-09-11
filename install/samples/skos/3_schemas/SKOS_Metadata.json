@@ -1,0 +1,74 @@
+{
+    "definitions": [
+        {
+            "name": "Title",
+            "typeId": {{types_DCT_title}},
+            "required": true,
+            "unique": false,
+            "mainEntry": true,
+            "titleField": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Author",
+            "typeId": {{types_DCT_creator}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Creation Date",
+            "typeId": {{types_DCT_created}},
+            "required": true,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false
+        },
+        {
+            "name": "License",
+            "typeId": {{types_DCT_license}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        }
+    ],
+    "hierarchicalRecords": false,
+    "singleRootElement": true
+}

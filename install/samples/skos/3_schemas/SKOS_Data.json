@@ -1,0 +1,135 @@
+{
+    "definitions": [
+        {
+            "name": "Label",
+            "typeId": {{types_SKOS_prefLabel}},
+            "required": true,
+            "unique": false,
+            "mainEntry": true,
+            "titleField": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Alternative Label",
+            "typeId": {{types_SKOS_altLabel}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Definition",
+            "typeId": {{types_SKOS_definition}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Editorial Note",
+            "typeId": {{types_SKOS_editorialNote}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true,
+            "translationDefinitions": [
+                {
+                    "language": "eng",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "ger",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Related",
+            "typeId": {{types_SKOS_related}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
+            "name": "Close Match",
+            "typeId": {{types_SKOS_closeMatch}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
+            "name": "Exact Match",
+            "typeId": {{types_SKOS_exactMatch}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        }
+    ],
+    "hierarchicalRecords": true
+}

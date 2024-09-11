@@ -1,0 +1,38 @@
+{
+    "definitions": [
+        {
+            "name": "Name",
+            "typeId": {{types_Anything}},
+            "required": true,
+            "unique": true,
+            "mainEntry": true,
+            "titleField": true,
+            "translationDefinitions": [
+                {
+                    "language": "ger",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "eng",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "Color Code",
+            "typeId": {{types_Hex_RGB}},
+            "required": false,
+            "unique": true,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": false
+        }
+    ]
+}
