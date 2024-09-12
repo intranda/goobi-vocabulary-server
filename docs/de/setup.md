@@ -25,7 +25,9 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 - Führen Sie das Skript aus.
 
 ## Installationsskript
-Für die obigen drei Punkte unter Ubuntu:
+Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
+
+Für die obigen drei Punkte, unter Ubuntu:
 ```bash
 export VOC_PORT=8081
 export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
@@ -104,8 +106,6 @@ bash /tmp/default_setup.sh
 ## test
 curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
-
-Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
 
 ## Erreichbarkeit
 - Sie können den Vokabularserver von außen erreichbar machen, indem Sie einen Proxy samt Zugriffskontrolle davorschalten.
