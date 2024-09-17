@@ -116,8 +116,8 @@ pipeline {
     }
     stage('build and publish production image to GitHub container registry') {
       agent any
-      unstash 'target'
       steps {
+        unstash 'target'
         script {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
             dockerimage_public = docker.build("intranda/vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
