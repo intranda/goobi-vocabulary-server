@@ -37,6 +37,7 @@ pipeline {
       }
       steps {
         sh 'mvn clean verify -U -P snapshot-build'
+        stash includes: '**/target/*', name: 'target'
       }
     }
     stage('build-release') {
@@ -53,6 +54,7 @@ pipeline {
       }
       steps {
         sh 'mvn clean verify -U -P release-build'
+        stash includes: '**/target/*', name: 'target'
       }
     }
     /*stage('sonarcloud') {
@@ -112,7 +114,9 @@ pipeline {
         }
       }
     }
-    stage('publish production image to GitHub container registry') {
+    stage('build and publish production image to GitHub container registry') {
+      agent any
+      unstash 'target'
       steps {
         script {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
