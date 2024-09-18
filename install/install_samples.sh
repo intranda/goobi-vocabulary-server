@@ -44,6 +44,14 @@ curl_call() {
         --data "$2"
 }
 
+curl_file_upload_call() {
+    curl --location "$HOST:$PORT/api/v1/$1" \
+        --header "Authorization: Bearer $TOKEN" \
+        --fail \
+        --silent \
+        --form "file=@\"$2\""
+}
+
 for INSTALL_DIR in $(ls $SAMPLE_PATH); do
     ENDPOINT=$(echo $INSTALL_DIR | cut -d'_' -f2)
     echo "Installing $ENDPOINT"
@@ -51,8 +59,8 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
         ITEM_NAME=$(echo "$ITEM" | cut -d'.' -f1)
         ITEM_IDENTIFIER=${ENDPOINT}_"${ITEM_NAME}"
 
-        ID=$(cat $CACHE_FILE | grep $ITEM_IDENTIFIER | cut -d';' -f2)
-        if [ -z $ID ]; then
+        ID=$(cat $CACHE_FILE | grep "$ITEM_IDENTIFIER;" | cut -d';' -f2)
+        if [ -z "$ID" ]; then
             JSON=$(cat $SAMPLE_PATH/$INSTALL_DIR/$ITEM)
 
             # Replace ID placeholders
@@ -72,8 +80,36 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
             ID=$(echo $RESULT | jq ".id")
             echo "$ITEM_IDENTIFIER;$ID" >> $CACHE_FILE
             echo -e "\tInstalled $ITEM_NAME with ID $ID"
+
+            if [ $ENDPOINT = "schemas" ]; then
+                echo $RESULT | jq -r ".definitions[] | \"${ITEM_IDENTIFIER}_definitions_\(.name);\(.id)\"" >> $CACHE_FILE
+            fi
         else
             echo -e "\tSkipping $ITEM_NAME, already present with ID $ID"
+        fi
+    done
+    for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".csv"); do
+        VOCABULARY_NAME=$(echo "$ITEM" | cut -d'.' -f1)
+        VOCABULARY_IDENTIFIER=vocabularies_${VOCABULARY_NAME}
+        VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
+
+        if [ ! -z "$VOCABULARY_ID" ]; then
+            curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/csv" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
+            echo -e "\tImported \"$VOCABULARY_NAME\" vocabulary records"
+        else
+            echo -e "\tSkipping record imports into \"$VOCABULARY_NAME\" vocabulary, vocabulary not created beforehand!"
+        fi
+    done
+    for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".xlsx"); do
+        VOCABULARY_NAME=$(echo "$ITEM" | cut -d'.' -f1)
+        VOCABULARY_IDENTIFIER=vocabularies_${VOCABULARY_NAME}
+        VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
+
+        if [ ! -z "$VOCABULARY_ID" ]; then
+            curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/excel" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
+            echo -e "\tImported \"$VOCABULARY_NAME\" vocabulary records"
+        else
+            echo -e "\tSkipping record imports into \"$VOCABULARY_NAME\" vocabulary, vocabulary not created beforehand!"
         fi
     done
 done

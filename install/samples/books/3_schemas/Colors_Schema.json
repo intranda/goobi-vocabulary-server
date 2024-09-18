@@ -26,7 +26,7 @@
             ]
         },
         {
-            "name": "Color Code",
+            "name": "Farbcode",
             "typeId": {{types_Hex_RGB}},
             "required": false,
             "unique": true,
