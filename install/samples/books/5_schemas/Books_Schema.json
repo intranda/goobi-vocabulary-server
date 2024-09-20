@@ -5,7 +5,7 @@
             "typeId": {{types_Number}},
             "required": true,
             "unique": true,
-            "mainEntry": true,
+            "mainEntry": false,
             "titleField": false
         },
         {
@@ -13,7 +13,7 @@
             "typeId": {{types_Anything}},
             "required": true,
             "unique": true,
-            "mainEntry": false,
+            "mainEntry": true,
             "titleField": true,
             "translationDefinitions": [
                 {
@@ -32,6 +32,22 @@
                     "required": false
                 }
             ]
+        },
+        {
+            "name": "ISBN",
+            "typeId": {{types_ISBN13}},
+            "required": true,
+            "unique": true,
+            "mainEntry": false,
+            "titleField": false
+        },
+        {
+            "name": "Veröffentlichung",
+            "typeId": {{types_Date}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false
         },
         {
             "name": "Autoren",
