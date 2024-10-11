@@ -33,6 +33,19 @@ pipeline {
       steps {
         sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P snapshot-build'
+        junit "**/target/surefire-reports/*.xml"
+        step([
+          $class           : 'JacocoPublisher',
+          execPattern      : 'target/jacoco.exec',
+          classPattern     : 'target/classes/',
+          sourcePattern    : 'src/main/java',
+          exclusionPattern : '**/*Test.class'
+        ])
+        recordIssues (
+          enabledForFailure: true, aggregatingResults: false,
+          tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+        )
+        archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
         stash includes: '**/target/*', name: 'target'
       }
     }
@@ -60,6 +73,19 @@ pipeline {
       steps {
         sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P release-build'
+        junit "**/target/surefire-reports/*.xml"
+        step([
+          $class           : 'JacocoPublisher',
+          execPattern      : 'target/jacoco.exec',
+          classPattern     : 'target/classes/',
+          sourcePattern    : 'src/main/java',
+          exclusionPattern : '**/*Test.class'
+        ])
+        recordIssues (
+          enabledForFailure: true, aggregatingResults: false,
+          tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+        )
+        archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
         stash includes: '**/target/*', name: 'target'
       }
     }
@@ -154,23 +180,6 @@ pipeline {
     }
   }
   post {
-    always {
-      junit "**/target/surefire-reports/*.xml"
-      step([
-        $class           : 'JacocoPublisher',
-        execPattern      : 'target/jacoco.exec',
-        classPattern     : 'target/classes/',
-        sourcePattern    : 'src/main/java',
-        exclusionPattern : '**/*Test.class'
-      ])
-      recordIssues (
-        enabledForFailure: true, aggregatingResults: false,
-        tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
-      )
-    }
-    success {
-      archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
-    }
     changed {
       emailext(
         subject: '${DEFAULT_SUBJECT}',
