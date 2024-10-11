@@ -9,7 +9,6 @@ ENV VOCABULARY_SERVER_PORT 8081
 
 RUN mkdir -p /opt/digiverso/vocabulary
 COPY module-core/target/vocabulary-server-core.jar /opt/digiverso/vocabulary/
-COPY module-core/target/application.properties /opt/digiverso/vocabulary/
 COPY module-core/src/main/resources/application.properties /opt/digiverso/vocabulary/
 RUN sed -re "s|^(server.port=).*|\1${VOCABULARY_SERVER_PORT}|" \
      -e "s|^(#?security.token=).*|\1${VOCABULARY_SERVER_TOKEN}|" \
