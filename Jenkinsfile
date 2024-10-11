@@ -1,6 +1,5 @@
 pipeline {
   agent none
-  }
 
   options {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '15', daysToKeepStr: '90', numToKeepStr: '')
@@ -121,7 +120,7 @@ pipeline {
           branch 'hotfix_release_*'
         }
       }
-      unstash target
+      unstash 'target'
       steps {
         withCredentials([gitUsernamePassword(credentialsId: '93f7e7d3-8f74-4744-a785-518fc4d55314',
                  gitToolName: 'git-tool')]) {
