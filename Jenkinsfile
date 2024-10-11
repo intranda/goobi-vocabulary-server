@@ -36,14 +36,14 @@ pipeline {
         junit "**/target/surefire-reports/*.xml"
         step([
           $class           : 'JacocoPublisher',
-          execPattern      : 'target/jacoco.exec',
-          classPattern     : 'target/classes/',
+          execPattern      : '**/target/jacoco.exec',
+          classPattern     : '**/target/classes/',
           sourcePattern    : 'src/main/java',
           exclusionPattern : '**/*Test.class'
         ])
         recordIssues (
           enabledForFailure: true, aggregatingResults: false,
-          tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+          tools: [checkStyle(pattern: '**/target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
         )
         archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
         stash includes: '**/target/*', name: 'target'
@@ -76,14 +76,14 @@ pipeline {
         junit "**/target/surefire-reports/*.xml"
         step([
           $class           : 'JacocoPublisher',
-          execPattern      : 'target/jacoco.exec',
-          classPattern     : 'target/classes/',
+          execPattern      : '**/target/jacoco.exec',
+          classPattern     : '**/target/classes/',
           sourcePattern    : 'src/main/java',
           exclusionPattern : '**/*Test.class'
         ])
         recordIssues (
           enabledForFailure: true, aggregatingResults: false,
-          tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+          tools: [checkStyle(pattern: '**/target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
         )
         archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
         stash includes: '**/target/*', name: 'target'
