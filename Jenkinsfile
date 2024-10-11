@@ -120,7 +120,7 @@ pipeline {
         unstash 'target'
         script {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
-            dockerimage_public = docker.build("intranda/vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
+            dockerimage_public = docker.build("intranda/goobi-vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
             dockerimage_public.push("latest")
           }
         }
