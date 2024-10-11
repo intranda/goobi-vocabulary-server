@@ -99,8 +99,8 @@ pipeline {
         branch 'hotfix_release_*'
         }
       }
-      unstash 'target'
       steps {
+        unstash 'target'
         sh 'mvn -f module-exchange/pom.xml deploy -U'
       }
     }
@@ -120,8 +120,8 @@ pipeline {
           branch 'hotfix_release_*'
         }
       }
-      unstash 'target'
       steps {
+        unstash 'target'
         withCredentials([gitUsernamePassword(credentialsId: '93f7e7d3-8f74-4744-a785-518fc4d55314',
                  gitToolName: 'git-tool')]) {
           sh '''#!/bin/bash -xe
