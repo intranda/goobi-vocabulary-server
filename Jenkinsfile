@@ -1,13 +1,5 @@
 pipeline {
-
-  agent {
-    docker {
-      /* using a custom build image with a defined home directory for UID 1000 among other things */
-      image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
-      registryUrl 'https://nexus.intranda.com:4443'
-      registryCredentialsId 'jenkins-docker'
-      args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
-    }
+  agent none
   }
 
   options {
@@ -16,12 +8,16 @@ pipeline {
   }
 
   stages {
-    stage('prepare') {
-      steps {
-        sh 'git reset --hard HEAD && git clean -fdx'
-      }
-    }
     stage('build-snapshot') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         not {
           anyOf {
@@ -36,11 +32,21 @@ pipeline {
         }
       }
       steps {
+        sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P snapshot-build'
         stash includes: '**/target/*', name: 'target'
       }
     }
     stage('build-release') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
           branch 'master'
@@ -53,6 +59,7 @@ pipeline {
         }
       }
       steps {
+        sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P release-build'
         stash includes: '**/target/*', name: 'target'
       }
@@ -77,6 +84,15 @@ pipeline {
       }
     }*/
     stage('deploy') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
         branch 'master'
@@ -84,17 +100,28 @@ pipeline {
         branch 'hotfix_release_*'
         }
       }
+      unstash 'target'
       steps {
         sh 'mvn -f module-exchange/pom.xml deploy -U'
       }
     }
     stage('tag release') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
           branch 'master'
           branch 'hotfix_release_*'
         }
       }
+      unstash target
       steps {
         withCredentials([gitUsernamePassword(credentialsId: '93f7e7d3-8f74-4744-a785-518fc4d55314',
                  gitToolName: 'git-tool')]) {
