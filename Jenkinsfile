@@ -163,6 +163,9 @@ pipeline {
               echo "${projectversion}"
               git tag -a "v${projectversion}" -m "releasing v${projectversion}" && git push origin v"${projectversion}"
           '''
+          script {
+            latestTag = sh(returnStdout: true, script:'git describe --tags --abbrev=0').trim()
+          }
         }
       }
     }
@@ -174,6 +177,9 @@ pipeline {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
             dockerimage_public = docker.build("intranda/goobi-vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
             dockerimage_public.push("develop")
+            if (!latestTag == '' ) {
+              dockerimage_public.push(latestTag)
+            }
           }
         }
       }
