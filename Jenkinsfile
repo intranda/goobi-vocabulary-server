@@ -1,3 +1,4 @@
+def latestTag = ''
 pipeline {
   agent none
 
