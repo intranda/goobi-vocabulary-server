@@ -177,7 +177,9 @@ pipeline {
         script {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
             dockerimage_public = docker.build("intranda/goobi-vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
-            dockerimage_public.push("develop")
+            if (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop') {
+              dockerimage_public.push("develop")
+            }
             if (!latestTag == '' ) {
               dockerimage_public.push(latestTag)
             }
