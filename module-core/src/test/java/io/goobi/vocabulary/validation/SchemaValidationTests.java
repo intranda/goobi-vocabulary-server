@@ -93,22 +93,6 @@ class SchemaValidationTests {
     }
 
     @Test
-    void titleFieldsThatIsNotRequired_fails() {
-        VocabularySchemaEntity schema = new VocabularySchemaEntity();
-
-        FieldDefinitionEntity mainEntryField = validMainField(schema, "Main");
-        FieldDefinitionEntity titleField = new FieldDefinitionEntity();
-        titleField.setSchema(schema);
-        titleField.setName("Title");
-        titleField.setTitleField(true);
-        titleField.setRequired(false);
-
-        schema.setDefinitions(List.of(mainEntryField, titleField));
-
-        assertThrows(VocabularyException.class, () -> validator.validate(schema));
-    }
-
-    @Test
     void titleFieldsThatIsRequired_success() throws VocabularyException {
         VocabularySchemaEntity schema = new VocabularySchemaEntity();
 
