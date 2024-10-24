@@ -90,7 +90,7 @@ public class FieldDefinitionEntity {
             return false;
         }
         FieldDefinitionEntity that = (FieldDefinitionEntity) o;
-        return id != that.id;
+        return id == that.id;
     }
 
     @Override
