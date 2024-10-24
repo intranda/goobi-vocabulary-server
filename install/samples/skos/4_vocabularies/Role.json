@@ -1,0 +1,6 @@
+{
+    "schemaId": {{schemas_SKOS_Data}},
+    "metadataSchemaId": {{schemas_SKOS_Metadata}},
+    "name": "Role",
+    "description": "An example SKOS vocabulary."
+}

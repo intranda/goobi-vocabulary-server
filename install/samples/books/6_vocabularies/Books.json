@@ -1,0 +1,5 @@
+{
+    "schemaId": {{schemas_Books_Schema}},
+    "name": "Bücher",
+    "description": "Buchdatenbank."
+}

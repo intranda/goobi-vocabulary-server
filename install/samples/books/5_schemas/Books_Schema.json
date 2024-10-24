@@ -1,0 +1,98 @@
+{
+    "definitions": [
+        {
+            "name": "Buch-ID",
+            "typeId": {{types_Number}},
+            "required": true,
+            "unique": true,
+            "mainEntry": false,
+            "titleField": false
+        },
+        {
+            "name": "Name",
+            "typeId": {{types_Anything}},
+            "required": true,
+            "unique": true,
+            "mainEntry": true,
+            "titleField": true,
+            "translationDefinitions": [
+                {
+                    "language": "ger",
+                    "fallback": true,
+                    "required": true
+                },
+                {
+                    "language": "eng",
+                    "fallback": false,
+                    "required": false
+                },
+                {
+                    "language": "fre",
+                    "fallback": false,
+                    "required": false
+                }
+            ]
+        },
+        {
+            "name": "ISBN",
+            "typeId": {{types_ISBN13}},
+            "required": true,
+            "unique": true,
+            "mainEntry": false,
+            "titleField": false
+        },
+        {
+            "name": "Veröffentlichung",
+            "typeId": {{types_Date}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false
+        },
+        {
+            "name": "Autoren",
+            "referenceVocabularyId": {{vocabularies_Authors}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": true
+        },
+        {
+            "name": "Buchfarbe",
+            "referenceVocabularyId": {{vocabularies_Colors}},
+            "required": true,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": true,
+            "multiValued": false
+        },
+        {
+            "name": "Standort",
+            "referenceVocabularyId": {{vocabularies_Locations}},
+            "required": true,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": true,
+            "multiValued": false
+        },
+        {
+            "name": "Beschreibung",
+            "typeId": {{types_Large_Text}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": false
+        },
+        {
+            "name": "Ausgeliehen",
+            "typeId": {{types_Yes_No}},
+            "required": true,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": false
+        }
+    ]
+}

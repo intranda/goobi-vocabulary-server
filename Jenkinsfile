@@ -1,14 +1,6 @@
+def latestTag = ''
 pipeline {
-
-  agent {
-    docker {
-      /* using a custom build image with a defined home directory for UID 1000 among other things */
-      image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
-      registryUrl 'https://nexus.intranda.com:4443'
-      registryCredentialsId 'jenkins-docker'
-      args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
-    }
-  }
+  agent none
 
   options {
     buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '15', daysToKeepStr: '90', numToKeepStr: '')
@@ -16,12 +8,16 @@ pipeline {
   }
 
   stages {
-    stage('prepare') {
-      steps {
-        sh 'git reset --hard HEAD && git clean -fdx'
-      }
-    }
     stage('build-snapshot') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         not {
           anyOf {
@@ -36,10 +32,34 @@ pipeline {
         }
       }
       steps {
+        sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P snapshot-build'
+        junit "**/target/surefire-reports/*.xml"
+        step([
+          $class           : 'JacocoPublisher',
+          execPattern      : '**/target/jacoco.exec',
+          classPattern     : '**/target/classes/',
+          sourcePattern    : 'src/main/java',
+          exclusionPattern : '**/*Test.class'
+        ])
+        recordIssues (
+          enabledForFailure: true, aggregatingResults: false,
+          tools: [checkStyle(pattern: '**/target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+        )
+        archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
+        stash includes: '**/target/*', name: 'target'
       }
     }
     stage('build-release') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
           branch 'master'
@@ -52,7 +72,22 @@ pipeline {
         }
       }
       steps {
+        sh 'git reset --hard HEAD && git clean -fdx'
         sh 'mvn clean verify -U -P release-build'
+        junit "**/target/surefire-reports/*.xml"
+        step([
+          $class           : 'JacocoPublisher',
+          execPattern      : '**/target/jacoco.exec',
+          classPattern     : '**/target/classes/',
+          sourcePattern    : 'src/main/java',
+          exclusionPattern : '**/*Test.class'
+        ])
+        recordIssues (
+          enabledForFailure: true, aggregatingResults: false,
+          tools: [checkStyle(pattern: '**/target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
+        )
+        archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
+        stash includes: '**/target/*', name: 'target'
       }
     }
     /*stage('sonarcloud') {
@@ -75,6 +110,15 @@ pipeline {
       }
     }*/
     stage('deploy') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
         branch 'master'
@@ -83,10 +127,20 @@ pipeline {
         }
       }
       steps {
+        unstash 'target'
         sh 'mvn -f module-exchange/pom.xml deploy -U'
       }
     }
     stage('tag release') {
+      agent {
+        docker {
+          /* using a custom build image with a defined home directory for UID 1000 among other things */
+          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          registryUrl 'https://nexus.intranda.com:4443'
+          registryCredentialsId 'jenkins-docker'
+          args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
+        }
+      }
       when {
         anyOf {
           branch 'master'
@@ -94,6 +148,7 @@ pipeline {
         }
       }
       steps {
+        unstash 'target'
         withCredentials([gitUsernamePassword(credentialsId: '93f7e7d3-8f74-4744-a785-518fc4d55314',
                  gitToolName: 'git-tool')]) {
           sh '''#!/bin/bash -xe
@@ -109,28 +164,31 @@ pipeline {
               echo "${projectversion}"
               git tag -a "v${projectversion}" -m "releasing v${projectversion}" && git push origin v"${projectversion}"
           '''
+          script {
+            latestTag = sh(returnStdout: true, script:'git describe --tags --abbrev=0').trim()
+          }
+        }
+      }
+    }
+    stage('build and publish production image to GitHub container registry') {
+      agent any
+      steps {
+        unstash 'target'
+        script {
+          docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
+            dockerimage_public = docker.build("intranda/goobi-vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
+            if (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop') {
+              dockerimage_public.push("develop")
+            }
+            if (!latestTag == '' ) {
+              dockerimage_public.push(latestTag)
+            }
+          }
         }
       }
     }
   }
   post {
-    always {
-      junit "**/target/surefire-reports/*.xml"
-      step([
-        $class           : 'JacocoPublisher',
-        execPattern      : 'target/jacoco.exec',
-        classPattern     : 'target/classes/',
-        sourcePattern    : 'src/main/java',
-        exclusionPattern : '**/*Test.class'
-      ])
-      recordIssues (
-        enabledForFailure: true, aggregatingResults: false,
-        tools: [checkStyle(pattern: 'target/checkstyle-result.xml', reportEncoding: 'UTF-8')]
-      )
-    }
-    success {
-      archiveArtifacts artifacts: 'module-*/target/*.jar, install/*, module-core/src/main/resources/application.properties, migration/**', fingerprint: true
-    }
     changed {
       emailext(
         subject: '${DEFAULT_SUBJECT}',

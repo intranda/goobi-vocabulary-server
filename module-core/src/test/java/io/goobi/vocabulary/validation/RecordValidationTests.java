@@ -32,6 +32,7 @@ class RecordValidationTests {
     private VocabularyEntity vocabulary;
     private FieldTypeEntity ftText;
     private FieldDefinitionEntity fdName;
+    private FieldDefinitionEntity fdOther;
 
 
     @BeforeEach
@@ -47,6 +48,7 @@ class RecordValidationTests {
         vocabulary.setName("Test vocabulary");
 
         fdName = new FieldDefinitionEntity();
+        fdName.setId(1L);
         fdName.setSchema(schema);
         fdName.setName("Name");
         fdName.setType(ftText);
@@ -55,13 +57,37 @@ class RecordValidationTests {
         fdName.setUnique(true);
         fdName.setRequired(true);
 
-        schema.setDefinitions(List.of(fdName));
+        fdOther = new FieldDefinitionEntity();
+        fdOther.setId(2L);
+        fdOther.setSchema(schema);
+        fdOther.setName("Other");
+        fdOther.setType(ftText);
+        fdOther.setMainEntry(false);
+        fdOther.setTitleField(true);
+        fdOther.setUnique(false);
+        fdOther.setRequired(true);
+
+        schema.setDefinitions(List.of(fdName, fdOther));
     }
 
     @Test
-    void missingRequiredField_fails() {
+    void missingAllRequiredFields_fails() {
         VocabularyRecordEntity record = new VocabularyRecordEntity();
         record.setVocabulary(vocabulary);
+
+        assertThrows(VocabularyException.class, () -> validator.validate(record));
+    }
+
+    @Test
+    void missingOneRequiredField_fails() {
+        VocabularyRecordEntity record = new VocabularyRecordEntity();
+        record.setVocabulary(vocabulary);
+
+        FieldInstanceEntity name = new FieldInstanceEntity();
+        name.setVocabularyRecord(record);
+        name.setDefinition(fdName);
+
+        record.setFields(List.of(name));
 
         assertThrows(VocabularyException.class, () -> validator.validate(record));
     }
@@ -129,15 +155,23 @@ class RecordValidationTests {
         parentNameField.setId(1L);
         parentNameField.setDefinition(fdName);
         parentNameField.setVocabularyRecord(parent);
-        parent.setFields(List.of(parentNameField));
+        FieldInstanceEntity parentOtherField = new FieldInstanceEntity();
+        parentOtherField.setId(2L);
+        parentOtherField.setDefinition(fdOther);
+        parentOtherField.setVocabularyRecord(parent);
+        parent.setFields(List.of(parentNameField, parentOtherField));
 
         VocabularyRecordEntity child = new VocabularyRecordEntity();
         child.setVocabulary(vocabulary);
         FieldInstanceEntity childNameField = new FieldInstanceEntity();
-        childNameField.setId(2L);
+        childNameField.setId(3L);
         childNameField.setDefinition(fdName);
         childNameField.setVocabularyRecord(child);
-        child.setFields(List.of(childNameField));
+        FieldInstanceEntity childOtherField = new FieldInstanceEntity();
+        childOtherField.setId(4L);
+        childOtherField.setDefinition(fdOther);
+        childOtherField.setVocabularyRecord(child);
+        child.setFields(List.of(childNameField, childOtherField));
         child.setParentRecord(parent);
         parent.setChildren(List.of(child));
 

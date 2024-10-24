@@ -1,0 +1,5 @@
+{
+    "schemaId": {{schemas_Names}},
+    "name": "Standorte",
+    "description": "Liste aller Standorte an denen Bücher verwaltet werden."
+}
