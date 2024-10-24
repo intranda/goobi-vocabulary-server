@@ -69,8 +69,6 @@ class FieldDefinition(dict):
                     logging.warning(f'Fallback language {fallback_language} is not defined for field definition:\n{self.__str__()}')
                 fallback_translations[0]['fallback'] = True
                 fallback_translations[0]['required'] = True
-        if self['titleField']:
-            self['required'] = True
         if self['mainEntry']:
             self['required'] = True
     

@@ -28,7 +28,6 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
                 this::checkFieldDefinitionExistence,
                 this::checkSingleMainFieldDefinition,
                 this::checkMainFieldIsRequired,
-                this::checkTitleFieldsAreRequired,
                 this::perFieldDefinitionChecks
         ));
     }
@@ -67,20 +66,6 @@ public class SchemaValidatorImpl extends BaseValidator<VocabularySchemaEntity> {
                             .collect(Collectors.joining(",")))
             ),
                     params -> "The main field needs to be set required: " + params.get("mainFieldNames"));
-        }
-    }
-
-    private void checkTitleFieldsAreRequired(VocabularySchemaEntity schema) throws VocabularyException {
-        List<String> titleFieldsThatAreNotRequired = schema.getDefinitions().stream()
-                .filter(d -> Boolean.TRUE.equals(d.isTitleField()))
-                .filter(d -> Boolean.FALSE.equals(d.isRequired()))
-                .map(FieldDefinitionEntity::getName)
-                .collect(Collectors.toList());
-        if (!titleFieldsThatAreNotRequired.isEmpty()) {
-            throw new VocabularyException(SchemaValidationTitleFieldsAreNotRequired, null, Map.of(
-                    "titleFieldNames", String.join(",", titleFieldsThatAreNotRequired)
-            ),
-                    params -> "Title fields need to be required: " + params.get("titleFieldNames"));
         }
     }
 
