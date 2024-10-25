@@ -16,7 +16,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Table(name = "selectable_value")
 @Getter
 @Setter
-public class SelectableValueEntity {
+public class SelectableValueEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

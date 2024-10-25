@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "field_type")
 @Getter
 @Setter
-public class FieldTypeEntity {
+public class FieldTypeEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

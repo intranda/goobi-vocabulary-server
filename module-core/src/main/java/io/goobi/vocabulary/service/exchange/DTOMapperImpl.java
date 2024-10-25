@@ -1,6 +1,5 @@
 package io.goobi.vocabulary.service.exchange;
 
-import io.goobi.vocabulary.api.assemblers.RecordAssembler;
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.MissingAttributeException;
 import io.goobi.vocabulary.exchange.FieldDefinition;

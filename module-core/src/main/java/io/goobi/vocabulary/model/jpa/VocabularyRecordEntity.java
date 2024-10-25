@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 // Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
-public class VocabularyRecordEntity {
+public class VocabularyRecordEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

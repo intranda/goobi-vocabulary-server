@@ -20,7 +20,7 @@ import org.hibernate.proxy.HibernateProxy;
         })
 @Getter
 @Setter
-public class TranslationDefinitionEntity {
+public class TranslationDefinitionEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
