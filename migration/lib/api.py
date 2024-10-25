@@ -31,6 +31,9 @@ SCHEMA_LOOKUP = 9
 
 class API:
     def __init__(self, host, port, token):
+        self.host = host
+        self.port = port
+        self.token = token
         self.urls = {}
         self.urls[SCHEMA_INSERTION] = SCHEMA_INSERTION_URL
         self.urls[VOCABULARY_INSERTION] = VOCABULARY_INSERTION_URL
