@@ -20,7 +20,7 @@ import java.util.List;
 @Table(name = "vocabulary")
 @Getter
 @Setter
-public class VocabularyEntity {
+public class VocabularyEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

@@ -14,7 +14,6 @@ import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.Schema
 import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationMainFieldIsNotRequired;
 import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationMissingMainField;
 import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationNoDefinitions;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationTitleFieldsAreNotRequired;
 import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.SchemaValidationTooManyMainFields;
 
 @Service

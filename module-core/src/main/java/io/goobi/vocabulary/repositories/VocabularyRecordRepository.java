@@ -4,13 +4,13 @@ import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface VocabularyRecordRepository extends CrudRepository<VocabularyRecordEntity, Long> {
+public interface VocabularyRecordRepository extends ListCrudRepository<VocabularyRecordEntity, Long> {
     @Override
     Optional<VocabularyRecordEntity> findById(Long aLong);
 

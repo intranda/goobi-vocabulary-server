@@ -14,7 +14,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Table(name = "language")
 @Getter
 @Setter
-public class LanguageEntity {
+public class LanguageEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

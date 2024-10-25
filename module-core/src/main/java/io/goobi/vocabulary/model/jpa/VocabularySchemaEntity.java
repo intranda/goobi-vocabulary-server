@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "vocabulary_schema")
 @Getter
 @Setter
-public class VocabularySchemaEntity {
+public class VocabularySchemaEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

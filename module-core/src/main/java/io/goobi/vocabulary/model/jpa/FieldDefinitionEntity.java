@@ -26,7 +26,7 @@ import java.util.List;
         })
 @Getter
 @Setter
-public class FieldDefinitionEntity {
+public class FieldDefinitionEntity implements Identifiable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

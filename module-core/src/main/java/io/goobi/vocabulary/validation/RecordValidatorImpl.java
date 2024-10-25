@@ -67,7 +67,7 @@ public class RecordValidatorImpl extends BaseValidator<VocabularyRecordEntity> {
                             .map(FieldDefinitionEntity::getName)
                             .collect(Collectors.joining(","))
             ),
-                    params -> "Missing required fields: " + params.get("missingFields")
+                    params -> "Missing required fields: " + params.get("missingFieldNames")
             );
         }
     }
