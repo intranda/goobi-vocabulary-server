@@ -86,7 +86,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable vocabulary.service
 
 # create and configure the database
-sudo mysql -e "CREATE DATABASE ${VOC_SQL_DB};
+sudo mysql -e "CREATE DATABASE ${VOC_SQL_DB} CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
                CREATE USER '${VOC_SQL_USER}'@'localhost' IDENTIFIED BY '${PW_SQL_VOC}';
                GRANT ALL PRIVILEGES ON ${VOC_SQL_DB}.* TO '${VOC_SQL_USER}'@'localhost' WITH GRANT OPTION;
                FLUSH PRIVILEGES;"
