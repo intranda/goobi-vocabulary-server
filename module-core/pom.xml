@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-core</artifactId>
-    <version>1.1.6</version>
+    <version>1.1.7</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
@@ -20,13 +20,22 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- Manifest information -->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <buildDate>${maven.build.timestamp}</buildDate>
+
+        <!-- Library versions -->
         <poi.version>5.2.5</poi.version>
     </properties>
+    <scm>
+        <url>scm:git:https://github.com/intranda/goobi-vocabulary-server</url>
+        <connection>scm:git:https://github.com/intranda/goobi-vocabulary-server</connection>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>io.goobi.vocabulary</groupId>
             <artifactId>vocabulary-server-exchange</artifactId>
-            <version>1.1.6</version>
+            <version>1.1.7</version>
             <scope>compile</scope>
         </dependency>
 
@@ -161,6 +170,41 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <!-- MANIFEST -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shortRevisionLength>7</shortRevisionLength>
+                    <doCheck>false</doCheck>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Application-Name>${project.name}</Application-Name>
+                            <Build-Date>${buildDate}</Build-Date>
+                            <Version>${project.version}</Version>
+                            <Revision>${buildNumber}</Revision>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <!-- MANIFEST -->
 
             <!-- COMPILATION -->
             <plugin>
