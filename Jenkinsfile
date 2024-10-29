@@ -172,11 +172,21 @@ pipeline {
     }
     stage('build and publish production image to GitHub container registry') {
       agent any
+      when {
+        anyOf {
+          branch 'master'
+          branch 'develop'
+          branch 'hotfix_release_*'
+        }
+      }
       steps {
         unstash 'target'
         script {
           docker.withRegistry('https://ghcr.io','jenkins-github-container-registry') {
             dockerimage_public = docker.build("intranda/goobi-vocabulary-server:${env.BUILD_ID}_${env.GIT_COMMIT}")
+            if (env.GIT_BRANCH == 'origin/master' || env.GIT_BRANCH == 'master') {
+              dockerimage_public.push("latest")
+            }
             if (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop') {
               dockerimage_public.push("develop")
             }
