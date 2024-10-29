@@ -2,19 +2,21 @@ import logging
 import datetime
 import shutil
 from lxml import etree as ET
+import sys
 import re
 
-VOCABULARY_ENDPOINT = 'http://localhost:8081/api/v1/vocabularies/{{ID}}'
-RECORD_ENDPOINT = 'http://localhost:8081/api/v1/records/{{ID}}'
-
-VOCABULARY_URI_REGEX = re.compile(VOCABULARY_ENDPOINT.replace('{{ID}}', '\\d+'))
-RECORD_URI_REGEX = re.compile(RECORD_ENDPOINT.replace('{{ID}}', '\\d+'))
+VOCABULARY_ENDPOINT = 'http://{{HOST}}:{{PORT}}/api/v1/vocabularies/{{ID}}'
+RECORD_ENDPOINT = 'http://{{HOST}}:{{PORT}}/api/v1/records/{{ID}}'
 
 class MetsManipulator:
     def __init__(self, ctx, file_path):
         self.ctx = ctx
         self.file_path = file_path
         self.changed = False
+        self.vocabulary_endpoint = VOCABULARY_ENDPOINT.replace('{{HOST}}', ctx.api.host).replace('{{PORT}}', ctx.api.port)
+        self.record_endpoint = RECORD_ENDPOINT.replace('{{HOST}}', ctx.api.host).replace('{{PORT}}', ctx.api.port)
+        self.vocabulary_uri_regex = re.compile(self.vocabulary_endpoint.replace('{{ID}}', '\\d+'))
+        self.record_uri_regex = re.compile(self.record_endpoint.replace('{{ID}}', '\\d+'))
 
     def process(self):
         logging.debug(f'Processing mets file {self.file_path}')
@@ -56,7 +58,13 @@ class MetsManipulator:
         return self.ctx.manual_id_fix != None and node.tag.endswith('metadata') and 'name' in node.attrib and node.attrib['name'] == self.ctx.manual_id_fix
     
     def is_already_migrated(self, node):
-        return re.match(VOCABULARY_URI_REGEX, node.attrib['authorityURI']) != None and re.match(RECORD_URI_REGEX, node.attrib['valueURI']) != None
+        return re.match(self.vocabulary_uri_regex, node.attrib['authorityURI']) != None and re.match(self.record_uri_regex, node.attrib['valueURI']) != None
+
+    def generate_vocabulary_uri(self, vocabulary_id):
+        return self.vocabulary_endpoint.replace('{{ID}}', str(vocabulary_id))
+
+    def generate_record_uri(self, record_id):
+        return self.record_endpoint.replace('{{ID}}', str(record_id))
 
     def process_vocabulary_reference(self, node):
         try:
@@ -98,24 +106,26 @@ class MetsManipulator:
             if vocabulary_id_new == None or record_id_new == None:
                 raise Exception(f'Unable to read old IDs from mets')
 
-            record_data = self.ctx.api.lookup_record(record_id_new)
-            main_field_id = self.ctx.find_main_field_id_for_vocabulary(record_data['vocabularyId'])
-            main_field_data = [f for f in record_data['fields'] if f['definitionId'] == main_field_id]
-            if len(main_field_data) != 1:
-                logging.critical(f'Record [{record_id_new}] has no unique main entry field')
-                sys.exit(1)
+            if not self.is_manual_id_reference(node):
+                record_data = self.ctx.api.lookup_record(record_id_new)
 
-            # Replace node text if not matching any translation of main value
-            translated_main_values = self.ctx.extract_language_values(main_field_data[0])
-            if not self.ctx.record_contains_value(record_data, node.text.strip()):
-                node.text = self.ctx.extract_preferred_language(translated_main_values)
+                main_field_id = self.ctx.find_main_field_id_for_vocabulary(record_data['vocabularyId'])
+                main_field_data = [f for f in record_data['fields'] if f['definitionId'] == main_field_id]
+                if len(main_field_data) != 1:
+                    logging.critical(f'Record [{record_id_new}] has no unique main entry field')
+                    sys.exit(1)
+
+                # Replace node text if not matching any translation of main value
+                translated_main_values = self.ctx.extract_language_values(main_field_data[0])
+                if not self.ctx.record_contains_value(record_data, node.text.strip()):
+                    node.text = self.ctx.extract_preferred_language(translated_main_values)
 
             vocabulary_name = self.ctx.lookup_vocabulary_name(vocabulary_id_new)
 
             # Set all attributes accordingly
             node.attrib['authority'] = vocabulary_name
-            node.attrib['authorityURI'] = generate_vocabulary_uri(vocabulary_id_new)
-            node.attrib['valueURI'] = generate_record_uri(record_id_new)
+            node.attrib['authorityURI'] = self.generate_vocabulary_uri(vocabulary_id_new)
+            node.attrib['valueURI'] = self.generate_record_uri(record_id_new)
 
             self.changed = True
         except Exception as e:
@@ -124,16 +134,15 @@ class MetsManipulator:
             self.ctx.log_issue(self.file_path, error)
 
     def process_manual_id_reference(self, node):
-        record_id_old = int(node.text)
-        record_id_new = self.ctx.lookup_record_id(record_id_old)
-        node.text = str(record_id_new)
-        self.changed = True
-
-def generate_vocabulary_uri(vocabulary_id):
-    return VOCABULARY_ENDPOINT.replace('{{ID}}', str(vocabulary_id))
-
-def generate_record_uri(record_id):
-    return RECORD_ENDPOINT.replace('{{ID}}', str(record_id))
+        try:
+            record_id_old = int(node.text)
+            record_id_new = self.ctx.lookup_record_id(record_id_old)
+            node.text = str(record_id_new)
+            self.changed = True
+        except Exception as e:
+            msg = f'Unable to read ID {node.text}!'
+            logging.critical(msg)
+            raise Exception(msg)
 
 def dump_node(node):
     attributes = ' '.join(f'{k}="{v}"' for k, v in node.attrib.items())
