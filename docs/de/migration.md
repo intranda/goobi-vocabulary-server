@@ -155,6 +155,8 @@ Diese URLs sollten gültig und auflösbar sein.
 Der Host-Teil dieser URLs wird aus der Anfrage generiert.
 
 ## Migration der Mets-Datei
+**Achtung** Bitte erstellen Sie vorher ein Backup. In einigen Fällen sind die mets-Dateien inkonsistent, d. h. die gespeicherten Werte und Vokabularreferenzen stimmen nicht überein. Das Migrationsskript verwendet die Vokabularreferenzen, um die richtigen Werte zu finden. Wenn die Vokabularreferenzen falsch und die Werte richtig sind, wird die Migration die Datenintegrität korrumpieren!
+
 Dieser Schritt kann nur durchgeführt werden, wenn die Migration der Vokabulardaten erfolgreich abgeschlossen wurde!
 
 Wenn die Datei `migration.csv` vorhanden ist, führen Sie den folgenden Befehl in der aktivierten Python-Umgebung aus:
