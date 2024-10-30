@@ -141,8 +141,8 @@ class MetsManipulator:
             self.changed = True
         except Exception as e:
             msg = f'Unable to read ID {node.text}!'
-            logging.critical(msg)
-            raise Exception(msg)
+            logging.warn(msg)
+            #raise Exception(msg)
 
 def dump_node(node):
     attributes = ' '.join(f'{k}="{v}"' for k, v in node.attrib.items())

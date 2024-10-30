@@ -1,6 +1,7 @@
 import logging
 import requests
 import json
+import sys
 
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
 SCHEMA_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas/{{SCHEMA_ID}}'
@@ -61,7 +62,16 @@ class API:
         response = requests.request(method, url=url, headers=HEADERS, data=payload)
         try:
             # Check for success
-            if response.status_code // 100 != 2:
+            if response.status_code == 401 or response.status_code == 403:
+                error_msg = f'API call was not successful, reason: Authentification'
+                logging.critical(error_msg)
+                sys.exit(1)
+                raise Exception(error_msg)
+            if response.status_code == 404:
+                error_msg = f'API call was not successful, reason: Entity not found {url}'
+                logging.warning(error_msg)
+                raise Exception(error_msg)
+            elif response.status_code // 100 != 2:
                 error_msg = f'API call was not successful, reason:\n{extract_error_from_response(response)}'
                 logging.warning(error_msg)
                 raise Exception(error_msg)
