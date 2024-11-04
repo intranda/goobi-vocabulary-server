@@ -121,18 +121,20 @@ class API:
         result = self.query(url, record)
         return result['id']
     
-    def find_record(self, ctx, vocabulary_id, search_term):
+    def find_record(self, ctx, vocabulary_id, search_term, main_value_only=False):
         url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id)).replace('{{SEARCH_TERM}}', search_term)
         result = self.query(url, obj=None, method='GET')
         if not '_embedded' in result:
-            raise Exception(f'Record search for search term "{search_term}" has no results')
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
         results = result['_embedded']['vocabularyRecordList']
         # Filter for exact searches
-        results = [r for r in results if ctx.record_contains_value(r, search_term)]
+        results = [r for r in results if ctx.record_contains_value(r, search_term, main_value_only=main_value_only)]
+
         if len(results) == 0:
-            raise Exception(f'Record search for search term "{search_term}" has no results')
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
         elif len(results) > 1:
-            raise Exception(f'Record search for search term "{search_term}" has no unique result, {len(results)} records found')
+            ids = [r['id'] for r in results]
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no unique result, {len(results)} records found: {ids}')
         
         return results[0]['id']
 

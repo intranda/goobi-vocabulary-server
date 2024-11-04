@@ -40,12 +40,12 @@ class MetsManipulator:
             self.ctx.log_processed(self.file_path)
 
     def process_node(self, node):
-        if self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
-            self.process_vocabulary_reference(node)
-            if self.ctx.dry:
-                dump_node(node)
         if self.is_manual_id_reference(node):
             self.process_manual_id_reference(node)
+            if self.ctx.dry:
+                dump_node(node)
+        elif self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
+            self.process_vocabulary_reference(node)
             if self.ctx.dry:
                 dump_node(node)
         for child in node:
@@ -67,6 +67,14 @@ class MetsManipulator:
         return self.record_endpoint.replace('{{ID}}', str(record_id))
 
     def process_vocabulary_reference(self, node):
+        if (self.ctx.trust == 'ID'):
+            self.process_vocabulary_reference_by_id(node)
+        elif (self.ctx.trust == 'Value'):
+            self.process_vocabulary_reference_by_value(node)
+        else:
+            raise Exception(f'Unknown trust source \"{self.ctx.trust}\"')
+        
+    def process_vocabulary_reference_by_id(self, node):
         try:
             # Extract old vocabulary and record ids
             valueURI = node.attrib['valueURI']
@@ -132,12 +140,50 @@ class MetsManipulator:
             error = f'Unable to retrieve vocabulary and record id from valueURI: {valueURI}\n\t\t{e}'
             logging.debug(error)
             self.ctx.log_issue(self.file_path, error)
+    
+    def process_vocabulary_reference_by_value(self, node):
+        try:
+            vocabulary_name = node.attrib['authority']
+            vocabulary_id = self.ctx.find_vocabulary_by_name(vocabulary_name)
+        except Exception as e:
+            error = f'Unable to retrieve vocabulary by name: {vocabulary_name}\n\t\t{e}'
+            logging.debug(error)
+            self.ctx.log_issue(self.file_path, error)
+            return
+
+        try:
+            value = node.text
+            try:
+                new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, main_value_only=False)
+            except:
+                new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, main_value_only=True)
+
+            # Set all attributes accordingly
+            node.attrib['authority'] = vocabulary_name
+            node.attrib['authorityURI'] = self.generate_vocabulary_uri(vocabulary_id)
+            node.attrib['valueURI'] = self.generate_record_uri(new_record_id)
+
+            self.changed = True
+        except Exception as e:
+            error = f'Unable to find record by value: {value}\n\t\t{e}'
+            logging.error(error)
+            self.ctx.log_issue(self.file_path, error)
 
     def process_manual_id_reference(self, node):
         try:
+            if node.text == None:
+                return
             record_id_old = int(node.text)
             record_id_new = self.ctx.lookup_record_id(record_id_old)
             node.text = str(record_id_new)
+
+            if 'authority' in node.attrib or 'authorityURI' in node.attrib or 'valueURI' in node.attrib:
+                record = self.ctx.api.lookup_record(record_id_new)
+                vocabulary = self.ctx.api.lookup_vocabulary(record['vocabularyId'])
+                node.attrib['authority'] = vocabulary['name']
+                node.attrib['authorityURI'] = self.generate_vocabulary_uri(vocabulary['id'])
+                node.attrib['valueURI'] = self.generate_record_uri(record_id_new)
+
             self.changed = True
         except Exception as e:
             msg = f'Unable to read ID {node.text}!'
@@ -146,4 +192,5 @@ class MetsManipulator:
 
 def dump_node(node):
     attributes = ' '.join(f'{k}="{v}"' for k, v in node.attrib.items())
-    logging.info(f'<{node.tag} {attributes} />')
+    value = node.text
+    logging.info(f'<{node.tag} {attributes}>{value}</{node.tag}>')
