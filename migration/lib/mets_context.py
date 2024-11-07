@@ -6,7 +6,7 @@ NUMBER_PATTERN = re.compile('^\\d+$')
 RECORD_PATTERN = re.compile('^(\\d+).*$')
 
 class Context:
-    def __init__(self, api, dry, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust):
+    def __init__(self, api, dry, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust, enable_relation_vocabulary_column_logic):
         self.api = api
         self.dry = dry
         self.verbose = verbose
@@ -16,6 +16,7 @@ class Context:
         self.preferred_mets_main_value_language = preferred_mets_main_value_language
         self.manual_id_fix = manual_id_fix
         self.trust = trust
+        self.enable_relation_vocabulary_column_logic = enable_relation_vocabulary_column_logic
         self.vocabulary_name_id_map = {}
         self.vocabulary_id_name_map = {}
         self.vocabulary_id_map = {}
@@ -80,18 +81,18 @@ class Context:
             self.schema_id_main_field_id_map[schema_id] = main_definitions[0]['id']
         return self.schema_id_main_field_id_map[schema_id]
 
-    def record_contains_value(self, record, value, main_value_only=False):
-        main_value_id = None
-        if main_value_only:
+    def record_contains_value(self, record, value, search_field=None):
+        field_id = None
+        if search_field != None:
             vocabulary = self.api.lookup_vocabulary(record['vocabularyId'])
             schema = self.api.lookup_schema(vocabulary['schemaId'])
-            mainIds = [d['id'] for d in schema['definitions'] if d['mainEntry'] == True]
-            if len(mainIds) != 1:
-                logging.critical(f'Non unique main entries: {mainIds}!')
+            ids = [d['id'] for d in schema['definitions'] if d['name'] == search_field]
+            if len(ids) != 1:
+                logging.critical(f'Non unique "{search_field}" fields found: {ids}!')
                 sys.exit(1)
-            main_value_id = mainIds[0]
+            field_id = ids[0]
         for f in record['fields']:
-            if main_value_id == None or f['definitionId'] == main_value_id:
+            if field_id == None or f['definitionId'] == field_id:
                 for v in f['values']:
                     for t in v['translations']:
                         if t['value'] == value:

@@ -144,6 +144,9 @@ class MetsManipulator:
     def process_vocabulary_reference_by_value(self, node):
         try:
             vocabulary_name = node.attrib['authority']
+
+            if vocabulary_name == 'geonames':
+                return
             vocabulary_id = self.ctx.find_vocabulary_by_name(vocabulary_name)
         except Exception as e:
             error = f'Unable to retrieve vocabulary by name: {vocabulary_name}\n\t\t{e}'
@@ -153,10 +156,34 @@ class MetsManipulator:
 
         try:
             value = node.text
-            try:
-                new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, main_value_only=False)
-            except:
-                new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, main_value_only=True)
+
+            search_field=None
+            if self.ctx.enable_relation_vocabulary_column_logic and 'Relationship' in vocabulary_name:
+                parent = node.getparent()
+                if parent == None:
+                    logging.warn(f'No parent found!')
+                    dump_node(node)
+                    return
+
+                entity_type = None
+                for sibling in parent:
+                    if sibling.attrib['name'] == 'RelationEntityType':
+                        entity_type = sibling.text
+                        break
+                
+                entity_type_in_relation_count = vocabulary_name.count(entity_type)
+                if entity_type_in_relation_count == 1:
+                    # Find out relation direction
+                    separator_position = vocabulary_name.index('-')
+                    entity_type_position = vocabulary_name.index(entity_type)
+
+                    # use second column of vocabulary: `Reverse relationship` (The relation vocabulary is specified from `A->B`, the relation references an entity of type `A` and is therefore of type `B`)
+                    if entity_type_position < separator_position:
+                        search_field='Reverse relationship'
+                    else:
+                        search_field='Relationship type'
+
+            new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=search_field)
 
             # Set all attributes accordingly
             node.attrib['authority'] = vocabulary_name

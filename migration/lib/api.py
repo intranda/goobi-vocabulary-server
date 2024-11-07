@@ -121,14 +121,14 @@ class API:
         result = self.query(url, record)
         return result['id']
     
-    def find_record(self, ctx, vocabulary_id, search_term, main_value_only=False):
+    def find_record(self, ctx, vocabulary_id, search_term, search_field=None):
         url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id)).replace('{{SEARCH_TERM}}', search_term)
         result = self.query(url, obj=None, method='GET')
         if not '_embedded' in result:
             raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
         results = result['_embedded']['vocabularyRecordList']
         # Filter for exact searches
-        results = [r for r in results if ctx.record_contains_value(r, search_term, main_value_only=main_value_only)]
+        results = [r for r in results if ctx.record_contains_value(r, search_term, search_field=search_field)]
 
         if len(results) == 0:
             raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
