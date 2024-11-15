@@ -127,6 +127,8 @@ blau,123
 This file maps all record values to the corresponding record IDs in the reference vocabulary.
 
 ## Mets file migration
+**Caution** Please create a backup beforehand. In some cases the mets files are inconsistent, i. e. the stored values and vocabulary references do not match. The migration script uses the vocabulary references to find the correct values. If the vocabulary references were wrong and the values correct, the migration will corrupt the data!
+
 This step can only be done after the vocabulary data migration has been successfully completed!
 
 With the `migration.csv` file present, run the following command in the activated Python environment:

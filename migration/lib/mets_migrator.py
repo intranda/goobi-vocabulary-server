@@ -43,6 +43,8 @@ class MetsMigrator:
 
                 if not vocabulary_id_new in self.ctx.vocabulary_id_name_map:
                     self.ctx.vocabulary_id_name_map[vocabulary_id_new] = vocabulary_name
+                if not vocabulary_name in self.ctx.vocabulary_name_id_map:
+                    self.ctx.vocabulary_name_id_map[vocabulary_name] = vocabulary_id_new
                 if not vocabulary_id_old in self.ctx.vocabulary_id_map:
                     self.ctx.vocabulary_id_map[vocabulary_id_old] = vocabulary_id_new
                 if not record_id_old in self.ctx.record_id_map:

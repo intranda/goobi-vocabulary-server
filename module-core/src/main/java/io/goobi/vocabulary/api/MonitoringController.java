@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.api;
 
-import io.goobi.vocabulary.maintenance.MonitoringResult;
+import io.goobi.vocabulary.monitoring.MonitoringResult;
 import io.goobi.vocabulary.service.manager.MaintenanceManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

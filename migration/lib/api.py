@@ -1,6 +1,7 @@
 import logging
 import requests
 import json
+import sys
 
 SCHEMA_INSERTION_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas'
 SCHEMA_LOOKUP_URL = 'http://{{HOST}}:{{PORT}}/api/v1/schemas/{{SCHEMA_ID}}'
@@ -61,7 +62,16 @@ class API:
         response = requests.request(method, url=url, headers=HEADERS, data=payload)
         try:
             # Check for success
-            if response.status_code // 100 != 2:
+            if response.status_code == 401 or response.status_code == 403:
+                error_msg = f'API call was not successful, reason: Authentification'
+                logging.critical(error_msg)
+                sys.exit(1)
+                raise Exception(error_msg)
+            if response.status_code == 404:
+                error_msg = f'API call was not successful, reason: Entity not found {url}'
+                logging.warning(error_msg)
+                raise Exception(error_msg)
+            elif response.status_code // 100 != 2:
                 error_msg = f'API call was not successful, reason:\n{extract_error_from_response(response)}'
                 logging.warning(error_msg)
                 raise Exception(error_msg)
@@ -111,18 +121,20 @@ class API:
         result = self.query(url, record)
         return result['id']
     
-    def find_record(self, ctx, vocabulary_id, search_term):
+    def find_record(self, ctx, vocabulary_id, search_term, search_field=None):
         url = self.urls[RECORD_SEARCH].replace('{{VOCABULARY_ID}}', str(vocabulary_id)).replace('{{SEARCH_TERM}}', search_term)
         result = self.query(url, obj=None, method='GET')
         if not '_embedded' in result:
-            raise Exception(f'Record search for search term "{search_term}" has no results')
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
         results = result['_embedded']['vocabularyRecordList']
         # Filter for exact searches
-        results = [r for r in results if ctx.record_contains_value(r, search_term)]
+        results = [r for r in results if ctx.record_contains_value(r, search_term, search_field=search_field)]
+
         if len(results) == 0:
-            raise Exception(f'Record search for search term "{search_term}" has no results')
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no results')
         elif len(results) > 1:
-            raise Exception(f'Record search for search term "{search_term}" has no unique result, {len(results)} records found')
+            ids = [r['id'] for r in results]
+            raise Exception(f'Record search in vocabulary "{vocabulary_id}" for search term "{search_term}" has no unique result, {len(results)} records found: {ids}')
         
         return results[0]['id']
 
