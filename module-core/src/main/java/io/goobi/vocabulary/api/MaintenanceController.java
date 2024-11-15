@@ -1,6 +1,6 @@
 package io.goobi.vocabulary.api;
 
-import io.goobi.vocabulary.maintenance.selfcheck.SelfCheckResult;
+import io.goobi.vocabulary.monitoring.SelfCheckResult;
 import io.goobi.vocabulary.service.manager.MaintenanceManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

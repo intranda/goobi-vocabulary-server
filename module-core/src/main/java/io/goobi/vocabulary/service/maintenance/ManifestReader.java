@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.maintenance;
+package io.goobi.vocabulary.service.maintenance;
 
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;

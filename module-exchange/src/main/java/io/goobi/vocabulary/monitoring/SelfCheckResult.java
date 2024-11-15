@@ -1,4 +1,4 @@
-package io.goobi.vocabulary.maintenance.selfcheck;
+package io.goobi.vocabulary.monitoring;
 
 import java.util.Date;
 
