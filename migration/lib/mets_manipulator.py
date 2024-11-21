@@ -187,8 +187,10 @@ class MetsManipulator:
                         inverse_search_field='Reverse relationship'
 
                 try:
+                    # First, try to find the value in the correct column
                     new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=search_field)
                 except:
+                    # If failed, try to find the value in the other column (assuming the value was stored incorrectly)
                     new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=inverse_search_field)
                     old_value = node.text
                     record_data = self.ctx.api.lookup_record(new_record_id)
@@ -223,9 +225,27 @@ class MetsManipulator:
 
             self.changed = True
         except Exception as e:
-            error = f'Unable to find record by value: {value}\n\t\t{e}'
-            logging.error(error)
-            self.ctx.log_issue(self.file_path, error)
+            # If this fails as well and the value is not found, remove the metadata if configured
+            if 'has no results' in e.__str__() and self.ctx.is_removable_metadata(vocabulary_id, node.text):
+                logging.warn(f'Removing node due to intentionally missing vocabulary value: "{node.text}"')
+                self.remove_metadata_node(node)
+            else:
+                error = f'Unable to find record by value: {value}\n\t\t{e}'
+                logging.error(error)
+                self.ctx.log_issue(self.file_path, error)
+
+    def remove_metadata_node(self, node):
+        parent = node.getparent()
+        if parent != None and parent.attrib['type'] == 'group':
+            node = parent
+        parent = node.getparent()
+
+        if parent == None:
+            dump_node(node)
+            raise Exception(f'Unable to remove node due to missing parent')
+
+        parent.remove(node)
+        self.changed = True
 
     def process_manual_id_reference(self, node):
         try:

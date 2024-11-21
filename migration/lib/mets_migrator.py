@@ -11,6 +11,7 @@ class MetsMigrator:
     
     def migrate(self):
         self.load_mapping_file()
+        self.load_delete_missing_vocabulary_references_file()
         self.mets_files = self.scan_for_mets_files()
         logging.info(f'{len(self.mets_files)} mets file(s) found!')
         logging.info(f'Start processing ...')
@@ -51,6 +52,31 @@ class MetsMigrator:
                     self.ctx.record_id_map[record_id_old] = record_id_new
                 else:
                     raise Exception(f'Mapping file contains duplicate entry for old record {record_id_old}')
+
+    def load_delete_missing_vocabulary_references_file(self):
+        if self.ctx.delete_missing_vocabulary_references == None:
+            return
+
+        header = None
+        with open(self.ctx.delete_missing_vocabulary_references, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if header == None:
+                    header = line
+                    if header != CSV_DELIMITER.join(['vocabulary_id', 'value']):
+                        raise Exception('Header mismatch in mapping file!')
+                    continue
+
+                parts = line.split(CSV_DELIMITER)
+                if len(parts) != 2:
+                    raise Exception(f'Wrong number of fields in line: {line}')
+                
+                vocabulary_id = int(parts[0])
+                value = parts[1]
+
+                if not vocabulary_id in self.ctx.removable_metadata_map:
+                    self.ctx.removable_metadata_map[vocabulary_id] = []
+                self.ctx.removable_metadata_map[vocabulary_id].append(value)
 
     def scan_for_mets_files(self):
         results = []

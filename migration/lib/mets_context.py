@@ -6,7 +6,7 @@ NUMBER_PATTERN = re.compile('^\\d+$')
 RECORD_PATTERN = re.compile('^(\\d+).*$')
 
 class Context:
-    def __init__(self, api, dry, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust, enable_relation_vocabulary_column_logic):
+    def __init__(self, api, dry, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust, enable_relation_vocabulary_column_logic, delete_missing_vocabulary_references):
         self.api = api
         self.dry = dry
         self.verbose = verbose
@@ -17,6 +17,8 @@ class Context:
         self.manual_id_fix = manual_id_fix
         self.trust = trust
         self.enable_relation_vocabulary_column_logic = enable_relation_vocabulary_column_logic
+        self.delete_missing_vocabulary_references = delete_missing_vocabulary_references
+        self.removable_metadata_map = {}
         self.vocabulary_name_id_map = {}
         self.vocabulary_id_name_map = {}
         self.vocabulary_id_map = {}
@@ -133,6 +135,12 @@ class Context:
             return vocabulary_id, record_id
         except:
             return None, None
+    
+    def is_removable_metadata(self, vocabulary_id, value):
+        if not vocabulary_id in self.removable_metadata_map:
+            return False
+
+        return value in self.removable_metadata_map[vocabulary_id]
 
     def log_processed(self, file):
         with open('mets_migration.log', 'a') as f:
