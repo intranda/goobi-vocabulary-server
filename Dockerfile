@@ -12,6 +12,7 @@ COPY module-core/target/vocabulary-server-core.jar /opt/digiverso/vocabulary/
 COPY module-core/src/main/resources/application.properties /opt/digiverso/vocabulary/
 RUN sed -re "s|^(server.port=).*|\1${VOCABULARY_SERVER_PORT}|" \
      -e "s|^#?(security.token=).*|\1${VOCABULARY_SERVER_TOKEN}|" \
+     -e "s|^#?(server.forward-headers-strategy.*)|\1|" \
      -e "s|^(spring.datasource.username=).*|\1${VOCABULARY_DB_USER}|" \
      -e "s|^(spring.datasource.password=).*|\1${VOCABULARY_DB_PASSWORD}|" \
      -e "s|^(spring.datasource.url=).*|\1jdbc:mariadb://$VOCABULARY_DB_SERVER:3306/${VOCABULARY_DB_DATABASE}|" \
