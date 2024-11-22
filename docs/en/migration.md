@@ -30,6 +30,23 @@ If you don't want to create any field types, you can start the data migration wi
 ```bash
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
 ```
+
+### Script 
+The above two points, the virtual Python environment and the migration of the vocabulary data in a typical installation, as root:
+```bash
+cd /opt/digiverso/vocabulary/migration
+python3 -m venv vmenv
+. vmenv/bin/activate
+pip install requests mysql-connector-python==8.4.0 alive_progress lxml
+VOC_PORT=$(sudo grep -oP '^server.port=\K.*' /opt/digiverso/vocabulary/application.properties)
+VOC_TOKEN=$(sudo grep -oP '^security.token=\K.*' /opt/digiverso/vocabulary/application.properties)
+DB_GOOBI_PW=$(sudo xmlstarlet sel -t -v '//Resource/@password' -n /etc/tomcat9/Catalina/localhost/goobi.xml)
+python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port "${VOC_PORT}" --vocabulary-server-token "${VOC_TOKEN}" --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password "${DB_GOOBI_PW}" --continue-on-error --fallback-language ger
+
+# Test
+curl -s http://localhost:8081/api/v1/vocabularies --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.vocabularyList[] .name'
+```
+
 **Hint** Change the parameters according to your configuration. The `fallback-language` parameter defines the default language to be used for a multi-lingual vocabulary field for which no default language could be derived. The `continue-on-error` option prevents the migration tool to stop on data migration errors. These errors can occur if the data could not be inserted into the new vocabulary server. Possible reasons might be:
 - The vocabulary record is empty.
 - The vocabulary record contains data that is incompatible with some type restrictions.
