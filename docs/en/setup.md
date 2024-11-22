@@ -31,7 +31,7 @@ This documentation describes the process of bootstrapping the vocabulary server.
 The vocabulary server requires Java 17, the systemd service assumes that Java 17 is the system default.
 
 For the above three points, under Ubuntu:
-``bash
+```bash
 export VOC_PORT=8081
 export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
 export VOC_PATH=/opt/digiverso/vocabulary
