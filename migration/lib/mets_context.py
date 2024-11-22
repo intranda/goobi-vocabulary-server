@@ -6,10 +6,11 @@ NUMBER_PATTERN = re.compile('^\\d+$')
 RECORD_PATTERN = re.compile('^(\\d+).*$')
 
 class Context:
-    def __init__(self, api, dry, verbose, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust, enable_relation_vocabulary_column_logic, delete_missing_vocabulary_references):
+    def __init__(self, api, dry, verbose, force, continue_on_error, metadata_directory, mapping_file, preferred_mets_main_value_language, manual_id_fix, trust, enable_relation_vocabulary_column_logic, delete_missing_vocabulary_references):
         self.api = api
         self.dry = dry
         self.verbose = verbose
+        self.force = force
         self.continue_on_error = continue_on_error
         self.metadata_directory = metadata_directory
         self.mapping_file = mapping_file

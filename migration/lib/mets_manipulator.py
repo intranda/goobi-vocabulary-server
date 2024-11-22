@@ -44,10 +44,11 @@ class MetsManipulator:
             self.process_manual_id_reference(node)
             if self.ctx.dry:
                 dump_node(node)
-        elif self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
-            self.process_vocabulary_reference(node)
-            if self.ctx.dry:
-                dump_node(node)
+        elif self.is_vocabulary_reference(node):
+            if self.ctx.force or not self.is_already_migrated(node):
+                self.process_vocabulary_reference(node)
+                if self.ctx.dry:
+                    dump_node(node)
         for child in node:
             self.process_node(child)
 

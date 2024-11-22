@@ -14,7 +14,7 @@ def main():
         args.vocabulary_server_port,
         args.vocabulary_server_token
     )
-    ctx = Context(api, args.dry, args.verbose, args.continue_on_error, args.metadata_directory, args.mapping_file, args.preferred_mets_main_value_language, args.manual_id_fix, args.trust, args.enable_relation_vocabulary_column_logic, args.delete_missing_vocabulary_references)
+    ctx = Context(api, args.dry, args.verbose, args.force, args.continue_on_error, args.metadata_directory, args.mapping_file, args.preferred_mets_main_value_language, args.manual_id_fix, args.trust, args.enable_relation_vocabulary_column_logic, args.delete_missing_vocabulary_references)
 
     try:
         migrator = MetsMigrator(ctx)
@@ -33,6 +33,7 @@ class RawTextDefaultsHelpFormatter(argparse.RawTextHelpFormatter, argparse.Argum
 def parse_args():
     parser = argparse.ArgumentParser(prog='metadata-migrator.py', formatter_class=RawTextDefaultsHelpFormatter, description='Metadata migration tool.')
     parser.add_argument('--dry', required=False, default=False, action='store_const', const=True, help='Don\'t persist changes but only print replacements to the console')
+    parser.add_argument('--force', '-f', required=False, default=False, action='store_const', const=True, help='Force a re-execution of the migration on already migrated metadata')
     parser.add_argument('--metadata-directory', '-d', required=True, help='directory to recursively scan for metadata to update')
     parser.add_argument('--mapping-file', '-m', required=True, help='vocabulary and record mapping file')
     parser.add_argument('--vocabulary-server-host', type=str, default='localhost', help='vocabulary server host')
