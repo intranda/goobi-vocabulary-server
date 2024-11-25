@@ -37,14 +37,18 @@ class MetsManipulator:
             logging.error(error)
             self.ctx.log_issue(self.file_path, error)
             return
-
-        root = tree.getroot()
-        self.process_node(root)
+        try:
+            root = tree.getroot()
+            self.process_node(root)
         
-        if self.changed and not self.ctx.dry:
-            self.create_backup()
-            tree.write(self.file_path, encoding='utf-8', xml_declaration=True)
-            self.ctx.log_processed(self.file_path)
+            if self.changed and not self.ctx.dry:
+                self.create_backup()
+                tree.write(self.file_path, encoding='utf-8', xml_declaration=True)
+                self.ctx.log_processed(self.file_path)
+        except Exception as e:
+            error = f'Something very unexpected happened during processing of mets file {self.file_path}: {e}'
+            logging.critical(error)
+            raise Exception(error)
 
     def process_node(self, node):
         if self.is_manual_id_reference(node):
