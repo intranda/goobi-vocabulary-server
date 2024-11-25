@@ -181,14 +181,14 @@ class MetsManipulator:
                 entity_type = None
                 for sibling in parent:
                     if sibling.attrib['name'] == 'RelationEntityType':
-                        entity_type = sibling.text
+                        entity_type = sibling.text.lower()
                         break
                 
-                entity_type_in_relation_count = vocabulary_name.count(entity_type)
+                entity_type_in_relation_count = vocabulary_name.lower().count(entity_type)
                 if entity_type_in_relation_count == 1:
                     # Find out relation direction
                     separator_position = vocabulary_name.index('-')
-                    entity_type_position = vocabulary_name.index(entity_type)
+                    entity_type_position = vocabulary_name.lower().index(entity_type)
 
                     # use second column of vocabulary: `Reverse relationship` (The relation vocabulary is specified from `A->B`, the relation references an entity of type `A` and is therefore of type `B`)
                     if entity_type_position < separator_position:
@@ -197,9 +197,11 @@ class MetsManipulator:
                     else:
                         search_field='Relationship type'
                         inverse_search_field='Reverse relationship'
-                else:
+                elif entity_type_in_relation_count == 2:
                     search_field='Relationship type'
                     inverse_search_field='Reverse relationship'
+                else:
+                    raise Exception(f'Unable to perform relation column logic on relation [{vocabulary_name}] with search entity: {entity_type}')
 
                 try:
                     # First, try to find the value in the correct column
@@ -227,7 +229,7 @@ class MetsManipulator:
                     new_value =  self.ctx.extract_preferred_language(translated_main_values)
 
                     #dump_node(node)
-                    logging.warn(f'Relation is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
+                    logging.warn(f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
                     node.text = new_value
 
             else:
