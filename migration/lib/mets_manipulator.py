@@ -171,6 +171,7 @@ class MetsManipulator:
 
             search_field=None
             inverse_search_field=None
+            perform_inversion_fix=False
             if self.ctx.enable_relation_vocabulary_column_logic and 'Relationship' in vocabulary_name:
                 parent = node.getparent()
                 if parent == None:
@@ -197,6 +198,8 @@ class MetsManipulator:
                     else:
                         search_field='Relationship type'
                         inverse_search_field='Reverse relationship'
+                    perform_inversion_fix=True
+
                 elif entity_type_in_relation_count == 2:
                     search_field='Relationship type'
                     inverse_search_field='Reverse relationship'
@@ -210,27 +213,31 @@ class MetsManipulator:
                     # If failed, try to find the value in the other column (assuming the value was stored incorrectly)
                     new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=inverse_search_field)
                     old_value = node.text
-                    record_data = self.ctx.api.lookup_record(new_record_id)
 
-                    v = self.ctx.api.lookup_vocabulary(record_data['vocabularyId'])
-                    s = self.ctx.api.lookup_schema(v['schemaId'])
-                    ids = [d['id'] for d in s['definitions'] if d['name'] == search_field] # We need the value, that we actually originally searched for
-                    if len(ids) != 1:
-                        logging.critical(f'Non unique "{search_field}" fields found: {ids}!')
-                        sys.exit(1)
+                    if perform_inversion_fix:
+                        record_data = self.ctx.api.lookup_record(new_record_id)
 
-                    field_data = [f for f in record_data['fields'] if f['definitionId'] == ids[0]]
-                    if len(field_data) != 1:
-                        logging.critical(f'Record [{new_record_id}] has no unique search column entry field')
-                        sys.exit(1)
+                        v = self.ctx.api.lookup_vocabulary(record_data['vocabularyId'])
+                        s = self.ctx.api.lookup_schema(v['schemaId'])
+                        ids = [d['id'] for d in s['definitions'] if d['name'] == search_field] # We need the value, that we actually originally searched for
+                        if len(ids) != 1:
+                            logging.critical(f'Non unique "{search_field}" fields found: {ids}!')
+                            sys.exit(1)
 
-                    # Replace node text if not matching any translation of main value
-                    translated_main_values = self.ctx.extract_language_values(field_data[0])
-                    new_value =  self.ctx.extract_preferred_language(translated_main_values)
+                        field_data = [f for f in record_data['fields'] if f['definitionId'] == ids[0]]
+                        if len(field_data) != 1:
+                            logging.critical(f'Record [{new_record_id}] has no unique search column entry field')
+                            sys.exit(1)
 
-                    #dump_node(node)
-                    logging.warn(f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
-                    node.text = new_value
+                        # Replace node text if not matching any translation of main value
+                        translated_main_values = self.ctx.extract_language_values(field_data[0])
+                        new_value =  self.ctx.extract_preferred_language(translated_main_values)
+
+                        #dump_node(node)
+                        logging.warn(f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
+                        node.text = new_value
+                    else:
+                        logging.debug(f'Relation [{vocabulary_name}] value "{value}" found in column "{inverse_search_field}", keeping as is')
 
             else:
                 new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=None)
