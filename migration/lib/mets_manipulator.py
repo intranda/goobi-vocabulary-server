@@ -234,7 +234,9 @@ class MetsManipulator:
                         new_value =  self.ctx.extract_preferred_language(translated_main_values)
 
                         #dump_node(node)
-                        logging.warn(f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
+                        warn_message = f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"'
+                        logging.warn(warn_message)
+                        self.ctx.log_issue(self.file_path, warn_message)
                         node.text = new_value
                     else:
                         logging.debug(f'Relation [{vocabulary_name}] value "{value}" found in column "{inverse_search_field}", keeping as is')
