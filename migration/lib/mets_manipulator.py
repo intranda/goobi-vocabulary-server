@@ -33,7 +33,8 @@ class MetsManipulator:
         try:
             tree = ET.parse(self.file_path)
         except Exception as e:
-            logging.error(f'Error parsing mets file {self.file_path}, skipping')
+            error = f'Error parsing mets file {self.file_path}, skipping'
+            logging.error(error)
             self.ctx.log_issue(self.file_path, error)
             return
 
