@@ -197,6 +197,9 @@ class MetsManipulator:
                     else:
                         search_field='Relationship type'
                         inverse_search_field='Reverse relationship'
+                else:
+                    search_field='Relationship type'
+                    inverse_search_field='Reverse relationship'
 
                 try:
                     # First, try to find the value in the correct column
