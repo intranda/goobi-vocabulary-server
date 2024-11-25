@@ -253,7 +253,9 @@ class MetsManipulator:
         except Exception as e:
             # If this fails as well and the value is not found, remove the metadata if configured
             if 'has no results' in e.__str__() and self.ctx.is_removable_metadata(vocabulary_id, node.text):
-                logging.warn(f'Removing node due to intentionally missing vocabulary value: "{node.text}"')
+                warn_message = f'Removing node due to intentionally missing vocabulary value: "{node.text}"'
+                logging.warn(warn_message)
+                self.ctx.log_issue(self.file_path, warn_message)
                 self.remove_metadata_node(node)
             else:
                 error = f'Unable to find record by value: {value}\n\t\t{e}'
