@@ -30,7 +30,13 @@ class MetsManipulator:
         logging.debug(f'Backed up mets file: {backup_filename}')
 
     def process_mets_file(self):
-        tree = ET.parse(self.file_path)
+        try:
+            tree = ET.parse(self.file_path)
+        except Exception as e:
+            logging.error(f'Error parsing mets file {self.file_path}, skipping')
+            self.ctx.log_issue(self.file_path, error)
+            return
+
         root = tree.getroot()
         self.process_node(root)
         
