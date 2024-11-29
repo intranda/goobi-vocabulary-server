@@ -40,6 +40,25 @@ if [ ! -e $SAMPLE_PATH ]; then
 fi
 CACHE_FILE="$SAMPLE_PATH/cache.txt"
 
+if [ -f "$CACHE_FILE" ]; then
+    while true; do
+        read -n 1 -s -p "An existing import cache was found, do you want to install from scratch? [Y]es|[N]o " answer
+        case $answer in
+            y|Y)
+                rm "$CACHE_FILE"
+                break
+                ;;
+            n|N)
+                break
+                ;;
+            *)
+                echo -e "\nInvalid choice!"
+                ;;
+        esac
+    done
+    echo ""
+fi
+
 curl_call() {
     curl --location "$HOST:$PORT/api/v1/$1" \
         --header 'Content-Type: application/json' \
@@ -58,6 +77,10 @@ curl_file_upload_call() {
 }
 
 for INSTALL_DIR in $(ls $SAMPLE_PATH); do
+    if [ "$INSTALL_DIR" == "cache.txt" ]; then
+        continue
+    fi
+
     ENDPOINT=$(echo $INSTALL_DIR | cut -d'_' -f2)
     echo "Installing $ENDPOINT"
     for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".json"); do
