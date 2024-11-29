@@ -13,16 +13,21 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 ## Einrichtung von Goobi Workflow zur Kommunikation mit dem Vokabularserver
 - Goobi Workflow verwendet seit Version `24.07` den neuen Vokabularserver.
 - Konfigurieren Sie die Variablen `vocabularyServerHost`, `vocabularyServerPort` und `vocabularyServerToken` in der Datei `goobi_config.properties` entsprechend der Konfiguration Ihres Vokabularservers.
+- Alternativ zu `vocabularyServerHost` und `vocabularyServerPort` kann auch die Variable `vocabularyServerAddress` gesetzt werden (beispielsweise `vocabularyServerAddress=https://external.address.com/vocabulary`). Diese Variable erlaubt auch eine SSL Verbindung.
 - Starten Sie Goobi Workflow neu, damit die Änderungen wirksam werden.
 - Navigieren Sie zu `Administration` > `Vocabulare`, um zu überprüfen, ob alles funktioniert. Sie sollten eine Liste von Vokabularen sehen, wenn alles in Ordnung ist (nicht jetzt, sondern nachdem Sie einige Vokabulare erstellt oder die bestehenden migriert haben). Wenn etwas nicht funktioniert, wird eine rote Fehlermeldung angezeigt.
 
 ## Ersteinrichtung
-- Für den ordnungsgemäßen Betrieb benötigt der Vokabularserver einige Ausgangsdaten.
+- Im Falle einer Datenmigration benötigt der Vokabularserver einige Ausgangsdaten.
 - Diese Daten enthalten Sprachangaben (wenn mehrsprachige Vokabulare verwendet werden) und Feldtypdefinitionen. 
-- Sie können das folgende Skript verwenden, welches einige Beispielsprachen und Feldtypen installiert.
-- Laden Sie das [Initial Data Script](https://github.com/intranda/goobi-vocabulary-server/raw/develop/install/default_setup.sh) herunter.
-- Ändern Sie die Variablen `HOST` und `TOKEN` am Anfang entsprechend der Konfiguration des Vokabularservers, lassen Sie das Suffix `/api/v1` unverändert.
-- Führen Sie das Skript aus.
+- Diese Daten sind in einem Minimaldatensatz hinterlegt und können einfach mithilfe des dafür vorgesehenen Installationsscriptes installiert werden.
+- Laden Sie das [Vokabular-Initialisierungs-Tool](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) herunter.
+- Falls nicht bereits geschehen, starten Sie den Vokabularserver.
+- Entpacken Sie das Archiv.
+- Passen Sie die Variablen `HOST`, `PORT` und `TOKEN` an Ihre Konfiguration an und starten Sie das Script wie folgt:
+```bash
+HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
+```
 
 ## Installationsskript
 Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
@@ -100,8 +105,9 @@ grep ^vocabularyServerToken= /opt/digiverso/goobi/config/goobi_config.properties
 sudo systemctl restart vocabulary.service & sudo journalctl -u vocabulary.service  -f -n 0 | grep -q "Started VocabularyServerApplication in"
 
 # initial set up
-wget https://github.com/intranda/goobi-vocabulary-server/raw/develop/install/default_setup.sh -O /tmp/default_setup.sh
-bash /tmp/default_setup.sh
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip -O /tmp/vocabulary-init-script.zip
+sudo unzip /tmp/vocabulary-init-script.zip -d "${VOC_PATH}"
+HOST=localhost PORT=${VOC_PORT} TOKEN=${VOC_TOKEN} ${VOC_PATH}/vocabulary-init-script/install.sh minimal
 
 ## test
 curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
@@ -118,15 +124,8 @@ curl "http://localhost:${VOC_PORT:-8081}/api/v1/types" --header "Authorization: 
 ```
 - Das Ergebnis sollte wie folgt aussehen:
 ```bash
+Any Text
 Anything
 Boolean
 Number
-Word
-skos:prefLabel
-skos:altLabel
-skos:definition
-skos:editorialNote
-skos:related
-skos:closeMatch
-skos:exactMatch
 ```

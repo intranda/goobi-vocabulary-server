@@ -34,7 +34,7 @@ jobs:
       - name: Create ZIP archive for setup scripts
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r setup-scripts.zip install
+          args: zip -qq -r vocabulary-init-script.zip install
       - name: Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -46,5 +46,5 @@ jobs:
           files: |
             module-*/target/*.jar
             module-core/src/main/resources/application.properties
-            setup-scripts.zip
+            vocabulary-init-script.zip
             migration-tool.zip
