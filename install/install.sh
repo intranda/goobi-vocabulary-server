@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 MY_PATH="$(dirname -- "${BASH_SOURCE[0]}")"
 SAMPLES_DIR=$MY_PATH/samples
-CACHE_FILE=$MY_PATH/cache.txt
 
 # Check for parameters
 FAIL=0
@@ -29,10 +28,35 @@ if [ -z $SAMPLE ]; then
     ls $SAMPLES_DIR
     read SAMPLE
 fi
-SAMPLE_PATH=$SAMPLES_DIR/$SAMPLE
+
+if [ -d "$SAMPLE" ]; then
+    SAMPLE_PATH="$SAMPLE"
+else
+    SAMPLE_PATH="$SAMPLES_DIR/$SAMPLE"
+fi
 if [ ! -e $SAMPLE_PATH ]; then
     echo "Sample \"$SAMPLE\" does not exist!"
     exit 1
+fi
+CACHE_FILE="$SAMPLE_PATH/cache.txt"
+
+if [ -f "$CACHE_FILE" ]; then
+    while true; do
+        read -n 1 -s -p "An existing import cache was found, do you want to install from scratch? [Y]es|[N]o " answer
+        case $answer in
+            y|Y)
+                rm "$CACHE_FILE"
+                break
+                ;;
+            n|N)
+                break
+                ;;
+            *)
+                echo -e "\nInvalid choice!"
+                ;;
+        esac
+    done
+    echo ""
 fi
 
 curl_call() {
@@ -53,22 +77,32 @@ curl_file_upload_call() {
 }
 
 for INSTALL_DIR in $(ls $SAMPLE_PATH); do
+    if [ "$INSTALL_DIR" == "cache.txt" ]; then
+        continue
+    fi
+
     ENDPOINT=$(echo $INSTALL_DIR | cut -d'_' -f2)
     echo "Installing $ENDPOINT"
     for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".json"); do
         ITEM_NAME=$(echo "$ITEM" | cut -d'.' -f1)
         ITEM_IDENTIFIER=${ENDPOINT}_"${ITEM_NAME}"
 
-        ID=$(cat $CACHE_FILE | grep "$ITEM_IDENTIFIER;" | cut -d';' -f2)
+        if [ -f "$CACHE_FILE" ]; then
+            ID=$(cat $CACHE_FILE | grep "$ITEM_IDENTIFIER;" | cut -d';' -f2)
+        else
+            ID=""
+        fi
         if [ -z "$ID" ]; then
             JSON=$(cat $SAMPLE_PATH/$INSTALL_DIR/$ITEM)
 
             # Replace ID placeholders
-            for CACHE_LINE in $(cat $CACHE_FILE); do
-                TEMPLATE_PLACEHOLDER="{{$(echo $CACHE_LINE | cut -d';' -f1)}}"
-                CACHE_ID=$(echo $CACHE_LINE | cut -d';' -f2)
-                JSON=$(echo $JSON | sed "s/$TEMPLATE_PLACEHOLDER/$CACHE_ID/g")
-            done
+            if [ -f "$CACHE_FILE" ]; then
+                for CACHE_LINE in $(cat $CACHE_FILE); do
+                    TEMPLATE_PLACEHOLDER="{{$(echo $CACHE_LINE | cut -d';' -f1)}}"
+                    CACHE_ID=$(echo $CACHE_LINE | cut -d';' -f2)
+                    JSON=$(echo $JSON | sed "s/$TEMPLATE_PLACEHOLDER/$CACHE_ID/g")
+                done
+            fi
 
             RESULT=$(curl_call $ENDPOINT "$JSON")
         
@@ -91,7 +125,11 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
     for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".csv"); do
         VOCABULARY_NAME=$(echo "$ITEM" | cut -d'.' -f1)
         VOCABULARY_IDENTIFIER=vocabularies_${VOCABULARY_NAME}
-        VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
+        if [ -f "$CACHE_FILE" ]; then
+            VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
+        else
+            VOCABULARY_ID=""
+        fi
 
         if [ ! -z "$VOCABULARY_ID" ]; then
             curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/csv" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
@@ -103,8 +141,12 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
     for ITEM in $(ls $SAMPLE_PATH/$INSTALL_DIR | grep ".xlsx"); do
         VOCABULARY_NAME=$(echo "$ITEM" | cut -d'.' -f1)
         VOCABULARY_IDENTIFIER=vocabularies_${VOCABULARY_NAME}
-        VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
-
+        if [ -f "$CACHE_FILE" ]; then
+            VOCABULARY_ID=$(cat $CACHE_FILE | grep $VOCABULARY_IDENTIFIER | cut -d';' -f2)
+        else
+            VOCABULARY_ID=""
+        fi
+        
         if [ ! -z "$VOCABULARY_ID" ]; then
             curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/excel" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
             echo -e "\tImported \"$VOCABULARY_NAME\" vocabulary records"

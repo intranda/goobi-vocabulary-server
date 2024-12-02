@@ -1,0 +1,6 @@
+{
+    "name": "Boolean",
+    "selectableValues": [
+        "true", "false"
+    ]
+}

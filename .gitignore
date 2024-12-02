@@ -36,4 +36,5 @@ build/
 
 ### Python ###
 /migration/vmenv
+/migration/migration.csv
 __pycache__/

@@ -30,24 +30,36 @@ class MetsManipulator:
         logging.debug(f'Backed up mets file: {backup_filename}')
 
     def process_mets_file(self):
-        tree = ET.parse(self.file_path)
-        root = tree.getroot()
-        self.process_node(root)
+        try:
+            tree = ET.parse(self.file_path)
+        except Exception as e:
+            error = f'Error parsing mets file {self.file_path}, skipping'
+            logging.error(error)
+            self.ctx.log_issue(self.file_path, error)
+            return
+        try:
+            root = tree.getroot()
+            self.process_node(root)
         
-        if self.changed and not self.ctx.dry:
-            self.create_backup()
-            tree.write(self.file_path, encoding='utf-8', xml_declaration=True)
-            self.ctx.log_processed(self.file_path)
+            if self.changed and not self.ctx.dry:
+                self.create_backup()
+                tree.write(self.file_path, encoding='utf-8', xml_declaration=True)
+                self.ctx.log_processed(self.file_path)
+        except Exception as e:
+            error = f'Something very unexpected happened during processing of mets file {self.file_path}: {e}'
+            logging.critical(error)
+            raise Exception(error)
 
     def process_node(self, node):
         if self.is_manual_id_reference(node):
             self.process_manual_id_reference(node)
             if self.ctx.dry:
                 dump_node(node)
-        elif self.is_vocabulary_reference(node) and not self.is_already_migrated(node):
-            self.process_vocabulary_reference(node)
-            if self.ctx.dry:
-                dump_node(node)
+        elif self.is_vocabulary_reference(node):
+            if self.ctx.force or not self.is_already_migrated(node):
+                self.process_vocabulary_reference(node)
+                if self.ctx.dry:
+                    dump_node(node)
         for child in node:
             self.process_node(child)
 
@@ -159,6 +171,7 @@ class MetsManipulator:
 
             search_field=None
             inverse_search_field=None
+            perform_inversion_fix=False
             if self.ctx.enable_relation_vocabulary_column_logic and 'Relationship' in vocabulary_name:
                 parent = node.getparent()
                 if parent == None:
@@ -169,14 +182,14 @@ class MetsManipulator:
                 entity_type = None
                 for sibling in parent:
                     if sibling.attrib['name'] == 'RelationEntityType':
-                        entity_type = sibling.text
+                        entity_type = sibling.text.lower()
                         break
                 
-                entity_type_in_relation_count = vocabulary_name.count(entity_type)
+                entity_type_in_relation_count = vocabulary_name.lower().count(entity_type)
                 if entity_type_in_relation_count == 1:
                     # Find out relation direction
                     separator_position = vocabulary_name.index('-')
-                    entity_type_position = vocabulary_name.index(entity_type)
+                    entity_type_position = vocabulary_name.lower().index(entity_type)
 
                     # use second column of vocabulary: `Reverse relationship` (The relation vocabulary is specified from `A->B`, the relation references an entity of type `A` and is therefore of type `B`)
                     if entity_type_position < separator_position:
@@ -185,33 +198,48 @@ class MetsManipulator:
                     else:
                         search_field='Relationship type'
                         inverse_search_field='Reverse relationship'
+                    perform_inversion_fix=True
+
+                elif entity_type_in_relation_count == 2:
+                    search_field='Relationship type'
+                    inverse_search_field='Reverse relationship'
+                else:
+                    raise Exception(f'Unable to perform relation column logic on relation [{vocabulary_name}] with search entity: {entity_type}')
 
                 try:
+                    # First, try to find the value in the correct column
                     new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=search_field)
                 except:
+                    # If failed, try to find the value in the other column (assuming the value was stored incorrectly)
                     new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=inverse_search_field)
                     old_value = node.text
-                    record_data = self.ctx.api.lookup_record(new_record_id)
 
-                    v = self.ctx.api.lookup_vocabulary(record_data['vocabularyId'])
-                    s = self.ctx.api.lookup_schema(v['schemaId'])
-                    ids = [d['id'] for d in s['definitions'] if d['name'] == search_field] # We need the value, that we actually originally searched for
-                    if len(ids) != 1:
-                        logging.critical(f'Non unique "{search_field}" fields found: {ids}!')
-                        sys.exit(1)
+                    if perform_inversion_fix:
+                        record_data = self.ctx.api.lookup_record(new_record_id)
 
-                    field_data = [f for f in record_data['fields'] if f['definitionId'] == ids[0]]
-                    if len(field_data) != 1:
-                        logging.critical(f'Record [{new_record_id}] has no unique search column entry field')
-                        sys.exit(1)
+                        v = self.ctx.api.lookup_vocabulary(record_data['vocabularyId'])
+                        s = self.ctx.api.lookup_schema(v['schemaId'])
+                        ids = [d['id'] for d in s['definitions'] if d['name'] == search_field] # We need the value, that we actually originally searched for
+                        if len(ids) != 1:
+                            logging.critical(f'Non unique "{search_field}" fields found: {ids}!')
+                            sys.exit(1)
 
-                    # Replace node text if not matching any translation of main value
-                    translated_main_values = self.ctx.extract_language_values(field_data[0])
-                    new_value =  self.ctx.extract_preferred_language(translated_main_values)
+                        field_data = [f for f in record_data['fields'] if f['definitionId'] == ids[0]]
+                        if len(field_data) != 1:
+                            logging.critical(f'Record [{new_record_id}] has no unique search column entry field')
+                            sys.exit(1)
 
-                    #dump_node(node)
-                    logging.warn(f'Relation is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"')
-                    node.text = new_value
+                        # Replace node text if not matching any translation of main value
+                        translated_main_values = self.ctx.extract_language_values(field_data[0])
+                        new_value =  self.ctx.extract_preferred_language(translated_main_values)
+
+                        #dump_node(node)
+                        warn_message = f'Relation [{vocabulary_name}] is saved in the wrong direction, correct direction found and corrected: "{old_value}" -> "{new_value}"'
+                        logging.warn(warn_message)
+                        self.ctx.log_issue(self.file_path, warn_message)
+                        node.text = new_value
+                    else:
+                        logging.debug(f'Relation [{vocabulary_name}] value "{value}" found in column "{inverse_search_field}", keeping as is')
 
             else:
                 new_record_id = self.ctx.api.find_record(self.ctx, vocabulary_id, value, search_field=None)
@@ -223,9 +251,29 @@ class MetsManipulator:
 
             self.changed = True
         except Exception as e:
-            error = f'Unable to find record by value: {value}\n\t\t{e}'
-            logging.error(error)
-            self.ctx.log_issue(self.file_path, error)
+            # If this fails as well and the value is not found, remove the metadata if configured
+            if 'has no results' in e.__str__() and self.ctx.is_removable_metadata(vocabulary_id, node.text):
+                warn_message = f'Removing node due to intentionally missing vocabulary value: "{node.text}"'
+                logging.warn(warn_message)
+                self.ctx.log_issue(self.file_path, warn_message)
+                self.remove_metadata_node(node)
+            else:
+                error = f'Unable to find record by value: {value}\n\t\t{e}'
+                logging.error(error)
+                self.ctx.log_issue(self.file_path, error)
+
+    def remove_metadata_node(self, node):
+        parent = node.getparent()
+        if parent != None and parent.attrib['type'] == 'group':
+            node = parent
+        parent = node.getparent()
+
+        if parent == None:
+            dump_node(node)
+            raise Exception(f'Unable to remove node due to missing parent')
+
+        parent.remove(node)
+        self.changed = True
 
     def process_manual_id_reference(self, node):
         try:

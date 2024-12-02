@@ -7,63 +7,128 @@ This documentation describes the process of bootstrapping the vocabulary server.
 - Adapt configuration file properly and remove unmodified lines.
     - Database credentials and database name.
     - Base URL and port.
-- **TODO** *Install the `vocabulary-server.jar` and the `application.properties` configuration file both directly into a new folder (e. g. `/opt/digiverso/vocabulary/`)*
+    - Security token (this must also be configured identically in Goobi).
+- Create a Systemd service to start the service automatically. 
 
-## Start as systemd service
-- **TODO** *Create a systemd service unit for the vocabulary server (The application should be able to correctly shutdown on SIGTERM)*
-- **TODO** *Admin documentation here*
-- Run `java -jar vocabulary-server-VERSION.jar`.
-- If startup succeeds, you will see a line like this after a few seconds:
-```bash
-Started VocabularyServerApplication in 4.244 seconds (process running for 4.581)
-```
+## Setting up Goobi Workflow to communicate with the vocabulary server
 
-## Goobi Workflow Setup Communication
-- Goobi Workflow uses the new vocabulary server since version `24.07`.
-- Configure the `vocabularyServerHost` and `vocabularyServerPort` variables in `goobi_config.properties` according to your vocabulary server configuration.
+- Goobi Workflow has been using the new vocabulary server since version `24.07`.
+- Configure the variables `vocabularyServerHost`, `vocabularyServerPort` and `vocabularyServerToken` in the `goobi_config.properties` file according to the configuration of your vocabulary server.
+- As an alternative to `vocabularyServerHost` and `vocabularyServerPort`, the variable `vocabularyServerAddress` can also be set (e. g. `vocabularyServerAddress=https://external.address.com/vocabulary`). This variable also allows an SSL connection.
 - Restart Goobi Workflow for the changes to take effect.
-- Navigate to `Administration` > `Vocabularies` to check if everything works. You should see a list of vocabularies if everything is okay (not right now, but after you have created some vocabularies or migrated the existing ones). You will see a red error message if something doesn't work.
+- Navigate to `Administration` > `Vocabularies` to check that everything is working. You should see a list of vocabularies if everything is OK (not now, but after you have created some vocabularies or migrated the existing ones). If something is not working, you will see a red error message.
 
-## Initial Setup
-- For proper operation, the vocabulary server needs some initial data.
-- This data contains language specifications (if multi-language vocabularies are used) and field type definitions. 
-- You can use the following script that installs some sample languages and field types.
-- Download the [Initial Data Script](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/install/default_setup.sh).
-- Change the `HOST` variable at the top according to the vocabulary server configuration, leave the `/api/v1` suffix unchanged.
-- Run the script.
 
-## Security
-- You can setup Apache url restrictions in order to secure the vocabulary server from unauthorized access.
-- **TODO** *Admins, please find out what and how to do it in detail.*
-
-## Installation Test
-- For all commands, change host and port accordingly.
-- After the initial setup, check that types were created successfully:
+## Initial setup
+- In the case of data migration, the vocabulary server requires some initial data.
+- This data contains language information (if multilingual vocabularies are used) and field type definitions.
+- This data is stored in a minimal data set and can be easily installed using the installation script provided.
+- Download the [Vocabulary-Initialization-Tool](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip).
+- If you have not already done so, start the vocabulary server.
+- Unpack the archive.
+- Adapt the variables `HOST`, `PORT` and `TOKEN` to your configuration and start the script as follows:
 ```bash
-curl http://localhost:8081/api/v1/types | jq -r '._embedded.fieldTypeList[] .name'
+HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 ```
-- The result should look like:
+
+## Installation script
+The vocabulary server requires Java 17, the systemd service assumes that Java 17 is the system default.
+
+For the above three points, under Ubuntu:
 ```bash
+export VOC_PORT=8081
+export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
+export VOC_PATH=/opt/digiverso/vocabulary
+export VOC_USER=vocabulary
+export VOC_SQL_USER=${VOC_USER}
+export VOC_SQL_DB=${VOC_USER}
+export PW_SQL_VOC=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
+
+# create install folder
+sudo mkdir ${VOC_PATH}
+# download and link vocabulary server application file
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-server-core.jar -O - | sudo tee ${VOC_PATH}/vocabulary-server-core.jar >/dev/null
+
+# create system user which will run the service
+sudo adduser --system --home ${VOC_PATH}/home --shell /usr/sbin/nologin --no-create-home --disabled-login ${VOC_USER}
+
+# download the vocabulary migration tools
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/migration-tool.zip -O /tmp/migration-tool.zip
+sudo unzip /tmp/migration-tool.zip -d "${VOC_PATH}"
+
+# download and set up the config file
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties -O - | sudo tee ${VOC_PATH}/application.properties >/dev/null
+sudo sed -re "s|^(server.port=).*|\1${VOC_PORT}|" \
+     -e "s|^#?(security.token=).*|\1${VOC_TOKEN}|" \
+     -e "s|^(spring.datasource.username=).*|\1${VOC_SQL_USER}|" \
+     -e "s|^(spring.datasource.password=).*|\1${PW_SQL_VOC}|" \
+     -e "s|^(spring.datasource.url=).*|\1jdbc:mariadb://localhost:3306/${VOC_SQL_DB}|" \
+     -i ${VOC_PATH}/application.properties
+sudo chown ${VOC_USER}: ${VOC_PATH}/application.properties
+sudo chmod 600 ${VOC_PATH}/application.properties
+
+# install a systemd service unit file
+cat << EOF | sudo tee /etc/systemd/system/vocabulary.service
+[Unit]
+Description=Goobi Vocabulary Server
+After=mysql.service remote-fs.target
+Requires=mysql.service remote-fs.target
+
+[Service]
+WorkingDirectory=${VOC_PATH}
+Restart=always
+RestartSec=20s
+StartLimitInterval=100s
+StartLimitBurst=4
+ExecStart=/usr/bin/java -jar vocabulary-server-core.jar
+User=${VOC_USER}
+NoNewPrivileges=true
+ProtectSystem=true
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target tomcat9.service
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable vocabulary.service
+
+# create and configure the database
+sudo mysql -e "CREATE DATABASE ${VOC_SQL_DB} CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci';
+               CREATE USER '${VOC_SQL_USER}'@'localhost' IDENTIFIED BY '${PW_SQL_VOC}';
+               GRANT ALL PRIVILEGES ON ${VOC_SQL_DB}.* TO '${VOC_SQL_USER}'@'localhost' WITH GRANT OPTION;
+               FLUSH PRIVILEGES;"
+
+# append vocabulary server address to the Goobi workflow config
+grep ^vocabularyServerHost= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerHost=localhost"   | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+grep ^vocabularyServerPort= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerPort=${VOC_PORT}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+grep ^vocabularyServerToken= /opt/digiverso/goobi/config/goobi_config.properties || echo "vocabularyServerToken=${VOC_TOKEN}" | sudo tee -a /opt/digiverso/goobi/config/goobi_config.properties
+
+# start the vocabulary server and wait for startup
+sudo systemctl restart vocabulary.service & sudo journalctl -u vocabulary.service  -f -n 0 | grep -q "Started VocabularyServerApplication in"
+
+# initial set up
+wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip -O /tmp/vocabulary-init-script.zip
+sudo unzip /tmp/vocabulary-init-script.zip -d "${VOC_PATH}"
+HOST=localhost PORT=${VOC_PORT} TOKEN=${VOC_TOKEN} ${VOC_PATH}/vocabulary-init-script/install.sh minimal
+
+## test
+curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
+```
+
+## Accessibility
+- You can make the vocabulary server accessible from outside by connecting a proxy with access control in front of it.
+
+## Installation test
+- Change the host and port accordingly for all commands.
+- After the initial setup, check whether the field types have been created successfully:
+```bash
+curl ‘http://localhost:${VOC_PORT:-8081}/api/v1/types’ --header ‘Authorisation: Bearer $VOC_TOKEN’ | jq -r ‘._embedded.fieldTypeList[] .name’
+```
+
+- The result should look like this:
+```bash
+Any Text
 Anything
 Boolean
 Number
-Word
-skos:prefLabel
-skos:altLabel
-skos:definition
-skos:editorialNote
-skos:related
-skos:closeMatch
-skos:exactMatch
 ```
-- If a data migration has been done, check that all vocabularies have been migrated:
-```bash
-curl http://localhost:8081/api/v1/vocabularies/all | jq -r '._embedded.vocabularyList[] .name'                
-```
-- Check that links resolve correctly (see configuration):
-```bash
-curl http://localhost:8081/api/v1/records/1 | jq
-```
-The `_links` JSON element should contain references to other resources. 
-These URLs should be valid and resolvable. 
-The host part of these URLs is generated from the request.
