@@ -31,10 +31,12 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -qq -r migration-tool.zip migration
-      - name: Create ZIP archive for setup scripts
+      - name: Rename vocabulary init script folder
+        run: mv install vocabulary-init-script
+      - name: Create ZIP archive for vocabulary init script
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r vocabulary-init-script.zip install
+          args: zip -qq -r vocabulary-init-script.zip vocabulary-init-script
       - name: Release
         id: create_release
         uses: softprops/action-gh-release@v2
