@@ -61,12 +61,15 @@ class FieldDefinition(dict):
         
     def post_process(self, fallback_language):
         if 'translationDefinitions' in self:
-            if len([t for t in self['translationDefinitions'] if t['fallback']]) == 0:
+            if len(self['translationDefinitions']) == 1:
+                self['translationDefinitions'][0]['fallback'] = True
+                self['translationDefinitions'][0]['required'] = True
+            elif len([t for t in self['translationDefinitions'] if t['fallback']]) == 0:
                 if fallback_language == None:
-                    raise Exception(f'There are optional fields with no fallback language defined, please use the "--fallback-language" parameter to set a fallback language for these cases')
+                    raise Exception(f'There are translation definitions with no fallback language defined, please use the "--fallback-language" parameter to set a fallback language for these cases')
                 fallback_translations = [t for t in self['translationDefinitions'] if t['language'] == fallback_language]
-                if len(fallback_translations) == 0:
-                    logging.warning(f'Fallback language {fallback_language} is not defined for field definition:\n{self.__str__()}')
+                if len(fallback_translations) != 0:
+                    logging.warning(f'Fallback language {fallback_language} is not unique for field definition:\n{self.__str__()}')
                 fallback_translations[0]['fallback'] = True
                 fallback_translations[0]['required'] = True
         if self['mainEntry']:
