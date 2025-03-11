@@ -1,24 +1,24 @@
-DROP TABLE field_definition_seq;
+DROP TABLE IF EXISTS field_definition_seq;
 
-DROP TABLE field_instance_seq;
+DROP TABLE IF EXISTS field_instance_seq;
 
-DROP TABLE field_translation_seq;
+DROP TABLE IF EXISTS field_translation_seq;
 
-DROP TABLE field_type_seq;
+DROP TABLE IF EXISTS field_type_seq;
 
-DROP TABLE field_value_seq;
+DROP TABLE IF EXISTS field_value_seq;
 
-DROP TABLE language_seq;
+DROP TABLE IF EXISTS language_seq;
 
-DROP TABLE selectable_value_seq;
+DROP TABLE IF EXISTS selectable_value_seq;
 
-DROP TABLE translation_definition_seq;
+DROP TABLE IF EXISTS translation_definition_seq;
 
-DROP TABLE vocabulary_record_seq;
+DROP TABLE IF EXISTS vocabulary_record_seq;
 
-DROP TABLE vocabulary_schema_seq;
+DROP TABLE IF EXISTS vocabulary_schema_seq;
 
-DROP TABLE vocabulary_seq;
+DROP TABLE IF EXISTS vocabulary_seq;
 
 ALTER TABLE field_definition
     MODIFY id BIGINT AUTO_INCREMENT;
