@@ -12,7 +12,7 @@ pipeline {
       agent {
         docker {
           /* using a custom build image with a defined home directory for UID 1000 among other things */
-          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          image 'nexus.intranda.com:4443/maven:3-eclipse-temurin-21'
           registryUrl 'https://nexus.intranda.com:4443'
           registryCredentialsId 'jenkins-docker'
           args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
@@ -54,7 +54,7 @@ pipeline {
       agent {
         docker {
           /* using a custom build image with a defined home directory for UID 1000 among other things */
-          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          image 'nexus.intranda.com:4443/maven:3-eclipse-temurin-21'
           registryUrl 'https://nexus.intranda.com:4443'
           registryCredentialsId 'jenkins-docker'
           args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
@@ -113,7 +113,7 @@ pipeline {
       agent {
         docker {
           /* using a custom build image with a defined home directory for UID 1000 among other things */
-          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          image 'nexus.intranda.com:4443/maven:3-eclipse-temurin-21'
           registryUrl 'https://nexus.intranda.com:4443'
           registryCredentialsId 'jenkins-docker'
           args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
@@ -135,7 +135,7 @@ pipeline {
       agent {
         docker {
           /* using a custom build image with a defined home directory for UID 1000 among other things */
-          image 'nexus.intranda.com:4443/maven:3.9.3-eclipse-temurin-17'
+          image 'nexus.intranda.com:4443/maven:3-eclipse-temurin-21'
           registryUrl 'https://nexus.intranda.com:4443'
           registryCredentialsId 'jenkins-docker'
           args '-v $HOME/.m2:/var/maven/.m2:z -v $HOME/.config:/var/maven/.config -v $HOME/.sonar:/var/maven/.sonar -u 1000 -ti -e _JAVA_OPTIONS=-Duser.home=/var/maven -e MAVEN_CONFIG=/var/maven/.m2'
