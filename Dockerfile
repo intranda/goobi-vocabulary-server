@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 ENV VOCABULARY_DB_SERVER vocabulary-db
 ENV VOCABULARY_DB_USER vocabulary
