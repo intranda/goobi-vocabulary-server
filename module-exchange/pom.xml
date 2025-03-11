@@ -9,7 +9,7 @@
     <description>Vocabulary data exchange classes</description>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
         <maven.version>3.8.8</maven.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
