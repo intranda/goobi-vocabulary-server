@@ -32,8 +32,8 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -qq -r migration-tool.zip migration
-      - name: Rename vocabulary init script folder
-        run: mv install vocabulary-init-script
+      - name: Prepare vocabulary init script folder
+        run: mv init-script vocabulary-init-script
       - name: Create ZIP archive for vocabulary init script
         uses: montudor/action-zip@v1
         with:
@@ -56,5 +56,6 @@ jobs:
           files: |
             module-*/target/*.jar
             module-core/src/main/resources/application.properties
+            install/*
             vocabulary-init-script.zip
             migration-tool.zip
