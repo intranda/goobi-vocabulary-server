@@ -20,7 +20,7 @@ import java.util.List;
 @Setter
 public class VocabularySchemaEntity implements Identifiable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
 

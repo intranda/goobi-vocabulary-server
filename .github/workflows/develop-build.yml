@@ -15,11 +15,12 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: 'temurin'
           java-version: 17
       - name: Set up Maven cache
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -31,10 +32,12 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -qq -r migration-tool.zip migration
-      - name: Create ZIP archive for setup scripts
+      - name: Prepare vocabulary init script folder
+        run: mv init-script vocabulary-init-script
+      - name: Create ZIP archive for vocabulary init script
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r vocabulary-init-script.zip install
+          args: zip -qq -r vocabulary-init-script.zip vocabulary-init-script
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S %Z')"
@@ -53,5 +56,6 @@ jobs:
           files: |
             module-*/target/*.jar
             module-core/src/main/resources/application.properties
+            install/*
             vocabulary-init-script.zip
             migration-tool.zip

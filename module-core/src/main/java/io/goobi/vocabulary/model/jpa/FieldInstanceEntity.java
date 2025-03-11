@@ -25,7 +25,7 @@ public class FieldInstanceEntity implements Identifiable {
     private static final int MAX_LANGUAGE_LENGTH = 3;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
 

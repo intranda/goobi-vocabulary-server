@@ -18,7 +18,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Setter
 public class SelectableValueEntity implements Identifiable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
 

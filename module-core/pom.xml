@@ -5,17 +5,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server-core</artifactId>
-    <version>1.1.11</version>
+    <version>1.1.12</version>
     <name>Vocabulary-Server-Core</name>
     <description>Spring Boot based RESTful web service for vocabulary management</description>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
         <maven.version>3.8.8</maven.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,7 +36,7 @@
         <dependency>
             <groupId>io.goobi.vocabulary</groupId>
             <artifactId>vocabulary-server-exchange</artifactId>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
             <scope>compile</scope>
         </dependency>
 
@@ -225,7 +226,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <goals>
