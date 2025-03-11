@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.goobi.vocabulary</groupId>
     <artifactId>vocabulary-server</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2-SNAPSHOT</version>
     <name>Vocabulary-Server</name>
     <packaging>pom</packaging>
     <description>RESTful webservice for vocabulary management</description>
