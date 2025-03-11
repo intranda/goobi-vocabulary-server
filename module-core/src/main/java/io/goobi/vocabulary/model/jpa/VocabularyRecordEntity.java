@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 // Naming this class `Record` led to wrong behavior because of the introduction of Java records and some Spring Boot JPA logic
 public class VocabularyRecordEntity implements Identifiable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
 

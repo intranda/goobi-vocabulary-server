@@ -19,7 +19,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Setter
 public class FieldTranslationEntity implements Identifiable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
 
