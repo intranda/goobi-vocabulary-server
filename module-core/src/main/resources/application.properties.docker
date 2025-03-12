@@ -1,0 +1,7 @@
+server.port=8081
+security.token=secret
+server.address=
+server.forward-headers-strategy=framework
+spring.datasource.username=vocabulary
+spring.datasource.password=vocabulary
+spring.datasource.url=jdbc:mariadb://localhost:3306/vocabulary
