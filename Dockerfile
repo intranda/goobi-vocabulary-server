@@ -1,15 +1,16 @@
 FROM eclipse-temurin:21-jre
 
-ENV VOCABULARY_DB_SERVER vocabulary-db
-ENV VOCABULARY_DB_USER vocabulary
-ENV VOCABULARY_DB_PASSWORD vocabulary
-ENV VOCABULARY_DB_DATABASE vocabulary
-ENV VOCABULARY_SERVER_TOKEN secret
-ENV VOCABULARY_SERVER_PORT 8081
+ENV VOCABULARY_DB_SERVER=vocabulary-db
+ENV VOCABULARY_DB_USER=vocabulary
+ENV VOCABULARY_DB_PASSWORD=vocabulary
+ENV VOCABULARY_DB_DATABASE=vocabulary
+ENV VOCABULARY_SERVER_TOKEN=secret
+ENV VOCABULARY_SERVER_PORT=8081
 
 RUN mkdir -p /opt/digiverso/vocabulary
-COPY module-core/target/vocabulary-server-core.jar /opt/digiverso/vocabulary/
-COPY module-core/src/main/resources/application.properties /opt/digiverso/vocabulary/
+COPY module-core/target/vocabulary-server-core.jar /opt/digiverso/vocabulary/vocabulary-server.jar
+COPY module-core/src/main/resources/application.properties.docker /opt/digiverso/vocabulary/application.properties
+RUN echo ""
 RUN sed -re "s|^(server.port=).*|\1${VOCABULARY_SERVER_PORT}|" \
      -e "s|^#?(security.token=).*|\1${VOCABULARY_SERVER_TOKEN}|" \
      -e "s|^#?(server.forward-headers-strategy.*)|\1|" \
@@ -20,4 +21,4 @@ RUN sed -re "s|^(server.port=).*|\1${VOCABULARY_SERVER_PORT}|" \
 
 EXPOSE $VOCABULARY_SERVER_PORT
 WORKDIR /opt/digiverso/vocabulary
-CMD [ "java", "-jar", "vocabulary-server-core.jar"]
+CMD [ "java", "-jar", "vocabulary-server.jar"]
