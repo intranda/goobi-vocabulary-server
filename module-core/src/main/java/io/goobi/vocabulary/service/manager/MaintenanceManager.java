@@ -3,10 +3,9 @@ package io.goobi.vocabulary.service.manager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.goobi.vocabulary.exception.VocabularyException;
 import io.goobi.vocabulary.monitoring.FlywayInformation;
-import io.goobi.vocabulary.service.maintenance.ManifestReader;
+import io.goobi.vocabulary.service.maintenance.VersionInformation;
 import io.goobi.vocabulary.monitoring.MonitoringResult;
 import io.goobi.vocabulary.monitoring.MonitoringState;
-import io.goobi.vocabulary.monitoring.VersionInformation;
 import io.goobi.vocabulary.monitoring.VersionsCollection;
 import io.goobi.vocabulary.monitoring.SelfCheckResult;
 import io.goobi.vocabulary.monitoring.ValidationResult;
@@ -46,12 +45,12 @@ public class MaintenanceManager {
     private final Validator<VocabularySchemaEntity> vocabularySchemaValidator;
     private final Validator<VocabularyRecordEntity> vocabularyRecordValidator;
 
-    private final ManifestReader manifestReader;
+    private final VersionInformation versionInformation;
     private final Flyway flyway;
 
     private final ObjectMapper objectMapper;
 
-    public MaintenanceManager(FieldTypeRepository fieldTypeRepository, VocabularyRepository vocabularyRepository, VocabularySchemaRepository vocabularySchemaRepository, VocabularyRecordRepository vocabularyRecordRepository, Validator<FieldTypeEntity> fieldTypeValidator, Validator<VocabularyEntity> vocabularyValidator, Validator<VocabularySchemaEntity> vocabularySchemaValidator, Validator<VocabularyRecordEntity> vocabularyRecordValidator, ManifestReader manifestReader, Flyway flyway, ObjectMapper objectMapper) {
+    public MaintenanceManager(FieldTypeRepository fieldTypeRepository, VocabularyRepository vocabularyRepository, VocabularySchemaRepository vocabularySchemaRepository, VocabularyRecordRepository vocabularyRecordRepository, Validator<FieldTypeEntity> fieldTypeValidator, Validator<VocabularyEntity> vocabularyValidator, Validator<VocabularySchemaEntity> vocabularySchemaValidator, Validator<VocabularyRecordEntity> vocabularyRecordValidator, VersionInformation versionInformation, Flyway flyway, ObjectMapper objectMapper) {
         this.fieldTypeRepository = fieldTypeRepository;
         this.vocabularyRepository = vocabularyRepository;
         this.vocabularyValidator = vocabularyValidator;
@@ -60,7 +59,7 @@ public class MaintenanceManager {
         this.fieldTypeValidator = fieldTypeValidator;
         this.vocabularySchemaValidator = vocabularySchemaValidator;
         this.vocabularyRecordValidator = vocabularyRecordValidator;
-        this.manifestReader = manifestReader;
+        this.versionInformation = versionInformation;
         this.flyway = flyway;
         this.objectMapper = objectMapper;
     }
@@ -101,7 +100,7 @@ public class MaintenanceManager {
     }
 
     public MonitoringResult getMonitoringResult() {
-        VersionInformation coreVersion = new VersionInformation(manifestReader.getVersion(), manifestReader.getRevision());
+        io.goobi.vocabulary.monitoring.VersionInformation coreVersion = new io.goobi.vocabulary.monitoring.VersionInformation(versionInformation.getVersion(), versionInformation.getRevision());
         VersionsCollection versions = new VersionsCollection(coreVersion);
         FlywayInformation flywayInformation = getFlywayInformation();
         Optional<SelfCheckResult> selfCheckResult = loadSelfCheckResult();
