@@ -85,8 +85,11 @@ public class FieldTypeDTOManager implements Manager<FieldType> {
                 jpaFieldType.getSelectableValues().addAll(selectableValues);
             });
         }
+        if (newFieldTypeDTO.getLarge() != null) {
+            replacements.add(() -> jpaFieldType.setLarge(newFieldTypeDTO.getLarge()));
+        }
         if (replacements.isEmpty()) {
-            throw new MissingAttributeException(newFieldTypeDTO.getClass(), List.of("name", "validation", "selectableValues"));
+            throw new MissingAttributeException(newFieldTypeDTO.getClass(), List.of("name", "validation", "selectableValues", "large"));
         }
         replacements.forEach(Runnable::run);
         validator.validate(jpaFieldType);
