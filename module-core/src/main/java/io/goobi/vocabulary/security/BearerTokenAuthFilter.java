@@ -25,6 +25,9 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
     @Value("${security.anonymous.read-allowed:false}")
     private boolean anonymousReadAllowed;
 
+    @Value("${security.anonymous.write-allowed:false}")
+    private boolean anonymousWriteAllowed;
+
     @Bean
     public FilterRegistrationBean<BearerTokenAuthFilter> bearerTokenAuthFilterFilterRegistrationBean(BearerTokenAuthFilter filter) {
         FilterRegistrationBean<BearerTokenAuthFilter> registration = new FilterRegistrationBean<>(filter);
@@ -44,7 +47,7 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
         if (authentication == null) {
             User user = new User();
 
-            if (isPublic(request) || (jwt.isPresent() && isTokenValid(jwt.get()))) {
+            if (isAnonymousReadAllowed(request) || isAnonymousWriteAllowed(request) || jwt.isPresent() && isTokenValid(jwt.get())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user,
                         null,
@@ -58,9 +61,15 @@ public class BearerTokenAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublic(HttpServletRequest request) {
+    private boolean isAnonymousReadAllowed(HttpServletRequest request) {
         // TODO: Vocabulary filtering
         return anonymousReadAllowed && "GET".equals(request.getMethod());
+    }
+
+    private boolean isAnonymousWriteAllowed(HttpServletRequest request) {
+        return anonymousWriteAllowed && (
+                    "POST".equals(request.getMethod()) || "PUT".equals(request.getMethod()) || "DELETE".equals(request.getMethod())
+                );
     }
 
     private boolean isTokenValid(String accessToken) {
