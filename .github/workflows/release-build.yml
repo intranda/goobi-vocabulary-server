@@ -38,6 +38,8 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -qq -r vocabulary-init-script.zip vocabulary-init-script
+      - name: Prepare configuration file
+        run: sed '/=@.*@/d' module-core/src/main/resources/application.properties > install/application.properties
       - name: Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -48,7 +50,6 @@ jobs:
           prerelease: false
           files: |
             module-*/target/*.jar
-            module-core/src/main/resources/application.properties
             install/*
             vocabulary-init-script.zip
             migration-tool.zip

@@ -38,6 +38,8 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -qq -r vocabulary-init-script.zip vocabulary-init-script
+      - name: Prepare configuration file
+        run: sed '/=@.*@/d' module-core/src/main/resources/application.properties > install/application.properties
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M:%S %Z')"
@@ -55,7 +57,6 @@ jobs:
           prerelease: true
           files: |
             module-*/target/*.jar
-            module-core/src/main/resources/application.properties
             install/*
             vocabulary-init-script.zip
             migration-tool.zip
