@@ -33,7 +33,7 @@ def main():
             traceback.print_exc()
             logging.critical(e)
         else:
-            logging.critical(f'An unhandled error occurred')
+            logging.critical(f'An unhandled error occurred: \n\t{e}')
         exit(1)
             
 class RawTextDefaultsHelpFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
