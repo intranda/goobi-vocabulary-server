@@ -16,6 +16,10 @@ class Record(dict):
     def set_new_id(self, new_id):
         self.new_id = new_id
 
+    def post_process(self):
+        for f in self['fields']:
+            f.post_process()
+
     def insert(self, ctx):
         identifier = ctx.api.insert_record(self)
         self.set_new_id(identifier)
