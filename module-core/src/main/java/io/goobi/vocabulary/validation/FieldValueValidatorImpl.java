@@ -2,34 +2,16 @@ package io.goobi.vocabulary.validation;
 
 import io.goobi.vocabulary.exception.EntityNotFoundException;
 import io.goobi.vocabulary.exception.VocabularyException;
-import io.goobi.vocabulary.model.jpa.FieldTranslationEntity;
-import io.goobi.vocabulary.model.jpa.FieldValueEntity;
-import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
-import io.goobi.vocabulary.model.jpa.TranslationDefinitionEntity;
-import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
+import io.goobi.vocabulary.model.jpa.*;
 import io.goobi.vocabulary.repositories.FieldInstanceRepository;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueContainsNonTranslatedValue;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueHasNonAllowedTranslations;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueIsBlank;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueIsNotUnique;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueMissingRequiredTranslations;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueReferencedRecordBelongsToWrongVocabulary;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueReferencedRecordIssues;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValueUnspecifiedTranslations;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValuesAreNonSelectableValues;
-import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.FieldValuesDoNotMatchSpecifiedValidationRegex;
+import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.*;
 
 @Service
 public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
@@ -50,6 +32,7 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                 this::checkTranslatableValueContainsNoNonTranslatedValues,
                 this::checkTranslatableValueHasNoUnspecifiedTranslations,
                 this::checkTranslatableValueAllRequiredTranslationsProvided,
+                this::checkTranslationsAreUnique,
                 this::checkReferencedVocabularyRecordIsExistingInCorrectVocabulary
         ));
     }
@@ -216,6 +199,27 @@ public class FieldValueValidatorImpl extends BaseValidator<FieldValueEntity> {
                         params -> "Translatable field \"" + params.get("definitionName") + "\" [" + params.get("definitionId")
                                 + "] is missing translations for the following required languages: " + params.get("requiredTranslationLanguages"));
             }
+        }
+    }
+
+    private void checkTranslationsAreUnique(FieldValueEntity fieldValue) {
+        if (fieldValue.getTranslations() == null || fieldValue.getTranslations().isEmpty()) {
+            return;
+        }
+        List<String> allTranslationLanguages = fieldValue.getTranslations().stream()
+                .map(FieldTranslationEntity::getLanguage)
+                .filter(Objects::nonNull)
+                .map(LanguageEntity::getAbbreviation)
+                .toList();
+        Set<String> uniqueTranslationLanguages = new HashSet<>(allTranslationLanguages);
+        if (allTranslationLanguages.size() != uniqueTranslationLanguages.size()) {
+            throw new VocabularyException(FieldValueMissingNonUniqueTranslations, null, Map.of(
+                    "definitionId", String.valueOf(fieldValue.getFieldInstance().getDefinition().getId()),
+                    "definitionName", fieldValue.getFieldInstance().getDefinition().getName(),
+                    "givenTranslationLanguages", String.join(",", allTranslationLanguages)
+            ),
+                    params -> "Translatable field \"" + params.get("definitionName") + "\" [" + params.get("definitionId")
+                            + "] has non unique translation languages given: " + params.get("givenTranslationLanguages"));
         }
     }
 

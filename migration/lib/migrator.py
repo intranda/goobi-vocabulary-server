@@ -178,13 +178,14 @@ def migrate_record(record_id, data, vocabulary, ctx):
             if len(f['values']) > 0:
                 r.add_field(f)
     
+        r.post_process()
         r.insert(ctx)
         ctx.log_processed(r)
         ctx.log_migration_info(r)
     except Exception as e:
         ctx.log_non_migrated_record(r, record_id, data, e)
         if ctx.continue_on_error:
-            logging.warning(f'Error migrating record')
+            logging.warning(f'Error migrating record:\n\t{r.__str__()}')
         else:
             raise e
 
@@ -230,17 +231,6 @@ def parse_fields(raw_fields, definitions, ctx):
                 
                 while len(fields[new_definition_id]['values'][0]['translations']) > 1:
                     del fields[new_definition_id]['values'][0]['translations'][1]
-        
-        # Fill translations that are required and missing with duplicates
-        if 'translationDefinitions' in matching_definitions[0]:
-            translation_definitions = matching_definitions[0]['translationDefinitions']
-            if len(translation_definitions) > 0:
-                required_languages = [td['language'] for td in translation_definitions if td['required']]
-                for v in fields[new_definition_id]['values']:
-                    found = [t['language'] for t in v['translations']]
-                    for missing_language in [l for l in required_languages if l not in found]:
-                        if len(v['translations']) > 0:
-                            v.add_translation(missing_language, v['translations'][0]['value'])
 
     return list(fields.values())
 

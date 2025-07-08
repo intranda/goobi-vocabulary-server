@@ -16,4 +16,4 @@ class TranslationDefinition(dict):
         self.new_id = new_id
     
     def __str__(self):
-        return f'TranslationDefinition (' + self['language'] + ', fallback=' + self['fallback'] + ', required=' + self['required'] + ')'
+        return f'TranslationDefinition (' + self['language'] + ', fallback=' + str(self['fallback']) + ', required=' + str(self['required']) + ')'

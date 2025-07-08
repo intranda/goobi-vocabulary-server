@@ -63,6 +63,7 @@ public class VocabularyException extends RuntimeException {
         FieldValueContainsNonTranslatedValue,
         FieldValueUnspecifiedTranslations,
         FieldValueMissingRequiredTranslations,
+        FieldValueMissingNonUniqueTranslations,
         FieldValueReferencedRecordIssues,
         FieldValueReferencedRecordBelongsToWrongVocabulary
     }

@@ -68,8 +68,11 @@ class FieldDefinition(dict):
                 if fallback_language == None:
                     raise Exception(f'There are translation definitions with no fallback language defined, please use the "--fallback-language" parameter to set a fallback language for these cases')
                 fallback_translations = [t for t in self['translationDefinitions'] if t['language'] == fallback_language]
-                if len(fallback_translations) != 0:
-                    logging.warning(f'Fallback language {fallback_language} is not unique for field definition:\n{self.__str__()}')
+                if len(fallback_translations) != 1:
+                    logging.warning(f'Fallback language {fallback_language} not found or not unique for field definition:\n{self.__str__()}')
+                    for ft in fallback_translations:
+                        print(ft)
+                    return
                 fallback_translations[0]['fallback'] = True
                 fallback_translations[0]['required'] = True
         if self['mainEntry']:

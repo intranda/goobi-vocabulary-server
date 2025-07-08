@@ -438,6 +438,34 @@ class FieldInstanceValidationTests {
     }
 
     @Test
+    void oneTranslationDefinitionsWithRequiredTranslationGivenTwice_fails() throws VocabularyException {
+        FieldInstanceEntity translationInstance = setupFieldInstance(
+                setupFieldDefinition("Description", null, null, List.of(
+                        createTranslationDefinition("eng", true, true)
+                ),false, false, false, true, false));
+
+        FieldValueEntity description = new FieldValueEntity();
+        description.setId(idCounter++);
+        description.setFieldInstance(translationInstance);
+        FieldTranslationEntity eng = new FieldTranslationEntity();
+        eng.setId(idCounter++);
+        eng.setLanguage(createLanguage("eng"));
+        eng.setFieldValue(description);
+        eng.setValue("Apple");
+        FieldTranslationEntity eng2 = new FieldTranslationEntity();
+        eng2.setId(idCounter++);
+        eng2.setLanguage(createLanguage("eng"));
+        eng2.setFieldValue(description);
+        eng2.setValue("Apple");
+        description.setTranslations(
+                List.of(eng, eng2)
+        );
+        translationInstance.setFieldValues(List.of(description));
+
+        assertThrows(VocabularyException.class, () -> validator.validate(translationInstance));
+    }
+
+    @Test
     void vocabularyRecordReferenceGiven_isPresent_success() throws VocabularyException {
         VocabularyEntity colors = new VocabularyEntity();
         VocabularyRecordEntity red = new VocabularyRecordEntity();
