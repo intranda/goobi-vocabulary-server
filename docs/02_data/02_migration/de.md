@@ -24,7 +24,7 @@ pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ```
 
 ## Migration der Vokabulardaten durchführen
-Laden Sie das [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip) herunter und entpacken Sie es, falls nicht schon bei der Installation geschehen.
+Laden Sie das [Vocabulary Migration Tool](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/migration-tool.zip) herunter und entpacken Sie es, falls nicht schon bei der Installation geschehen.
 
 :::info
 Bevor Sie einen der folgenden Schritte durchführen, lesen Sie diese Dokumentation bitte zuerst vollständig durch.

@@ -24,7 +24,7 @@ pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ```
 
 ## Perform vocabulary data migration
-Download and extract the [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip).
+Download and extract the [Vocabulary Migration Tool](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/migration-tool.zip).
 
 :::info
 Before performing any of the following steps, please first read this documentation completely.

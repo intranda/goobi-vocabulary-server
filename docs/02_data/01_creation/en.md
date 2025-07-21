@@ -245,8 +245,8 @@ Its type ID `2` could correspond to a field type that is set to `large`.
 The `Rating` field should contain a numeric rating value and correspond to the "Rating" type we have created earlier.
 This vocabulary schema is not hierarchical and can contain any number of records.
 
-Please check out the [example vocabulary setup script](../../install/demo.sh) to see some more complex examples.
-These examples require some field types to be present, you can [install these default field types with another provided script](../../install/default_setup.sh).
+The included [initialization script](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) contains several [examples](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples) with more complex use cases.
+The steps within each example build upon one another and require execution using the initialization script to ensure that the IDs are resolved correctly.
 
 With vocabulary schemas created, we can finally create vocabularies.
 
@@ -297,4 +297,4 @@ The vocabulary management server also supports special types for RDF compliant d
 For this to work, you need to have RDF compatible types created and create a schema that only consists of these types.
 The resulting vocabulary will additionally be exportable into RDF formats like RDF/XML or Turtle.
 
-If you used the [language and field type setup script](../../install/default_setup.sh) and the [demo vocabulary setup script](../../install/demo.sh), you will have an example of such a RDF vocabulary ready to go.
+In the [SKOS example](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples/skos) of the initialization script, an example of such an RDF vocabulary is available to you.

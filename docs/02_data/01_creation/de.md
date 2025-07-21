@@ -244,8 +244,7 @@ Seine Feldtypen-ID `2` könnte einem Feldtypen entsprechen, der als "große Date
 Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen `Bewertung` entsprechen, den wir zuvor erstellt haben.
 Dieses Vokabularschema ist nicht hierarchisch und kann eine beliebige Anzahl von Datensätzen enthalten.
 
-Im [Beispielskript zur Einrichtung des Vokabulars](../../install/demo.sh) finden Sie einige komplexere Beispiele.
-Für diese Beispiele müssen einige Feldtypen vorhanden sein. Sie können diese Standardfeldtypen mit einem anderen [bereitgestellten Skript](../../install/default_setup.sh) installieren.
+Im beliegenden [Initialisierungsscript](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) sind einige [Beispiele](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples) mit komplexeren Anwendungsfällen enthalten. Die Schritte innerhalb eines Beispiels bauen aufeinander auf und erfordern die Ausführung mit dem Initialisierungsscript, damit die IDs korrekt aufgelöst werden.
 
 Nachdem die Vokabularschemata erstellt wurden, können wir nun die Vokabulare erstellen.
 
@@ -296,4 +295,4 @@ Der Vokabularverwaltungsserver unterstützt auch spezielle Typen für RDF-konfor
 Damit dies funktioniert, müssen Sie RDF-kompatible Typen erstellen und ein Schema anlegen, das nur aus diesen Typen besteht.
 Das resultierende Vokabular kann dann zusätzlich in RDF-Formate wie RDF/XML oder Turtle exportierbar werden.
 
-Wenn Sie das [initiale Feldtypenscript](../../install/default_setup.sh) und das [Demovokabularscript](../../install/demo.sh) verwendet haben, steht Ihnen ein Beispiel für ein solches RDF-Vokabular zur Verfügung.
+Im [SKOS Beispiel](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples/skos) des Initialisierungsscripts steht Ihnen ein Beispiel für ein solches RDF-Vokabular zur Verfügung.
