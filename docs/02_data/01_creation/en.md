@@ -1,4 +1,7 @@
-# Vocabulary Creation Guide
+---
+title: Vocabulary Creation Guide
+published: true
+---
 Vocabularies are a very powerful tool to store arbitrary structured data.
 Therefore, the process of creating vocabularies isn't trivial.
 In this documentation, we will cover all aspects of vocabularies that are required to properly use them.
@@ -16,6 +19,7 @@ curl -s --location "http://BASE_PART/API_ENDPOINT" --header 'Content-Type: appli
 
 If you receive any errors, the error information is returned as complex JSON objects.
 You can pipe the result into `jq` to extract the relevant error message as follows:
+
 ```bash
 curl_call  | jq ".message"
 ```
@@ -23,6 +27,7 @@ curl_call  | jq ".message"
 If the call is successful, you will receive the API element as a response.
 Most vocabulary elements reference each other via ID.
 To get the generated ID for an inserted element, you can also use `jq`:
+
 ```bash
 curl_call | jq ".id"
 ```
@@ -43,6 +48,7 @@ Each language consists of the following information:
 - A language `abbreviation`.
 
 You can create languages with calls to the `languages` API endpoint:
+
 ```json
 {
     "abbreviation": "eng",
@@ -63,6 +69,7 @@ A field type consists of the following information:
 You can create types by sending API requests to the `types` API endpoint, with the following `DATA` examples.
 
 A normal field type that can contain any kind of data could be specified like this:
+
 ```json
 {
     "name": "Anything"
@@ -70,6 +77,7 @@ A normal field type that can contain any kind of data could be specified like th
 ```
 
 A numerical type that can hold values from `1` to `5` (e. g. a product rating) can be defined like this:
+
 ```json
 {
     "name": "Rating",
@@ -80,14 +88,16 @@ A numerical type that can hold values from `1` to `5` (e. g. a product rating) c
 ```
 
 You can achieve the exactly same type by solving this by a regular expression validation:
+
 ```json
-{                                                                                                                                                    
+{                        
     "name": "Rating",
     "validation": "[1-5]"
 }
 ```
 
 If you missed to save the IDs, you can call the following command to retrieve all existing field types with their IDs:
+
 ```bash
 curl -s --location "http://BASE_PART/types" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
@@ -107,11 +117,13 @@ Let's first discuss the last two pieces before diving into the field definitions
 Normally, vocabularies contain just a potentially long list of vocabulary records.
 It is possible, however, to structure vocabulary records hierarchically (e. g. you want to have an entry representing a "Material" with a child element "Iron").
 If you want to enable this hierarchy feature, set it to:
+
 ```json
 "hierarchicalRecords": true
 ```
 
 If you want to restrict your vocabulary to only allow a single root element (mostly useful in hierarchical vocabularies because you would otherwise allow only one single entry at all), set it to:
+
 ```json
 "singleRootElement": false
 ```
@@ -157,6 +169,7 @@ The birthday of an artist, however, should not be `multiValued`.
 If you want to store multiple languages in the vocabulary, i. e. translations to the stored values, you can define `translationDefinitions`.
 If you don't provide this attribute, the field is treated as a non-translatable value (e. g. a number or a date).
 If you want to provide translations, you need to provide translation definitions of the following form:
+
 ```json
 {
   "language": "eng",
@@ -176,6 +189,7 @@ In this case, because English is the fallback language, the English value will b
 
 **Example**
 Let's give an example of a whole vocabulary schema definition:
+
 ```json
 {
     "definitions": [
@@ -264,6 +278,7 @@ If you set this vocabulary schema as the vocabularies metadata schema, the metad
 
 **Example**
 Let's create a movie database with the previously created vocabulary schema with ID `1`:
+
 ```json
 {
     "schemaId": 1,

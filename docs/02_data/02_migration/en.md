@@ -1,6 +1,14 @@
-# Vocabulary migration
+---
+title: Vocabulary migration
+published: true
+---
 This documentation will guide you through the process of migrating existing vocabulary data to the new vocabulary server.
-You can check if there are any existing vocabularies with: `mysql goobi -e "select * from vocabulary;"`.
+You can check if there are any existing vocabularies with:
+
+```bash
+mysql goobi -e "select * from vocabulary;"`
+```
+
 If the output lists some vocabularies, you need to perform a migration in order to keep these vocabularies.
 
 For all of the following instructions, the vocabulary server needs to be running.
@@ -18,22 +26,26 @@ pip install requests mysql-connector-python==8.4.0 alive_progress lxml
 ## Perform vocabulary data migration
 Download and extract the [Vocabulary Migration Tool](https://jenkins.intranda.com/job/intranda/job/vocabulary-server/job/develop/lastSuccessfulBuild/artifact/migration/*zip*/migration.zip).
 
-**Hint** Before performing any of the following steps, please first read this documentation completely.
+:::info
+Before performing any of the following steps, please first read this documentation completely.
 There is no easy "only perform these steps" solution for every case, depending on the previous data and types of vocabularies, other steps may be required.
+:::
 
-During data migration, the Migration Tool generates new field types on-the-fly (please check out [the guide on how to create new data manually](../docs/creation.md) if you don't know what field types are or how vocabularies work in general).
+During data migration, the Migration Tool generates new field types on-the-fly (please check out [the guide on how to create new data manually](/en/other/vocabulary/data/creation/) if you don't know what field types are or how vocabularies work in general).
 Each existing vocabulary schema that contains fields with selectable values will be migrated to a new type containing these selectable values.
 If you want to avoid re-creating these field types for every vocabulary or if you want to create more complex types beforehand that should be used in the migrated data, you can manually create those field types beforehand (right now) and pass this information to the migration script.
 By specifying the `--lookup-file-directory` parameter, you can instruct the migration script to map existing selectable values to the given field types instead of generating new ones on-the-fly.
 We will give detailed instructions on how to do this later on.
 
 If you don't want to create any field types, you can start the data migration with the following command:
+
 ```bash
 python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-server-port 8081 --goobi-database-host localhost --goobi-database-port 3306 --goobi-database-name goobi --goobi-database-user goobi --goobi-database-password goobi --continue-on-error --fallback-language eng
 ```
 
 ### Script 
 The above two points, the virtual Python environment and the migration of the vocabulary data in a typical installation, as root:
+
 ```bash
 cd /opt/digiverso/vocabulary/migration
 python3 -m venv vmenv
@@ -70,6 +82,7 @@ This information is mandatory to update vocabulary record references in metadata
 
 **Example**
 Let's give an example of a possible migration issue (extracted from the `migration_issues.log` file):
+
 ```json
         ---------------------------------------------------------------------------------
 29293
@@ -84,6 +97,7 @@ Validation error
 Field values(s) "Geonames" are not one of the allowed selectable values for field "authority" [100775]: geonames,viaf
 ---------------------------------------------------------------------------------
 ```
+
 This issue is indicating, that one of the vocabulary records fields contains the value `Geonames`.
 During the migration, this field has been configured (based on existing data) with a new type, that has the following selectable values `geonames` and `viaf`.
 As you can see, the present value is written with a capital `G` but only the lower-case version of `geonames` is one of the selectable values.
@@ -117,24 +131,29 @@ In this example, the created type has the ID `21`.
 Let's now create the three required files for this example:
 
 The `type_definition_lookup.csv` looks like this:
+
 ```csv
 values,type_id
 on|off,21
 ```
+
 This file maps all selectable values in the original field definition to the new type ID.
 
 The `reference_type_lookup.csv` looks like this:
+
 ```csv
 values,vocabulary_id
 red|blue,2
 rot|blau,2
 ```
+
 This file maps all selectable values (in all languages, one language per line) to the ID of the vocabulary that contains the records.
 Please pay attention to always define one language per line.
 The reason for this is, that different languages were existing as multiple field definitions beforehand and the migration processing requires this kind of separation.
 The value for the `values` columns needs to match the `selection` column in the `vocabulary_structure` table of the existing database. 
 
 The `reference_value_lookup.csv` looks like this:
+
 ```csv
 value,record_id
 red,122
@@ -142,14 +161,19 @@ rot,122
 blue,123
 blau,123
 ```
+
 This file maps all record values to the corresponding record IDs in the reference vocabulary.
 
 ## Mets file migration
-**Caution** Please create a backup beforehand. In some cases the mets files are inconsistent, i. e. the stored values and vocabulary references do not match. The migration script uses the vocabulary references to find the correct values. If the vocabulary references were wrong and the values correct, the migration will corrupt the data!
+
+:::warning
+Please create a backup beforehand. In some cases the mets files are inconsistent, i. e. the stored values and vocabulary references do not match. The migration script uses the vocabulary references to find the correct values. If the vocabulary references were wrong and the values correct, the migration will corrupt the data!
+:::
 
 This step can only be done after the vocabulary data migration has been successfully completed!
 
 With the `migration.csv` file present, run the following command in the activated Python environment:
+
 ```bash
 . vmenv/bin/activate
 python metadata-migrator.py -m migration.csv -d /opt/digiverso/goobi/metadata
@@ -168,7 +192,9 @@ When the data migration is done successfully, and you are sure you will never ne
 - `vocabulary_record_data`
 - `vocabulary_structure`
 
-**Caution** The data cleanup cannot be reverted. 
+:::warning
+The data cleanup cannot be reverted. 
 If you are not sure, don't perform the cleanup steps. 
 The old vocabulary data doesn't affect newer versions of Goobi workflow. 
 We suggest keeping this data for some time in case anything unexpected happens.
+:::

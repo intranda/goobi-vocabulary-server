@@ -1,4 +1,7 @@
-# Anleitung zur Erstellung von Vokabularen
+---
+title: Anleitung zur Erstellung von Vokabularen
+published: true
+---
 Vokabulare sind ein sehr leistungsfähiges Instrument zur Speicherung beliebiger strukturierter Daten.
 Daher ist der Prozess der Erstellung von Vokabularen nicht trivial.
 In dieser Dokumentation werden wir alle Aspekte von Vokabularen abdecken, die für deren korrekte Verwendung erforderlich sind.
@@ -16,6 +19,7 @@ curl -s --location "http://BASE_PART/API_ENDPOINT" --header "Authorization: Bear
 
 Wenn Sie Fehler erhalten, werden die Fehlerinformationen als komplexe JSON-Objekte zurückgegeben.
 Sie können das Ergebnis in `jq` einspeisen, um die entsprechende Fehlermeldung wie folgt zu extrahieren:
+
 ```bash
 curl_call | jq ".message"
 ```
@@ -23,6 +27,7 @@ curl_call | jq ".message"
 Wenn der Aufruf erfolgreich ist, erhalten Sie das API-Element als Antwort.
 Die meisten Vokabularelemente referenzieren sich gegenseitig über ihre ID.
 Um die generierte ID für ein eingefügtes Element zu erhalten, können Sie auch hier `jq` verwenden:
+
 ```bash
 curl_call | jq ".id"
 ```
@@ -43,6 +48,7 @@ Jede Sprache besteht aus den folgenden Informationen:
 - Eine Sprachabkürzung (`abbreviation`)
 
 Sie können Sprachen mit API-Aufrufen an den  `languages` API Endpunkt erstellen:
+
 ```json
 {
     "abbreviation": "eng",
@@ -63,6 +69,7 @@ Ein Feldtyp besteht aus den folgenden Informationen:
 Sie können Feldtypen erstellen, indem Sie API-Aufgrufe an den API-Endpunkt `types` mit den folgenden Beispielen senden.
 
 Ein normaler Feldtyp, der jede Art von Daten enthalten kann, könnte wie folgt angegeben werden:
+
 ```json
 {
     "name": "Irgendetwas"
@@ -70,6 +77,7 @@ Ein normaler Feldtyp, der jede Art von Daten enthalten kann, könnte wie folgt a
 ```
 
 Ein numerischer Feldtyp, der Werte von `1` bis `5` enthalten kann (z. B. eine Produktbewertung), kann wie folgt definiert werden:
+
 ```json
 {
     "name": "Bewertung",
@@ -80,14 +88,16 @@ Ein numerischer Feldtyp, der Werte von `1` bis `5` enthalten kann (z. B. eine Pr
 ```
 
 Sie können genau den gleichen Feldtypen auch erreichen, indem Sie dies durch eine Validierung mit einem regulären Ausdruck lösen:
+
 ```json
-{                                                                                                                                                    
+{
     "name": "Bewertung",
     "validation": "[1-5]"
 }
 ```
 
 Wenn Sie es versäumt haben, die IDs zu speichern, können Sie den folgenden Befehl aufrufen, um alle vorhandenen Feldtypen mit ihren IDs abzurufen:
+
 ```bash
 curl -s --location "http://BASE_PART/types" --header "Authorization: Bearer TOKEN" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
@@ -107,11 +117,13 @@ Lassen Sie uns zunächst die letzten beiden Teile besprechen, bevor wir uns mit 
 Normalerweise enthalten Vokabulare nur eine potenziell lange Liste von Vokabulardatensätzen.
 Es ist jedoch möglich, Vokabulardatensätze hierarchisch zu strukturieren (z. B. ein Datensatz "Material" mit einem untergeordneten Element "Eisen").
 Wenn Sie diese Hierarchiefunktion aktivieren wollen, aktivieren Sie diese Option mit:
+
 ```json
 "hierarchicalRecords": true
 ```
 
 Wenn Sie Ihr Vokabular so einschränken wollen, dass nur ein einziges Wurzelelement zulässig ist (dies ist vor allem bei hierarchischen Vokabularen nützlich, da Sie sonst nur einen einzigen Eintrag zulassen würden), aktivieren Sie diese Option mit:
+
 ```json
 "singleRootElement": false
 ```
@@ -157,6 +169,7 @@ Der Geburtstag eines Künstlers sollte jedoch nicht mehrwertig sein.
 Wenn Sie mehrere Sprachen im Vokabular speichern wollen, d. h. Übersetzungen zu den gespeicherten Werten, können Sie Übersetzungsdefinitionen (`translationDefinitions`) definieren.
 Wenn Sie dieses Attribut nicht angeben, wird das Feld als nicht übersetzbarer Wert behandelt (z. B. eine Zahl oder ein Datum).
 Wenn Sie Übersetzungen anbieten wollen, müssen Sie Übersetzungsdefinitionen der folgenden Form bereitstellen:
+
 ```json
 {
   "language": "eng",
@@ -175,6 +188,7 @@ Ist in einem Vokabulardatensatz nur die englische Übersetzung angegeben, und di
 
 **Beispiel**
 Geben wir ein Beispiel für eine vollständige Vokabularschema-Definition:
+
 ```json
 {
     "definitions": [
@@ -263,6 +277,7 @@ Wenn Sie dieses Vokabularschema als Metadatenschema für Vokabulare festlegen, k
 
 **Beispiel**
 Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit der ID `1` erstellen:
+
 ```json
 {
     "schemaId": 1,

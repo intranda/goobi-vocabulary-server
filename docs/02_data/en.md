@@ -1,0 +1,4 @@
+---
+title: Vocabularies
+published: true
+---
