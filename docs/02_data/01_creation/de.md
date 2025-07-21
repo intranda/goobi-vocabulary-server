@@ -35,11 +35,11 @@ curl_call | jq ".id"
 ## Überblick
 Wir möchten mit einer vereinfachten Übersicht beginnen, um Ihnen den Einstieg zu erleichtern.
 
-*Vokabulare* sind lediglich eine Sammlung von Dateneinträgen, sogenannten *Vokabulardatensätzen*.
-Alle Vokabulardatensätze in einem Vokabular entsprechen demselben *Vokabularschema*, das Teil des Vokabulars ist.
-Ein Vokabularschema legt die möglichen *Felder* fest, die ein Vokabulardatensatz enthalten kann.
+`Vokabulare` sind lediglich eine Sammlung von Dateneinträgen, sogenannten `Vokabulardatensätzen`.
+Alle Vokabulardatensätze in einem Vokabular entsprechen demselben `Vokabularschema`, das Teil des Vokabulars ist.
+Ein Vokabularschema legt die möglichen `Felder` fest, die ein Vokabulardatensatz enthalten kann.
 Die Felder eines Vokabeldatensatzes können einen oder mehrere Werte haben, möglicherweise mit mehreren Übersetzungen.
-Auf der untersten Ebene stellen diese übersetzbaren Werte Daten bestimmter *Feldtypen* dar.
+Auf der untersten Ebene stellen diese übersetzbaren Werte Daten bestimmter `Feldtypen` dar.
 
 ## Sprachen
 Wenn Sie in Ihrem Vokabular mit Sprachen und übersetzbaren Werten arbeiten wollen, müssen Sie diese Sprachen zunächst definieren.
@@ -102,7 +102,9 @@ Wenn Sie es versäumt haben, die IDs zu speichern, können Sie den folgenden Bef
 curl -s --location "http://BASE_PART/types" --header "Authorization: Bearer TOKEN" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
 
-*Bitte beachten Sie den fehlenden `--data` Parameter in diesem Aufruf.*
+:::info
+Bitte beachten Sie den fehlenden `--data` Parameter in diesem Aufruf.
+:::
 
 ## Vokabularschemata
 Ein Vokabularschema definiert die Struktur eines Vokabulars, d. h. alle verfügbaren Felder, die jeder Vokabulardatensatz enthalten kann.
@@ -115,7 +117,7 @@ Sie können Vokabularschemata mit Aufrufen an den API-Endpunkt `Schemas` erstell
 
 Lassen Sie uns zunächst die letzten beiden Teile besprechen, bevor wir uns mit den Felddefinitionen befassen.
 Normalerweise enthalten Vokabulare nur eine potenziell lange Liste von Vokabulardatensätzen.
-Es ist jedoch möglich, Vokabulardatensätze hierarchisch zu strukturieren (z. B. ein Datensatz "Material" mit einem untergeordneten Element "Eisen").
+Es ist jedoch möglich, Vokabulardatensätze hierarchisch zu strukturieren (z. B. ein Datensatz `Material` mit einem untergeordneten Element `Eisen`).
 Wenn Sie diese Hierarchiefunktion aktivieren wollen, aktivieren Sie diese Option mit:
 
 ```json
@@ -182,11 +184,11 @@ Genau eine der Sprachübersetzungen muss als Standardsprache (`fallback`) gesetz
 Die Standardsprache muss immer verpflichtend (`required`) sein.
 Jede nicht-verpflichtende Sprache kann leer gelassen werden, wenn später Werte angegeben werden
 
-**Beispiel**
+### Beispiel
 Ein Feld ist so definiert, dass es in Englisch (`eng`) und Deutsch (`ger`) übersetzbar ist, wobei Englisch die verpflichtende Standardsprache und Deutsch die optionale Zweitsprache ist.
 Ist in einem Vokabulardatensatz nur die englische Übersetzung angegeben, und dieser Vokabulardatensatz wird später auf Deutsch angefordert, wird in diesem Fall die englische Übersetzung zurückgegeben, weil Englisch die Standardsprache ist.
 
-**Beispiel**
+### Beispiel
 Geben wir ein Beispiel für eine vollständige Vokabularschema-Definition:
 
 ```json
@@ -232,24 +234,24 @@ Geben wir ein Beispiel für eine vollständige Vokabularschema-Definition:
 }
 ```
 
-Dieses Vokabularschema besteht aus den drei Feldern "Name", "Beschreibung" und "Bewertung".
+Dieses Vokabularschema besteht aus den drei Feldern `Name`, `Beschreibung` und `Bewertung`.
 Es kann verwendet werden, um Filme, Artikel in einem Geschäft oder Lieblingsspielzeug zu beschreiben.
-Das Feld "Name" ist als erforderlicher Haupteintrag festgelegt.
+Das Feld `Name` ist als erforderlicher Haupteintrag festgelegt.
 Seine Feldtypen-ID `1` sollte dem Feldtypen "Irgendetwas" entsprechen, den wir zuvor erstellt haben.
-Das Feld "Beschreibung" sollte eine längere Beschreibung des Eintrags enthalten.
+Das Feld `Beschreibung` sollte eine längere Beschreibung des Eintrags enthalten.
 Es hat eine obligatorische englische Übersetzung und eine weitere optionale deutsche Übersetzung.
 Seine Feldtypen-ID `2` könnte einem Feldtypen entsprechen, der als "große Daten" eingestellt ist.
-Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen "Bewertung" entsprechen, den wir zuvor erstellt haben.
+Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen `Bewertung` entsprechen, den wir zuvor erstellt haben.
 Dieses Vokabularschema ist nicht hierarchisch und kann eine beliebige Anzahl von Datensätzen enthalten.
 
-Im [Beispielskript zur Einrichtung des Vokabulars] (../../install/demo.sh) finden Sie einige komplexere Beispiele.
+Im [Beispielskript zur Einrichtung des Vokabulars](../../install/demo.sh) finden Sie einige komplexere Beispiele.
 Für diese Beispiele müssen einige Feldtypen vorhanden sein. Sie können diese Standardfeldtypen mit einem anderen [bereitgestellten Skript](../../install/default_setup.sh) installieren.
 
 Nachdem die Vokabularschemata erstellt wurden, können wir nun die Vokabulare erstellen.
 
 ## Vokabulare
 Um Vokabulare zu erstellen, müssen Sie zunächst deren Vokabularschemata erstellen.
-Vokabularschemata können von beliebig vielen Vokabularen wiederverwendet werden (z. B. können Sie das Vokabularschema aus dem vorherigen Abschnitt für die beiden Vokabulare "Filme" und "Amazon Wunschliste" verwenden).
+Vokabularschemata können von beliebig vielen Vokabularen wiederverwendet werden (z. B. können Sie das Vokabularschema aus dem vorherigen Abschnitt für die beiden Vokabulare `Filme` und `Amazon Wunschliste` verwenden).
 
 Jedes Vokabular besteht aus den folgenden Informationen:
 - Einem eindeutigen Namen (`name`).
@@ -265,17 +267,17 @@ Die Vokabularschema-ID muss auf ein bestehendes Vokabularschema verweisen.
 Alle Vokabulardatensätze in diesem Vokabular müssen mit dem Vokabularschema mit der ID `schemaID` übereinstimmen.
 
 Wenn Sie zusätzliche Metadaten im Vokabular speichern möchten, die nicht mit einem Vokabulardatensatz verknüpft sind, können Sie mit dem Attribut `metadataSchemaId` ein Metadatenschema angeben.
-Sie könnten zum Beispiel ein zusätzliches Schema für die Felder "Erstellungsdatum" und "Autoren" erstellen, um diese zusätzlichen Informationen neben dem Vokabular zu speichern.
+Sie könnten zum Beispiel ein zusätzliches Schema für die Felder `Erstellungsdatum` und `Autoren` erstellen, um diese zusätzlichen Informationen neben dem Vokabular zu speichern.
 Dieses Metadatenschema wird wie jedes andere Schema erstellt.
 Um dieses Schema als Metadatenschema in einem Vokabular verwenden zu können, muss das Vokabularschema nicht-hierarchisch und auf ein einziges Wurzelelement beschränkt sein.
 Dies ist erforderlich, weil es nur einen Eintrag von Metadaten pro Vokabular geben kann.
 Das bedeutet jedoch nicht, dass die Felder des Metadatenschemas nicht mehrwertig sein können!
 
-**Beispiel**
-Nehmen wir an, Sie haben ein Metadatenschema mit dem einwertigen Feld "Erstellungsdatum" und dem mehrwertigen Feld "Autoren" erstellt.
+### Beispiel
+Nehmen wir an, Sie haben ein Metadatenschema mit dem einwertigen Feld `Erstellungsdatum` und dem mehrwertigen Feld `Autoren` erstellt.
 Wenn Sie dieses Vokabularschema als Metadatenschema für Vokabulare festlegen, können die Metadaten ein Erstellungsdatum und beliebig viele Autoren enthalten.
 
-**Beispiel**
+### Beispiel
 Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit der ID `1` erstellen:
 
 ```json
@@ -289,7 +291,7 @@ Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit d
 Nachdem Sie alle Vokabulare angelegt haben, können Sie Goobi Workflow mit dem Vokabularserver verbinden und in Goobi selbst Vokabulardatensätze anlegen oder bearbeiten.
 Außerdem können Sie Vokabulardatensätze aus verschiedenen Formaten importieren und exportieren.
 
-**RDF**
+### RDF
 Der Vokabularverwaltungsserver unterstützt auch spezielle Typen für RDF-konforme Daten.
 Damit dies funktioniert, müssen Sie RDF-kompatible Typen erstellen und ein Schema anlegen, das nur aus diesen Typen besteht.
 Das resultierende Vokabular kann dann zusätzlich in RDF-Formate wie RDF/XML oder Turtle exportierbar werden.

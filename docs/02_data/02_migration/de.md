@@ -81,7 +81,7 @@ Diese Datei enthält alle Informationen über die migrierten Datensätze mit ihr
 Diese Informationen werden benötigt, um später die Verweise auf die Vokabulardatensätze in den Metadaten-Dateien zu aktualisieren.
 - Sie sollten versuchen, die Migration am Ende ohne den Parameter `--continue-on-error` durchzuführen. Wenn dies funktioniert, dann wissen Sie dass alles problemslos migriert werden konnte.
 
-**Beispiel**
+### Beispiel
 Anhand des folgenden Beispiels möchten wir ein mögliches Migrationsproblem betrachten (aus der Datei `migration_issues.log`):
 
 ```json

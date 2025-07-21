@@ -80,7 +80,7 @@ This file contains all information about the migrated data with their old and ne
 This information is mandatory to update vocabulary record references in metadata files later on.
 - You should try to run the migration without the `--continue-on-error` parameter in the end. If it works, the data is migrated without any issues.
 
-**Example**
+### Example
 Let's give an example of a possible migration issue (extracted from the `migration_issues.log` file):
 
 ```json

@@ -35,11 +35,11 @@ curl_call | jq ".id"
 ## Overview
 We would like to start with a simplified overview to get you started.
 
-*Vocabularies* are just a collection of data entries, so-called *vocabulary records*.
-All vocabulary records in a vocabulary conform to the same *vocabulary schema*, which is part of the vocabulary.
-A vocabulary schema specifies the possible *fields* a vocabulary record can have.
+`Vocabularies` are just a collection of data entries, so-called `vocabulary records`.
+All vocabulary records in a vocabulary conform to the same `vocabulary schema`, which is part of the vocabulary.
+A vocabulary schema specifies the possible `fields` a vocabulary record can have.
 The fields of a vocabulary record can have one or many values, possibly with multiple translations.
-At the lowest end, these translatable values represent data of some *field types*.
+At the lowest end, these translatable values represent data of some `field types`.
 
 ## Languages
 If you want to work with languages and translatable values in your vocabulary, you need to define these languages first.
@@ -102,7 +102,9 @@ If you missed to save the IDs, you can call the following command to retrieve al
 curl -s --location "http://BASE_PART/types" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
 
-*Note the missing `--data` parameter here.*
+:::info
+Note the missing `--data` parameter here.*
+:::
 
 ## Vocabulary Schemas
 A vocabulary schema defines the structure of a vocabulary, i. e. all available fields each vocabulary record can have.
@@ -115,7 +117,7 @@ You can create vocabulary schemas with calls to the `schemas` API endpoint.
 
 Let's first discuss the last two pieces before diving into the field definitions.
 Normally, vocabularies contain just a potentially long list of vocabulary records.
-It is possible, however, to structure vocabulary records hierarchically (e. g. you want to have an entry representing a "Material" with a child element "Iron").
+It is possible, however, to structure vocabulary records hierarchically (e. g. you want to have an entry representing a `Material` with a child element `Iron`).
 If you want to enable this hierarchy feature, set it to:
 
 ```json
@@ -182,12 +184,12 @@ Exactly one of the language translations needs to be set to `fallback`.
 The fallback language needs to be set `required`.
 Every non-required language can be left empty when providing values later on.
 
-**Example**
+### Example
 A field is defined to be translatable into `eng` and `ger` with `eng` being the required fallback and `ger` being optional.
 In a vocabulary record, only the English translation is given and this vocabulary record is later requested in German.
 In this case, because English is the fallback language, the English value will be returned.
 
-**Example**
+### Example
 Let's give an example of a whole vocabulary schema definition:
 
 ```json
@@ -233,14 +235,14 @@ Let's give an example of a whole vocabulary schema definition:
 }
 ```
 
-This vocabulary schema consists of three fields "Name", "Description", "Rating".
+This vocabulary schema consists of three fields `Name`, `Description`, `Rating`.
 It can be used to describe movies, articles in a shop or favorite toys.
-The "Name" field is set to be the required main entry.
+The `Name` field is set to be the required main entry.
 Its type ID `1` should correspond to the "Anything" type we created earlier.
-The "Description" field should contain a longer description of the entry.
+The `Description` field should contain a longer description of the entry.
 It has a required English translation and an additional optional German translation.
 Its type ID `2` could correspond to a field type that is set to `large`.
-The "Rating" field should contain a numeric rating value and correspond to the "Rating" type we have created earlier.
+The `Rating` field should contain a numeric rating value and correspond to the "Rating" type we have created earlier.
 This vocabulary schema is not hierarchical and can contain any number of records.
 
 Please check out the [example vocabulary setup script](../../install/demo.sh) to see some more complex examples.
@@ -250,7 +252,7 @@ With vocabulary schemas created, we can finally create vocabularies.
 
 ## Vocabularies
 In order to create vocabularies, you first need to create its vocabulary schemas.
-Vocabulary schemas can be reused by as many vocabularies as you wish (e. g. you can use the vocabulary schema from the previous section for the two vocabularies "Movies" and "Amazon Wishlish").
+Vocabulary schemas can be reused by as many vocabularies as you wish (e. g. you can use the vocabulary schema from the previous section for the two vocabularies `Movies` and `Amazon Wishlish`).
 
 Each vocabulary consists of the following information:
 - A unique `name`.
@@ -266,17 +268,17 @@ The `schemaId` must reference an existing vocabulary schema, its purpose should 
 All vocabulary records in this vocabulary must conform to the vocabulary schema with ID `schemaID`.
 
 If you want to store additional metadata in the vocabulary that is not related to any vocabulary record, you can specify a metadata schema with the `metadataSchemaId` attribute.
-You could for example create an additional schema for the fields "Creation Date" and "Authors" to store these additional information alongside the vocabulary.
+You could for example create an additional schema for the fields `Creation Date` and `Authors` to store these additional information alongside the vocabulary.
 This metadata schema is created like any other schema.
 In order to use this schema as a metadata schema in a vocabulary, the vocabulary schema must be non-hierarchical and restricted to a single root element.
 This is required, because there can be only one entry of metadata per vocabulary.
 This doesn't mean, however, that the fields of the metadata schema can't be multi-valued!
 
-**Example**
-Consider the case that you created a metadata schema with the single-valued field "Creation Date" and the multi-valued field "Authors".
+### Example
+Consider the case that you created a metadata schema with the single-valued field `Creation Date` and the multi-valued field `Authors`.
 If you set this vocabulary schema as the vocabularies metadata schema, the metadata can hold one creation date and arbitrary many authors.
 
-**Example**
+### Example
 Let's create a movie database with the previously created vocabulary schema with ID `1`:
 
 ```json
@@ -290,7 +292,7 @@ Let's create a movie database with the previously created vocabulary schema with
 After you have created all vocabularies, you can connect Goobi workflow to the vocabulary server and start creating or editing vocabulary records in Goobi itself.
 You can also import and export vocabulary records from and into various formats.
 
-**RDF**
+### RDF
 The vocabulary management server also supports special types for RDF compliant data.
 For this to work, you need to have RDF compatible types created and create a schema that only consists of these types.
 The resulting vocabulary will additionally be exportable into RDF formats like RDF/XML or Turtle.
