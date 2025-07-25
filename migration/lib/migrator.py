@@ -42,8 +42,9 @@ class Migrator:
                 successful += 1
             except Exception as e:
                 if self.ctx.continue_on_error:
-                    logging.error(e)
+                    logging.warning(f'Error migrating schema:\n\t{s.__str__()}')
                 else:
+                    logging.error(f'Error migrating schema:\n\t{s.__str__()}')
                     raise e
         logging.info(f'{successful} of {len(self.schemas)} schemas successfully migrated')
 
@@ -58,8 +59,9 @@ class Migrator:
                 successful += 1
             except Exception as e:
                 if self.ctx.continue_on_error:
-                    logging.error(e)
+                    logging.warning(f'Error migrating vocabulary:\n\t{v.__str__()}')
                 else:
+                    logging.error(f'Error migrating vocabulary:\n\t{v.__str__()}')
                     raise e
         logging.info(f'{successful} of {len(self.vocabularies)} vocabularies successfully migrated')
 
@@ -187,6 +189,7 @@ def migrate_record(record_id, data, vocabulary, ctx):
         if ctx.continue_on_error:
             logging.warning(f'Error migrating record:\n\t{r.__str__()}')
         else:
+            logging.error(f'Error migrating record:\n\t{r.__str__()}')
             raise e
 
 def parse_fields(raw_fields, definitions, ctx):

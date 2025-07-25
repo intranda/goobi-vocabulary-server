@@ -1,4 +1,7 @@
-# Anleitung zur Erstellung von Vokabularen
+---
+title: Anleitung zur Erstellung von Vokabularen
+published: true
+---
 Vokabulare sind ein sehr leistungsfähiges Instrument zur Speicherung beliebiger strukturierter Daten.
 Daher ist der Prozess der Erstellung von Vokabularen nicht trivial.
 In dieser Dokumentation werden wir alle Aspekte von Vokabularen abdecken, die für deren korrekte Verwendung erforderlich sind.
@@ -16,6 +19,7 @@ curl -s --location "http://BASE_PART/API_ENDPOINT" --header "Authorization: Bear
 
 Wenn Sie Fehler erhalten, werden die Fehlerinformationen als komplexe JSON-Objekte zurückgegeben.
 Sie können das Ergebnis in `jq` einspeisen, um die entsprechende Fehlermeldung wie folgt zu extrahieren:
+
 ```bash
 curl_call | jq ".message"
 ```
@@ -23,6 +27,7 @@ curl_call | jq ".message"
 Wenn der Aufruf erfolgreich ist, erhalten Sie das API-Element als Antwort.
 Die meisten Vokabularelemente referenzieren sich gegenseitig über ihre ID.
 Um die generierte ID für ein eingefügtes Element zu erhalten, können Sie auch hier `jq` verwenden:
+
 ```bash
 curl_call | jq ".id"
 ```
@@ -30,11 +35,11 @@ curl_call | jq ".id"
 ## Überblick
 Wir möchten mit einer vereinfachten Übersicht beginnen, um Ihnen den Einstieg zu erleichtern.
 
-*Vokabulare* sind lediglich eine Sammlung von Dateneinträgen, sogenannten *Vokabulardatensätzen*.
-Alle Vokabulardatensätze in einem Vokabular entsprechen demselben *Vokabularschema*, das Teil des Vokabulars ist.
-Ein Vokabularschema legt die möglichen *Felder* fest, die ein Vokabulardatensatz enthalten kann.
+`Vokabulare` sind lediglich eine Sammlung von Dateneinträgen, sogenannten `Vokabulardatensätzen`.
+Alle Vokabulardatensätze in einem Vokabular entsprechen demselben `Vokabularschema`, das Teil des Vokabulars ist.
+Ein Vokabularschema legt die möglichen `Felder` fest, die ein Vokabulardatensatz enthalten kann.
 Die Felder eines Vokabeldatensatzes können einen oder mehrere Werte haben, möglicherweise mit mehreren Übersetzungen.
-Auf der untersten Ebene stellen diese übersetzbaren Werte Daten bestimmter *Feldtypen* dar.
+Auf der untersten Ebene stellen diese übersetzbaren Werte Daten bestimmter `Feldtypen` dar.
 
 ## Sprachen
 Wenn Sie in Ihrem Vokabular mit Sprachen und übersetzbaren Werten arbeiten wollen, müssen Sie diese Sprachen zunächst definieren.
@@ -43,6 +48,7 @@ Jede Sprache besteht aus den folgenden Informationen:
 - Eine Sprachabkürzung (`abbreviation`)
 
 Sie können Sprachen mit API-Aufrufen an den  `languages` API Endpunkt erstellen:
+
 ```json
 {
     "abbreviation": "eng",
@@ -63,6 +69,7 @@ Ein Feldtyp besteht aus den folgenden Informationen:
 Sie können Feldtypen erstellen, indem Sie API-Aufgrufe an den API-Endpunkt `types` mit den folgenden Beispielen senden.
 
 Ein normaler Feldtyp, der jede Art von Daten enthalten kann, könnte wie folgt angegeben werden:
+
 ```json
 {
     "name": "Irgendetwas"
@@ -70,6 +77,7 @@ Ein normaler Feldtyp, der jede Art von Daten enthalten kann, könnte wie folgt a
 ```
 
 Ein numerischer Feldtyp, der Werte von `1` bis `5` enthalten kann (z. B. eine Produktbewertung), kann wie folgt definiert werden:
+
 ```json
 {
     "name": "Bewertung",
@@ -80,19 +88,23 @@ Ein numerischer Feldtyp, der Werte von `1` bis `5` enthalten kann (z. B. eine Pr
 ```
 
 Sie können genau den gleichen Feldtypen auch erreichen, indem Sie dies durch eine Validierung mit einem regulären Ausdruck lösen:
+
 ```json
-{                                                                                                                                                    
+{
     "name": "Bewertung",
     "validation": "[1-5]"
 }
 ```
 
 Wenn Sie es versäumt haben, die IDs zu speichern, können Sie den folgenden Befehl aufrufen, um alle vorhandenen Feldtypen mit ihren IDs abzurufen:
+
 ```bash
 curl -s --location "http://BASE_PART/types" --header "Authorization: Bearer TOKEN" --header 'Content-Type: application/json' | jq '._embedded .fieldTypeList .[] | "\(.id) \(.name)"'
 ```
 
-*Bitte beachten Sie den fehlenden `--data` Parameter in diesem Aufruf.*
+:::info
+Bitte beachten Sie den fehlenden `--data` Parameter in diesem Aufruf.
+:::
 
 ## Vokabularschemata
 Ein Vokabularschema definiert die Struktur eines Vokabulars, d. h. alle verfügbaren Felder, die jeder Vokabulardatensatz enthalten kann.
@@ -105,13 +117,15 @@ Sie können Vokabularschemata mit Aufrufen an den API-Endpunkt `Schemas` erstell
 
 Lassen Sie uns zunächst die letzten beiden Teile besprechen, bevor wir uns mit den Felddefinitionen befassen.
 Normalerweise enthalten Vokabulare nur eine potenziell lange Liste von Vokabulardatensätzen.
-Es ist jedoch möglich, Vokabulardatensätze hierarchisch zu strukturieren (z. B. ein Datensatz "Material" mit einem untergeordneten Element "Eisen").
+Es ist jedoch möglich, Vokabulardatensätze hierarchisch zu strukturieren (z. B. ein Datensatz `Material` mit einem untergeordneten Element `Eisen`).
 Wenn Sie diese Hierarchiefunktion aktivieren wollen, aktivieren Sie diese Option mit:
+
 ```json
 "hierarchicalRecords": true
 ```
 
 Wenn Sie Ihr Vokabular so einschränken wollen, dass nur ein einziges Wurzelelement zulässig ist (dies ist vor allem bei hierarchischen Vokabularen nützlich, da Sie sonst nur einen einzigen Eintrag zulassen würden), aktivieren Sie diese Option mit:
+
 ```json
 "singleRootElement": false
 ```
@@ -157,6 +171,7 @@ Der Geburtstag eines Künstlers sollte jedoch nicht mehrwertig sein.
 Wenn Sie mehrere Sprachen im Vokabular speichern wollen, d. h. Übersetzungen zu den gespeicherten Werten, können Sie Übersetzungsdefinitionen (`translationDefinitions`) definieren.
 Wenn Sie dieses Attribut nicht angeben, wird das Feld als nicht übersetzbarer Wert behandelt (z. B. eine Zahl oder ein Datum).
 Wenn Sie Übersetzungen anbieten wollen, müssen Sie Übersetzungsdefinitionen der folgenden Form bereitstellen:
+
 ```json
 {
   "language": "eng",
@@ -169,12 +184,13 @@ Genau eine der Sprachübersetzungen muss als Standardsprache (`fallback`) gesetz
 Die Standardsprache muss immer verpflichtend (`required`) sein.
 Jede nicht-verpflichtende Sprache kann leer gelassen werden, wenn später Werte angegeben werden
 
-**Beispiel**
+### Beispiel
 Ein Feld ist so definiert, dass es in Englisch (`eng`) und Deutsch (`ger`) übersetzbar ist, wobei Englisch die verpflichtende Standardsprache und Deutsch die optionale Zweitsprache ist.
 Ist in einem Vokabulardatensatz nur die englische Übersetzung angegeben, und dieser Vokabulardatensatz wird später auf Deutsch angefordert, wird in diesem Fall die englische Übersetzung zurückgegeben, weil Englisch die Standardsprache ist.
 
-**Beispiel**
+### Beispiel
 Geben wir ein Beispiel für eine vollständige Vokabularschema-Definition:
+
 ```json
 {
     "definitions": [
@@ -218,24 +234,23 @@ Geben wir ein Beispiel für eine vollständige Vokabularschema-Definition:
 }
 ```
 
-Dieses Vokabularschema besteht aus den drei Feldern "Name", "Beschreibung" und "Bewertung".
+Dieses Vokabularschema besteht aus den drei Feldern `Name`, `Beschreibung` und `Bewertung`.
 Es kann verwendet werden, um Filme, Artikel in einem Geschäft oder Lieblingsspielzeug zu beschreiben.
-Das Feld "Name" ist als erforderlicher Haupteintrag festgelegt.
+Das Feld `Name` ist als erforderlicher Haupteintrag festgelegt.
 Seine Feldtypen-ID `1` sollte dem Feldtypen "Irgendetwas" entsprechen, den wir zuvor erstellt haben.
-Das Feld "Beschreibung" sollte eine längere Beschreibung des Eintrags enthalten.
+Das Feld `Beschreibung` sollte eine längere Beschreibung des Eintrags enthalten.
 Es hat eine obligatorische englische Übersetzung und eine weitere optionale deutsche Übersetzung.
 Seine Feldtypen-ID `2` könnte einem Feldtypen entsprechen, der als "große Daten" eingestellt ist.
-Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen "Bewertung" entsprechen, den wir zuvor erstellt haben.
+Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen `Bewertung` entsprechen, den wir zuvor erstellt haben.
 Dieses Vokabularschema ist nicht hierarchisch und kann eine beliebige Anzahl von Datensätzen enthalten.
 
-Im [Beispielskript zur Einrichtung des Vokabulars] (../../install/demo.sh) finden Sie einige komplexere Beispiele.
-Für diese Beispiele müssen einige Feldtypen vorhanden sein. Sie können diese Standardfeldtypen mit einem anderen [bereitgestellten Skript](../../install/default_setup.sh) installieren.
+Im beliegenden [Initialisierungsscript](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) sind einige [Beispiele](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples) mit komplexeren Anwendungsfällen enthalten. Die Schritte innerhalb eines Beispiels bauen aufeinander auf und erfordern die Ausführung mit dem Initialisierungsscript, damit die IDs korrekt aufgelöst werden.
 
 Nachdem die Vokabularschemata erstellt wurden, können wir nun die Vokabulare erstellen.
 
 ## Vokabulare
 Um Vokabulare zu erstellen, müssen Sie zunächst deren Vokabularschemata erstellen.
-Vokabularschemata können von beliebig vielen Vokabularen wiederverwendet werden (z. B. können Sie das Vokabularschema aus dem vorherigen Abschnitt für die beiden Vokabulare "Filme" und "Amazon Wunschliste" verwenden).
+Vokabularschemata können von beliebig vielen Vokabularen wiederverwendet werden (z. B. können Sie das Vokabularschema aus dem vorherigen Abschnitt für die beiden Vokabulare `Filme` und `Amazon Wunschliste` verwenden).
 
 Jedes Vokabular besteht aus den folgenden Informationen:
 - Einem eindeutigen Namen (`name`).
@@ -251,18 +266,19 @@ Die Vokabularschema-ID muss auf ein bestehendes Vokabularschema verweisen.
 Alle Vokabulardatensätze in diesem Vokabular müssen mit dem Vokabularschema mit der ID `schemaID` übereinstimmen.
 
 Wenn Sie zusätzliche Metadaten im Vokabular speichern möchten, die nicht mit einem Vokabulardatensatz verknüpft sind, können Sie mit dem Attribut `metadataSchemaId` ein Metadatenschema angeben.
-Sie könnten zum Beispiel ein zusätzliches Schema für die Felder "Erstellungsdatum" und "Autoren" erstellen, um diese zusätzlichen Informationen neben dem Vokabular zu speichern.
+Sie könnten zum Beispiel ein zusätzliches Schema für die Felder `Erstellungsdatum` und `Autoren` erstellen, um diese zusätzlichen Informationen neben dem Vokabular zu speichern.
 Dieses Metadatenschema wird wie jedes andere Schema erstellt.
 Um dieses Schema als Metadatenschema in einem Vokabular verwenden zu können, muss das Vokabularschema nicht-hierarchisch und auf ein einziges Wurzelelement beschränkt sein.
 Dies ist erforderlich, weil es nur einen Eintrag von Metadaten pro Vokabular geben kann.
 Das bedeutet jedoch nicht, dass die Felder des Metadatenschemas nicht mehrwertig sein können!
 
-**Beispiel**
-Nehmen wir an, Sie haben ein Metadatenschema mit dem einwertigen Feld "Erstellungsdatum" und dem mehrwertigen Feld "Autoren" erstellt.
+### Beispiel
+Nehmen wir an, Sie haben ein Metadatenschema mit dem einwertigen Feld `Erstellungsdatum` und dem mehrwertigen Feld `Autoren` erstellt.
 Wenn Sie dieses Vokabularschema als Metadatenschema für Vokabulare festlegen, können die Metadaten ein Erstellungsdatum und beliebig viele Autoren enthalten.
 
-**Beispiel**
+### Beispiel
 Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit der ID `1` erstellen:
+
 ```json
 {
     "schemaId": 1,
@@ -274,9 +290,9 @@ Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit d
 Nachdem Sie alle Vokabulare angelegt haben, können Sie Goobi Workflow mit dem Vokabularserver verbinden und in Goobi selbst Vokabulardatensätze anlegen oder bearbeiten.
 Außerdem können Sie Vokabulardatensätze aus verschiedenen Formaten importieren und exportieren.
 
-**RDF**
+### RDF
 Der Vokabularverwaltungsserver unterstützt auch spezielle Typen für RDF-konforme Daten.
 Damit dies funktioniert, müssen Sie RDF-kompatible Typen erstellen und ein Schema anlegen, das nur aus diesen Typen besteht.
 Das resultierende Vokabular kann dann zusätzlich in RDF-Formate wie RDF/XML oder Turtle exportierbar werden.
 
-Wenn Sie das [initiale Feldtypenscript](../../install/default_setup.sh) und das [Demovokabularscript](../../install/demo.sh) verwendet haben, steht Ihnen ein Beispiel für ein solches RDF-Vokabular zur Verfügung.
+Im [SKOS Beispiel](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples/skos) des Initialisierungsscripts steht Ihnen ein Beispiel für ein solches RDF-Vokabular zur Verfügung.

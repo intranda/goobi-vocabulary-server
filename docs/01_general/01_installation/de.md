@@ -1,4 +1,7 @@
-# Einrichtung
+---
+title: Installationseinleitung
+published: true
+---
 Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung des Vokabularservers.
 
 ## Download und Installation
@@ -25,6 +28,7 @@ Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung 
 - Falls nicht bereits geschehen, starten Sie den Vokabularserver.
 - Entpacken Sie das Archiv.
 - Passen Sie die Variablen `HOST`, `PORT` und `TOKEN` an Ihre Konfiguration an und starten Sie das Script wie folgt:
+
 ```bash
 HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 ```
@@ -33,6 +37,7 @@ HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
 
 Für die obigen drei Punkte, unter Ubuntu:
+
 ```bash
 export VOC_PORT=8081
 export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
@@ -119,10 +124,13 @@ curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Beare
 ## Installationstest
 - Ändern Sie für alle Befehle Host und Port entsprechend.
 - Prüfen Sie nach der Ersteinrichtung, ob die Feldtypen erfolgreich erstellt wurden:
+
 ```bash
 curl "http://localhost:${VOC_PORT:-8081}/api/v1/types" --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
+
 - Das Ergebnis sollte wie folgt aussehen:
+
 ```bash
 Any Text
 Anything

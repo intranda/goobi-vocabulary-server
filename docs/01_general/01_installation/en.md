@@ -1,4 +1,7 @@
-# Setup
+---
+title: Installation instructions
+published: true
+---
 This documentation describes the process of bootstrapping the vocabulary server.
 
 ## Download and Installation
@@ -27,6 +30,7 @@ This documentation describes the process of bootstrapping the vocabulary server.
 - If you have not already done so, start the vocabulary server.
 - Unpack the archive.
 - Adapt the variables `HOST`, `PORT` and `TOKEN` to your configuration and start the script as follows:
+
 ```bash
 HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 ```
@@ -35,6 +39,7 @@ HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 The vocabulary server requires Java 17, the systemd service assumes that Java 17 is the system default.
 
 For the above three points, under Ubuntu:
+
 ```bash
 export VOC_PORT=8081
 export VOC_TOKEN=$(</dev/urandom tr -dc '[:alnum:]' | head -c17)
@@ -115,17 +120,19 @@ HOST=localhost PORT=${VOC_PORT} TOKEN=${VOC_TOKEN} ${VOC_PATH}/vocabulary-init-s
 curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
 
-## Accessibility
+## Access
 - You can make the vocabulary server accessible from outside by connecting a proxy with access control in front of it.
 
 ## Installation test
 - Change the host and port accordingly for all commands.
 - After the initial setup, check whether the field types have been created successfully:
+
 ```bash
 curl ‘http://localhost:${VOC_PORT:-8081}/api/v1/types’ --header ‘Authorisation: Bearer $VOC_TOKEN’ | jq -r ‘._embedded.fieldTypeList[] .name’
 ```
 
 - The result should look like this:
+
 ```bash
 Any Text
 Anything
