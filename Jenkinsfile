@@ -158,9 +158,6 @@ pipeline {
               echo "${projectversion}"
               git tag -a "v${projectversion}" -m "releasing v${projectversion}" && git push origin v"${projectversion}"
           '''
-          script {
-            latestTag = sh(returnStdout: true, script:'git describe --tags --abbrev=0').trim()
-          }
         }
       }
     }
@@ -205,8 +202,9 @@ pipeline {
 
             # Tag logic
             TAGS=""
-            if [ ! -z "$latestTag" ]; then
-              TAGS="$TAGS -t $GHCR_IMAGE_BASE:$latestTag -t $DOCKERHUB_IMAGE_BASE:$latestTag -t $NEXUS_IMAGE_BASE:$latestTag"
+            GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ ! -z "$GIT_TAG" ]; then
+              TAGS="$TAGS -t $GHCR_IMAGE_BASE:$GIT_TAG -t $DOCKERHUB_IMAGE_BASE:$GIT_TAG -t $NEXUS_IMAGE_BASE:$GIT_TAG"
             fi
             if [ "$GIT_BRANCH" = "origin/master" ] || [ "$GIT_BRANCH" = "master" ]; then
               TAGS="$TAGS -t $GHCR_IMAGE_BASE:latest -t $DOCKERHUB_IMAGE_BASE:latest -t $NEXUS_IMAGE_BASE:latest"
