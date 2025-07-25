@@ -199,11 +199,6 @@ pipeline {
             echo "$DOCKERHUB_PASS" | docker login docker.io -u "$DOCKERHUB_USER" --password-stdin
             echo "$NEXUS_PASS" | docker login nexus.intranda.com:4443 -u "$NEXUS_USER" --password-stdin
 
-            # Setup QEMU and Buildx
-            docker run --privileged --rm tonistiigi/binfmt --install all || true
-            docker buildx create --name multiarch-builder --use || docker buildx use multiarch-builder
-            docker buildx inspect --bootstrap
-
             # Tag logic
             TAGS=""
             if [ ! -z "$latestTag" ]; then
@@ -222,8 +217,7 @@ pipeline {
             fi
 
             # Build and push to all registries
-            docker buildx build --build-arg build=false \
-              --no-cache --build-arg CONFIG_BRANCH=$CONFIG_BRANCH_NAME \
+            docker buildx build \
               --platform linux/amd64,linux/arm64/v8,linux/ppc64le,linux/riscv64,linux/s390x \
               $TAGS \
               --push .
