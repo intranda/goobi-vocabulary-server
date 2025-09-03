@@ -114,7 +114,7 @@ wget https://github.com/intranda/goobi-vocabulary-server/releases/latest/downloa
 sudo unzip /tmp/vocabulary-init-script.zip -d "${VOC_PATH}"
 HOST=localhost PORT=${VOC_PORT} TOKEN=${VOC_TOKEN} ${VOC_PATH}/vocabulary-init-script/install.sh minimal
 
-## test
+# test
 curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Bearer $VOC_TOKEN" | jq -r '._embedded.fieldTypeList[] .name'
 ```
 

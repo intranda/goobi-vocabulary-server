@@ -1,0 +1,29 @@
+{
+    "definitions": [
+        {
+            "name": "Name",
+            "typeId": {{types_Anything}},
+            "required": true,
+            "unique": true,
+            "mainEntry": true,
+            "titleField": false
+        },
+        {
+            "name": "Label",
+            "typeId": {{types_Anything}},
+            "required": true,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": true
+        },
+        {
+            "name": "Description",
+            "typeId": {{types_Large_Text}},
+            "required": false,
+            "unique": false,
+            "mainEntry": false,
+            "titleField": false,
+            "multiValued": false
+        }
+    ]
+}
