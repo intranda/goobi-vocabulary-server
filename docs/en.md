@@ -3,6 +3,8 @@ title: Vocabulary Server
 published: true
 sidemenu: true
 description: Documentation for the installation and use of the vocabulary server for connection to Goobi
+keywords:
+    - Vocabulary Server
 ---
 
 ## About this manual

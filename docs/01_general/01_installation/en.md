@@ -1,6 +1,8 @@
 ---
 title: Installation instructions
 published: true
+keywords:
+    - Vocabulary Server
 ---
 This documentation describes the process of bootstrapping the vocabulary server.
 

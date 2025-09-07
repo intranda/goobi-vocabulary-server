@@ -1,6 +1,8 @@
 ---
 title: Vocabulary Creation Guide
 published: true
+keywords:
+    - Vocabulary Server
 ---
 Vocabularies are a very powerful tool to store arbitrary structured data.
 Therefore, the process of creating vocabularies isn't trivial.

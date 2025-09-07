@@ -1,6 +1,8 @@
 ---
 title: Vocabulary migration
 published: true
+keywords:
+    - Vocabulary Server
 ---
 This documentation will guide you through the process of migrating existing vocabulary data to the new vocabulary server.
 You can check if there are any existing vocabularies with:

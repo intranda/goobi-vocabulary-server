@@ -1,6 +1,8 @@
 ---
 title: Migration von Vokabularen
 published: true
+keywords:
+    - Vokabularserver
 ---
 Diese Dokumentation führt Sie durch den Prozess der Migration bestehender Vokabulardaten auf den neuen Vokabularserver.
 So können Sie überprüfen, ob bereits Vokabulare vorhanden sind: 

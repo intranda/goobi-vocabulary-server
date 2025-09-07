@@ -1,6 +1,8 @@
 ---
 title: Snippets
 published: true
+keywords:
+    - Vocabulary Server
 ---
 Below are some snippets that illustrate how the vocabulary server can be put into operation using the example of a Goobi-to-go instance:
 

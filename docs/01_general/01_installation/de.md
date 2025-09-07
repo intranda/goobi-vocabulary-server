@@ -1,6 +1,8 @@
 ---
 title: Installationseinleitung
 published: true
+keywords:
+    - Vokabularserver
 ---
 Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung des Vokabularservers.
 

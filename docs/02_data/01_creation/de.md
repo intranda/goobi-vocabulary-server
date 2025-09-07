@@ -1,6 +1,8 @@
 ---
 title: Anleitung zur Erstellung von Vokabularen
 published: true
+keywords:
+    - Vokabularserver
 ---
 Vokabulare sind ein sehr leistungsfähiges Instrument zur Speicherung beliebiger strukturierter Daten.
 Daher ist der Prozess der Erstellung von Vokabularen nicht trivial.

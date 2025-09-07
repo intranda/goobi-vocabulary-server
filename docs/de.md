@@ -3,6 +3,8 @@ title: Vokabularserver
 published: true
 sidemenu: true
 description: Dokumentation für die Installation und Nutzung des Vokabularserver zur Anbindung an Goobi
+keywords:
+    - Vokabularserver
 ---
 
 ## Über dieses Handbuch
