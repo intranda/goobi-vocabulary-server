@@ -38,3 +38,5 @@ build/
 /migration/vmenv
 /migration/migration.csv
 __pycache__/
+.DS_Store
+docs/.DS_Store
