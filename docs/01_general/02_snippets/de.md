@@ -39,3 +39,9 @@ HOST=localhost PORT=8081 TOKEN=secret vocabulary-init-script/install.sh books
 ```bash
 HOST=localhost PORT=8081 TOKEN=secret vocabulary-init-script/install.sh collections
 ```
+
+## Beispiel für das Anlegen von hierarchischen Vokabularen für Sammlungen
+
+```bash
+HOST=localhost PORT=8081 TOKEN=secret vocabulary-init-script/install.sh hierarchical_collections
+```

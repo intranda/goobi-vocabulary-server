@@ -1,4 +1,8 @@
-ID,Name,Label,Description
-,biology,Biologie,Biologische Sammlung
-,chemistry,Chemie,Chemische Sammlung
-,physics, Physik,Physikalische Sammlung
+ID,Parent-ID,Name,Label,Description
+1,,biology,Biologie,Biologische Sammlung
+2,,chemistry,Chemie,Chemische Sammlung
+3,,physics,Physik,Physikalische Sammlung
+4,1,animals,Tiere,Tiere in der biologischen Sammlung
+5,1,plants,Pflanzen,Pflanzen in der biologischen Sammlung
+6,5,plants#big,Große Pflanzen,Große Pflanzen in der biologischen Sammlung
+7,5,plants#small,Kleine Pflanzen,Kleine Pflanzen in der biologischen Sammlung
