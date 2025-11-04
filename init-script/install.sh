@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 MY_PATH="$(dirname -- "${BASH_SOURCE[0]}")"
 SAMPLES_DIR=$MY_PATH/samples
+VERBOSE=${VERBOSE:-0}
 
 # Check for parameters
 FAIL=0
@@ -104,6 +105,9 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
                 done
             fi
 
+            if [[ "$VERBOSE" == 1 ]]; then
+                echo -e "curl --location \"$HOST:$PORT/api/v1/$ENDPOINT\" --header 'Content-Type: application/json' --header \"Authorization: Bearer $TOKEN\" --fail --data \"$JSON\""
+            fi
             RESULT=$(curl_call $ENDPOINT "$JSON")
         
             if [ -z "$RESULT" ]; then
@@ -132,6 +136,9 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
         fi
 
         if [ ! -z "$VOCABULARY_ID" ]; then
+            if [[ "$VERBOSE" == 1 ]]; then
+                echo -e "curl --location \"$HOST:$PORT/api/v1/vocabularies/$VOCABULARY_ID/import/csv\" --header \"Authorization: Bearer $TOKEN\" --fail --form \"file=@\\\"$SAMPLE_PATH/$INSTALL_DIR/$ITEM\\\"\""
+            fi
             curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/csv" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
             echo -e "\tImported \"$VOCABULARY_NAME\" vocabulary records"
         else
@@ -148,6 +155,9 @@ for INSTALL_DIR in $(ls $SAMPLE_PATH); do
         fi
         
         if [ ! -z "$VOCABULARY_ID" ]; then
+            if [[ "$VERBOSE" == 1 ]]; then
+                echo -e "curl --location \"$HOST:$PORT/api/v1/vocabularies/$VOCABULARY_ID/import/excel\" --header \"Authorization: Bearer $TOKEN\" --fail --form \"file=@\\\"$SAMPLE_PATH/$INSTALL_DIR/$ITEM\\\"\""
+            fi
             curl_file_upload_call "vocabularies/$VOCABULARY_ID/import/excel" "$SAMPLE_PATH/$INSTALL_DIR/$ITEM"
             echo -e "\tImported \"$VOCABULARY_NAME\" vocabulary records"
         else
