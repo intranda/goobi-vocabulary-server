@@ -80,6 +80,7 @@ cat << EOF | sudo tee /etc/systemd/system/vocabulary.service
 Description=Goobi Vocabulary Server
 After=mysql.service remote-fs.target
 Requires=mysql.service remote-fs.target
+PartOf=mysql.service remote-fs.target
 
 [Service]
 WorkingDirectory=${VOC_PATH}
