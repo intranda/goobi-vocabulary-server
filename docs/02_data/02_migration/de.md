@@ -68,7 +68,7 @@ curl -s http://localhost:8081/api/v1/vocabularies --header "Authorization: Beare
 - Der Vokabulardatensatz enthält Daten, die mit einigen Typbeschränkungen nicht kompatibel sind.
 - Andere, hier nicht genannte Gründe.
 - Nachdem die Datenmigration abgeschlossen ist, überprüfen Sie die Datei `migration_issues.log` auf alle fehlgeschlagenen Datensatzmigrationen:
-    - Führen Sie `cat migration_issues.log | grep "Error validating Record" | wc -l` aus, um die Anzahl der fehlgeschlagenen Datensatzmigrationen zu ermitteln.
+    - Führen Sie `cat migration_issues.log | grep "Error validating Record" -i | wc -l` aus, um die Anzahl der fehlgeschlagenen Datensatzmigrationen zu ermitteln.
     - Wenn der Datensatz keine nützlichen Daten enthält (leerer Datensatz, defekte Daten), ignorieren Sie das Problem.
     - Wenn der Datensatz gültige Informationen enthält, prüfen Sie den Grund für die fehlgeschlagene Datenmigration und versuchen Sie, ihn in der ursprünglichen `goobi`-Datenbank zu beheben (für einen erneuten Import) oder fügen Sie den neuen Datensatz später manuell hinzu.
     - Wenn der Datensatz gültige Informationen enthält und Sie nicht in der Lage sind, ihn so zu ändern, dass er funktioniert, wenden Sie sich an den Support.

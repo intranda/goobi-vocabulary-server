@@ -67,7 +67,7 @@ curl -s http://localhost:8081/api/v1/vocabularies --header "Authorization: Beare
 - The vocabulary record contains data that is incompatible with some type restrictions.
 - Something unexpected.
 - After the migration is done, check the file `migration_issues.log` for all unsuccessful record migrations:
-    - Run `cat migration_issues.log | grep "Error validating Record" | wc -l` to get the number of unsuccessful record migrations.
+    - Run `cat migration_issues.log | grep "Error validating Record" -i | wc -l` to get the number of unsuccessful record migrations.
     - If the record doesn't contain useful data (empty record, broken data), ignore the issue.
     - If the record contains valid information, check the reason of the failed data migration and try to fix it in the original `goobi` database (for a re-import) or add the new record manually later.
     - If the record contains valid information and you are not able to change it to work, contact the support.
