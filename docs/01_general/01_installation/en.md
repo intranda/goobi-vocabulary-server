@@ -131,7 +131,7 @@ curl -s http://localhost:${VOC_PORT}/api/v1/types --header "Authorization: Beare
 - After the initial setup, check whether the field types have been created successfully:
 
 ```bash
-curl ‘http://localhost:${VOC_PORT:-8081}/api/v1/types’ --header ‘Authorisation: Bearer $VOC_TOKEN’ | jq -r ‘._embedded.fieldTypeList[] .name’
+curl ‘http://localhost:${VOC_PORT:-8081}/api/v1/types’ --header ‘Authorization: Bearer $VOC_TOKEN’ | jq -r ‘._embedded.fieldTypeList[] .name’
 ```
 
 - The result should look like this:

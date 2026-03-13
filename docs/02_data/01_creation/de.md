@@ -68,7 +68,7 @@ Ein Feldtyp besteht aus den folgenden Informationen:
 - Einem Schalter um anzugeben, dass es sich um "große" Daten handelt (`large`).
 - Einer optionalen Menge von eingeschränkten, auswählbaren Werten (`selectableValues`).
 
-Sie können Feldtypen erstellen, indem Sie API-Aufgrufe an den API-Endpunkt `types` mit den folgenden Beispielen senden.
+Sie können Feldtypen erstellen, indem Sie API-Aufrufe an den API-Endpunkt `types` mit den folgenden Beispielen senden.
 
 Ein normaler Feldtyp, der jede Art von Daten enthalten kann, könnte wie folgt angegeben werden:
 
@@ -138,7 +138,7 @@ Konzentrieren wir uns nun auf die Felddefinitionen.
 Jede Felddefinition besteht aus den folgenden Informationen:
 - Ein eindeutiger Name unter allen anderen Definitionen (`name`).
 - Entweder eine Feldtypen-ID (`typeId`), die auf einen vorhandenen Feldtyp verweist (siehe vorheriger Abschnitt) oder eine Vokabular-ID (`referenceVocabularyId`), die auf ein vorhandenes Vokabular verweist.
-- Ein Schalter, um das Feld als Pflichtfeld zu kennzeichnen (`requried`).
+- Ein Schalter, um das Feld als Pflichtfeld zu kennzeichnen (`required`).
 - Ein Schalter, der den Feldwert für alle Vokabulardatensätze im Vokabular als eindeutig festlegt (`unique`).
 - Ein Schalter, der das Feld als "Haupteintrag" des Vokabulardatensatzes markiert (`mainEntry`).
 - Ein Schalter, mit dem das Feld als Titelfeld des Vokabulardatensatzes festgelegt wird (`titleField`).
@@ -184,7 +184,7 @@ Wenn Sie Übersetzungen anbieten wollen, müssen Sie Übersetzungsdefinitionen d
 
 Genau eine der Sprachübersetzungen muss als Standardsprache (`fallback`) gesetzt werden.
 Die Standardsprache muss immer verpflichtend (`required`) sein.
-Jede nicht-verpflichtende Sprache kann leer gelassen werden, wenn später Werte angegeben werden
+Jede nicht-verpflichtende Sprache kann leer gelassen werden, wenn später Werte angegeben werden.
 
 ### Beispiel
 Ein Feld ist so definiert, dass es in Englisch (`eng`) und Deutsch (`ger`) übersetzbar ist, wobei Englisch die verpflichtende Standardsprache und Deutsch die optionale Zweitsprache ist.
@@ -246,7 +246,7 @@ Seine Feldtypen-ID `2` könnte einem Feldtypen entsprechen, der als "große Date
 Das Feld "Bewertung" sollte einen numerischen Bewertungswert enthalten und dem Feldtypen `Bewertung` entsprechen, den wir zuvor erstellt haben.
 Dieses Vokabularschema ist nicht hierarchisch und kann eine beliebige Anzahl von Datensätzen enthalten.
 
-Im beliegenden [Initialisierungsscript](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) sind einige [Beispiele](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples) mit komplexeren Anwendungsfällen enthalten. Die Schritte innerhalb eines Beispiels bauen aufeinander auf und erfordern die Ausführung mit dem Initialisierungsscript, damit die IDs korrekt aufgelöst werden.
+Im beiliegenden [Initialisierungsscript](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/vocabulary-init-script.zip) sind einige [Beispiele](https://github.com/intranda/goobi-vocabulary-server/tree/develop/init-script/samples) mit komplexeren Anwendungsfällen enthalten. Die Schritte innerhalb eines Beispiels bauen aufeinander auf und erfordern die Ausführung mit dem Initialisierungsscript, damit die IDs korrekt aufgelöst werden.
 
 Nachdem die Vokabularschemata erstellt wurden, können wir nun die Vokabulare erstellen.
 
@@ -285,7 +285,7 @@ Lassen Sie uns eine Filmdatenbank mit dem zuvor erstellten Vokabularschema mit d
 {
     "schemaId": 1,
     "name": "MovieDB",
-    "description": "Persönliche Filmdatenbank".
+    "description": "Persönliche Filmdatenbank."
 }
 ```
 

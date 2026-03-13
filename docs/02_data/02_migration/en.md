@@ -8,7 +8,7 @@ This documentation will guide you through the process of migrating existing voca
 You can check if there are any existing vocabularies with:
 
 ```bash
-mysql goobi -e "select * from vocabulary;"`
+mysql goobi -e "select * from vocabulary;"
 ```
 
 If the output lists some vocabularies, you need to perform a migration in order to keep these vocabularies.

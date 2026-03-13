@@ -4,7 +4,7 @@ published: true
 keywords:
     - Vokabularserver
 ---
-Im Folgenden sind einige Snippets aufgeführt, die die Inbetriebnahme des Vokabularservers konkret am Beispiel eine Goobi-to-go-Instanz aufzeigen:
+Im Folgenden sind einige Snippets aufgeführt, die die Inbetriebnahme des Vokabularservers konkret am Beispiel einer Goobi-to-go-Instanz aufzeigen:
 
 ## Test auf Inhalte im Vokabularserver
 

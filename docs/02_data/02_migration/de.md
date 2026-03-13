@@ -47,7 +47,7 @@ python vocabulary-migrator.py --vocabulary-server-host localhost --vocabulary-se
 ```
 
 ### Skript
-Die obigen beiden Puntke, die virtuelle Python-Umgebung und die Migration der Vokabulardaten in einer typischen Installation, als root:
+Die obigen beiden Punkte, die virtuelle Python-Umgebung und die Migration der Vokabulardaten in einer typischen Installation, als root:
 
 ```bash
 cd /opt/digiverso/vocabulary/migration
@@ -120,7 +120,7 @@ Um die folgende Konfiguration besser zu verstehen, geben wir ein Beispiel.
 Stellen Sie sich vor, Sie haben derzeit ein Vokabular mit einem Feld mit den folgenden auswählbaren Werten: `red`, `blue`.
 Datensätze können jeden dieser beiden Werte enthalten.
 Die Unterstützung mehrerer Sprachen wird derzeit erreicht, indem eine neue Felddefinition mit einem anderen Sprachwert erstellt wird und die gleiche Anzahl von auswählbaren Werten, diesmal in der anderen Sprache, bereitgestellt wird: `rot`, `blau` (auf Deutsch).
-In der neuen Vokabularverwaltung können Sie diese Farbangaben in ein neues Vokabular verschieben und alle Datensätze, die Farbwerte enthalten, durch Verweise auf dieses Vokabular ersetzen.Das macht es viel einfacher, Farben hinzuzufügen und ihre Übersetzungen im Auge zu behalten.
+In der neuen Vokabularverwaltung können Sie diese Farbangaben in ein neues Vokabular verschieben und alle Datensätze, die Farbwerte enthalten, durch Verweise auf dieses Vokabular ersetzen. Das macht es viel einfacher, Farben hinzuzufügen und ihre Übersetzungen im Auge zu behalten.
 Damit dies funktioniert, müssen wir zunächst ein neues Vokabular `Farben` erstellen und zwei Datensätze für eine rote und eine blaue Farbe hinzufügen. In diesem Beispiel hat das Vokabular die ID `2`. Beide Datensätze enthalten sowohl englische als auch deutsche Übersetzungen.
 In diesem Beispiel hat der Datensatz für die rote Farbe die ID `122` und der für die blaue Farbe die ID `123`.
 

@@ -7,20 +7,20 @@ keywords:
 Diese Dokumentation beschreibt den Prozess der Installation und Ersteinrichtung des Vokabularservers.
 
 ## Download und Installation
-- Laden Sie die [Neuste Version](https://github.com/intranda/goobi-vocabulary-server/releases/latest) des Vokabularservers herunter.
+- Laden Sie die [Neueste Version](https://github.com/intranda/goobi-vocabulary-server/releases/latest) des Vokabularservers herunter.
 - Laden Sie die [Konfigurationsdatei](https://github.com/intranda/goobi-vocabulary-server/releases/latest/download/application.properties) des Vokabularservers herunter.
 - Passen Sie die Konfigurationsdatei entsprechend Ihrer Konfiguration an:
     - Datenbankanmeldeinformationen und Datenbankname.
     - Basis-URL und Port.
     - Sicherheitstoken (dieses muss identisch auch in Goobi konfiguriert werden).
-- Erstellen Sie ein Systemd-Service, um den Dienst automatisch zu starten.
+- Erstellen Sie einen Systemd-Service, um den Dienst automatisch zu starten.
 
 ## Einrichtung von Goobi Workflow zur Kommunikation mit dem Vokabularserver
 - Goobi Workflow verwendet seit Version `24.07` den neuen Vokabularserver.
 - Konfigurieren Sie die Variablen `vocabularyServerHost`, `vocabularyServerPort` und `vocabularyServerToken` in der Datei `goobi_config.properties` entsprechend der Konfiguration Ihres Vokabularservers.
 - Alternativ zu `vocabularyServerHost` und `vocabularyServerPort` kann auch die Variable `vocabularyServerAddress` gesetzt werden (beispielsweise `vocabularyServerAddress=https://external.address.com/vocabulary`). Diese Variable erlaubt auch eine SSL Verbindung.
 - Starten Sie Goobi Workflow neu, damit die Änderungen wirksam werden.
-- Navigieren Sie zu `Administration` > `Vocabulare`, um zu überprüfen, ob alles funktioniert. Sie sollten eine Liste von Vokabularen sehen, wenn alles in Ordnung ist (nicht jetzt, sondern nachdem Sie einige Vokabulare erstellt oder die bestehenden migriert haben). Wenn etwas nicht funktioniert, wird eine rote Fehlermeldung angezeigt.
+- Navigieren Sie zu `Administration` > `Vokabulare`, um zu überprüfen, ob alles funktioniert. Sie sollten eine Liste von Vokabularen sehen, wenn alles in Ordnung ist (nicht jetzt, sondern nachdem Sie einige Vokabulare erstellt oder die bestehenden migriert haben). Wenn etwas nicht funktioniert, wird eine rote Fehlermeldung angezeigt.
 
 ## Ersteinrichtung
 - Im Falle einer Datenmigration benötigt der Vokabularserver einige Ausgangsdaten.

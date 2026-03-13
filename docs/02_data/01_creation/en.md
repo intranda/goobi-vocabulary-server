@@ -105,7 +105,7 @@ curl -s --location "http://BASE_PART/types" --header 'Content-Type: application/
 ```
 
 :::info
-Note the missing `--data` parameter here.*
+Note the missing `--data` parameter here.
 :::
 
 ## Vocabulary Schemas
@@ -254,7 +254,7 @@ With vocabulary schemas created, we can finally create vocabularies.
 
 ## Vocabularies
 In order to create vocabularies, you first need to create its vocabulary schemas.
-Vocabulary schemas can be reused by as many vocabularies as you wish (e. g. you can use the vocabulary schema from the previous section for the two vocabularies `Movies` and `Amazon Wishlish`).
+Vocabulary schemas can be reused by as many vocabularies as you wish (e. g. you can use the vocabulary schema from the previous section for the two vocabularies `Movies` and `Amazon Wishlist`).
 
 Each vocabulary consists of the following information:
 - A unique `name`.
