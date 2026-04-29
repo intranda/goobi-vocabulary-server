@@ -104,11 +104,11 @@ public class VocabularyController {
 
     @GetMapping(
             value = "/vocabularies/{id}/export/json",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> exportAsJson(@PathVariable long id) {
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.APPLICATION_JSON)
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".json\"")
                 .body(IOUtils.toByteArray(jsonMapper.toJson(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
@@ -130,11 +130,11 @@ public class VocabularyController {
 
     @GetMapping(
             value = "/vocabularies/{id}/export/csv",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            produces = "text/csv"
     )
     public ResponseEntity<?> exportAsCsv(@PathVariable long id) {
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.parseMediaType("text/csv"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".csv\"")
                 .body(IOUtils.toByteArray(csvMapper.toCSV(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
@@ -158,36 +158,36 @@ public class VocabularyController {
 
     @GetMapping(
             value = "/vocabularies/{id}/export/excel",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
     public ResponseEntity<StreamingResponseBody> exportAsExcel(@PathVariable long id) {
         StreamingResponseBody responseBody = outputStream -> {
             excelMapper.toExcel(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)), outputStream);
         };
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".xlsx\"")
                 .body(responseBody);
     }
 
     @GetMapping(
             value = "/vocabularies/{id}/export/rdfxml",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            produces = "application/rdf+xml"
     )
     public @ResponseBody ResponseEntity<?> exportAsRdfXml(@PathVariable long id) {
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.parseMediaType("application/rdf+xml"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".rdf\"")
                 .body(IOUtils.toByteArray(rdfMapper.toRDFXML(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
 
     @GetMapping(
             value = "/vocabularies/{id}/export/turtle",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+            produces = "text/turtle"
     )
     public @ResponseBody ResponseEntity<?> exportAsRdfTurtle(@PathVariable long id) {
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.parseMediaType("text/turtle"))
                 .header("Content-disposition", "attachment; filename=\"vocabulary_" + id + ".ttl\"")
                 .body(IOUtils.toByteArray(rdfMapper.toRDFTurtle(vocabularyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Vocabulary.class, id)))));
     }
