@@ -5,15 +5,16 @@ import io.goobi.vocabulary.model.jpa.FieldTypeEntity;
 import io.goobi.vocabulary.model.jpa.SelectableValueEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class FieldTypeValidationTests {
     @InjectMocks
     private FieldTypeValidatorImpl validator;

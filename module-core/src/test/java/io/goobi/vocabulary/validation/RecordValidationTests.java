@@ -9,16 +9,17 @@ import io.goobi.vocabulary.model.jpa.VocabularyRecordEntity;
 import io.goobi.vocabulary.model.jpa.VocabularySchemaEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class RecordValidationTests {
     private static final Long FIELD_TYPE_TEXT_ID = 546L;
     private static final String FIELD_TYPE_TEXT_NAME = "Text";

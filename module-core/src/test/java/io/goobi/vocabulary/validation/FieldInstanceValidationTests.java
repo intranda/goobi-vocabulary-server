@@ -17,9 +17,10 @@ import io.goobi.vocabulary.repositories.FieldInstanceRepository;
 import io.goobi.vocabulary.repositories.VocabularyRecordRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
 import java.util.HashMap;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class FieldInstanceValidationTests {
     @Mock
     private FieldInstanceRepository fieldInstanceRepository;
@@ -222,7 +223,6 @@ class FieldInstanceValidationTests {
 
     @Test
     void duplicateUniqueFieldValueForAnotherFieldDefinition_success() throws VocabularyException {
-        when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 1L, record.getId(), "Bob")).thenReturn(true);
         when(fieldInstanceRepository.existsByVocabularyRecord_Vocabulary_IdAndDefinition_IdAndVocabularyRecord_IdNotAndFieldValues_Translations_Value(record.getVocabulary().getId(), 2L, record.getId(), "Bob")).thenReturn(false);
 
         FieldInstanceEntity fieldFriend = setupFieldInstance(
