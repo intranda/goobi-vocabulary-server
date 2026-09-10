@@ -36,7 +36,7 @@ HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 ```
 
 ## Installationsskript
-Der Vokabularserver benötigt Java 17, der Systemd-Service geht davon aus, dass Java 17 der System-Default ist.
+Der Vokabularserver benötigt Java 21, der Systemd-Service geht davon aus, dass Java 21 der System-Default ist.
 
 Für die obigen drei Punkte, unter Ubuntu:
 

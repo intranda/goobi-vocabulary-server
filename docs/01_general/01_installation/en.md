@@ -38,7 +38,7 @@ HOST=localhost PORT=8081 TOKEN=secret /path/to/the/script/install.sh minimal
 ```
 
 ## Installation script
-The vocabulary server requires Java 17, the systemd service assumes that Java 17 is the system default.
+The vocabulary server requires Java 21, the systemd service assumes that Java 21 is the system default.
 
 For the above three points, under Ubuntu:
 
