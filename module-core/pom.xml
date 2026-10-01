@@ -112,6 +112,12 @@
             <artifactId>poi-scratchpad</artifactId>
             <version>${poi.version}</version>
         </dependency>
+        <!-- CSV import and export -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.14.1</version>
+        </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
