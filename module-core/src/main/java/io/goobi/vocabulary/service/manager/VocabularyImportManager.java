@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.goobi.vocabulary.exception.VocabularyException.ErrorCode.RecordImport;
@@ -41,8 +42,9 @@ public class VocabularyImportManager {
         this.vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
 
-        manager.deleteAllRecords(vocabularyId);
         List<VocabularyRecord> insertionQueue = csvMapper.fromCSV(vocabulary, csv);
+        rejectRecordsOfOtherVocabularies(insertionQueue);
+        manager.deleteAllRecords(vocabularyId);
 
         performRecordImport(insertionQueue);
     }
@@ -53,6 +55,7 @@ public class VocabularyImportManager {
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
 
         List<VocabularyRecord> insertionQueue = csvMapper.fromCSV(vocabulary, csv);
+        rejectRecordsOfOtherVocabularies(insertionQueue);
 
         performRecordImport(insertionQueue);
     }
@@ -62,8 +65,9 @@ public class VocabularyImportManager {
         this.vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
 
-        manager.deleteAllRecords(vocabularyId);
         List<VocabularyRecord> insertionQueue = excelMapper.fromExcel(vocabulary, excel);
+        rejectRecordsOfOtherVocabularies(insertionQueue);
+        manager.deleteAllRecords(vocabularyId);
 
         performRecordImport(insertionQueue);
     }
@@ -74,8 +78,23 @@ public class VocabularyImportManager {
                 .orElseThrow(() -> new EntityNotFoundException(VocabularyEntity.class, vocabularyId));
 
         List<VocabularyRecord> insertionQueue = excelMapper.fromExcel(vocabulary, excel);
+        rejectRecordsOfOtherVocabularies(insertionQueue);
 
         performRecordImport(insertionQueue);
+    }
+
+    // An ID belonging to another vocabulary would otherwise make the import overwrite that record
+    private void rejectRecordsOfOtherVocabularies(List<VocabularyRecord> records) {
+        List<Long> foreignIds = records.stream()
+                .map(VocabularyRecord::getId)
+                .filter(Objects::nonNull)
+                .filter(id -> manager.existsInOtherVocabulary(id, vocabulary.getId()))
+                .toList();
+        if (!foreignIds.isEmpty()) {
+            throw new VocabularyException(RecordImport, null, Map.of(
+                    "recordIds", foreignIds.stream().map(String::valueOf).collect(Collectors.joining(", "))
+            ), (params) -> "Record ID(s) belong to another vocabulary: " + params.get("recordIds"));
+        }
     }
 
     private void performRecordImport(List<VocabularyRecord> insertionQueue) {

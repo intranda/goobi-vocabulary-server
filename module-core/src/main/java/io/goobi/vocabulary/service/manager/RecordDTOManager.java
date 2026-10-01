@@ -81,6 +81,10 @@ public class RecordDTOManager implements Manager<VocabularyRecord> {
         return vocabularyRecordRepository.existsById(id);
     }
 
+    public boolean existsInOtherVocabulary(long id, long vocabularyId) {
+        return vocabularyRecordRepository.existsByIdAndVocabulary_IdNot(id, vocabularyId);
+    }
+
     @Override
     public VocabularyRecord create(VocabularyRecord newRecord) throws VocabularyException {
         VocabularyRecordEntity jpaVocabularyRecord = modelMapper.toEntity(newRecord);
